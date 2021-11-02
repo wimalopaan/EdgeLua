@@ -10,7 +10,6 @@
 -- Please note that the above license also covers the transfer protocol used and the encoding scheme and 
 -- all further principals of tranferring state and other information.
 
-
 local Class = {};
 
 function Class.new(prototype)
@@ -100,37 +99,37 @@ local function rssiState(cfg, state)
 --    print("RSSIState:", state[1]);
     if (state[1] == 0) then -- safeMode
       if (getRSSI() > 10) then
-        print("smode A");
+--        print("smode A");
         state[1] = 1;
         state[2] = t;
       end 
     elseif (state[1] == 1) then -- wait rssi
       if (getRSSI() < 10) then
-        print("smode B");
+--        print("smode B");
         state[2] = t;
         state[1] = 0;
       end 
       if ((t - state[2]) > cfg[16]) then
         setSwitchOn(cfg[18]);
-        print("smode C");
+--        print("smode C");
         state[2] = t;
         state[1] = 2;
       end
     elseif (state[1] == 2) then -- normal
       if (getRSSI() < 10) then
-        print("smode D");
+--        print("smode D");
         state[2] = t;
         state[1] = 3;
       end 
     elseif (state[1] == 3) then -- wait normal
       if (getRSSI() > 10) then
-        print("smode E");
+--        print("smode E");
         state[2] = t;
         state[1] = 2;
       end 
       if ((t - state[2]) > cfg[17]) then
         setSwitchOff(cfg[18]);
-        print("smode F");
+--        print("smode F");
         state[2] = t;
         state[1] = 1;
       end
@@ -147,15 +146,15 @@ local function sbusConfigFSM(config, menu, headers, menuState, queue, state, enc
     if (state[2] == 0) then
       if (queue:size() > 0) then
         state[3] = queue:pop(); -- line
-        print("cFSM: ", state[2], state[3][1][1]);
+--        print("cFSM: ", state[2], state[3][1][1]);
         state[2] = 1;
         state[1] = t;
-        print("cFSM:", paramEncoder, config, config[10]);
+--        print("cFSM:", paramEncoder, config, config[10]);
         paramEncoder(config[10], 31, 31); -- bcast off (handles sbus correct)
-        print("x");
+--        print("x");
       end
     elseif (state[2] == 1) then -- broadcast off
-      print("cFSM: ", state[2]);
+--      print("cFSM: ", state[2]);
       if ((t - state[1]) > 50) then
         state[2] = 2;
         state[1] = t;
@@ -163,7 +162,7 @@ local function sbusConfigFSM(config, menu, headers, menuState, queue, state, enc
         encoder(config[10], item); -- set laston in module
       end
     elseif (state[2] == 2) then -- select item
-      print("cFSM: ", state[2]);
+--      print("cFSM: ", state[2]);
       if ((t - state[1]) > 50) then
         state[2] = 3;
         state[1] = t;
@@ -181,11 +180,11 @@ local function sbusConfigFSM(config, menu, headers, menuState, queue, state, enc
         local pageHeaders = headers[ menuState[3] ];
         local header = pageHeaders[itemLine + 2];
         local paramNumber = header[col][2];
-        print("cFSM: ", state[2], "P:", paramNumber, "V:", value, header);
+--        print("cFSM: ", state[2], "P:", paramNumber, "V:", value, header);
         paramEncoder(config[10], paramNumber, value);
       end
     elseif (state[2] == 4) then -- end
-      print("cFSM: ", state[2]);
+--      print("cFSM: ", state[2]);
       state[2] = 0;
       state[1] = t;
     end     

@@ -107,7 +107,7 @@ local function create(zone, options)
   queue = __libP.Class.Queue.new();
 
   collectgarbage();
-  print("gc6: ", collectgarbage("count"));
+--  print("gc6: ", collectgarbage("count"));
 
   return widget;
 end

@@ -122,7 +122,7 @@ local function init_telemetry()
   queue = __libP.Class.Queue.new();
 
   collectgarbage();
-  print("gc6: ", collectgarbage("count"));
+--  print("gc6: ", collectgarbage("count"));
 end
 
 local function background_telemetry()
