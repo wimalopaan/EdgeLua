@@ -22,6 +22,8 @@ local function compile(basedir)
     else
       lcd.drawText(0, 10, "fail", TEXT_COLOR);
     end 
+    chunk = nil;
+    collectgarbage();
   end
 end 
 
