@@ -96,7 +96,7 @@ local function init_telemetry()
   menu, exportValues, filename, map, modInfos = __libI.loadMenu();
   exportValues = nil;
   filename = nil;
-  collectgarbage(),
+  collectgarbage();
   
   encoder, paramScaler, paramEncoder = __libP.getEncoder(__WmSw2Config);
   
