@@ -13,61 +13,86 @@
 local function init() 
 end
 
-local function compile(basedir)
+local function gather(basedir, names)
   for filename in dir(basedir) do
-    lcd.drawText(30, 10, filename, TEXT_COLOR);
-    local chunk = loadScript(basedir .. "/" ..filename);
-    if (chunk) then
-      lcd.drawText(0, 10, "ok", TEXT_COLOR);
-    else
-      lcd.drawText(0, 10, "fail", TEXT_COLOR);
-    end 
-    chunk = nil;
-    collectgarbage();
+    if (string.find(filename, ".lua$")) then
+      names[#names + 1] = basedir .. "/" .. filename;
+      print(basedir .. "/" .. filename);
+    end
   end
+end
+
+local function compile(filename)
+  local chunk = loadScript(filename);
+  if (chunk) then
+    lcd.drawText(0, 40, "ok", TEXT_COLOR);
+  else
+    lcd.drawText(0, 40, "fail", TEXT_COLOR);
+  end 
+  chunk = nil;
+  collectgarbage();
 end 
 
 local lastTime = 0;
 local state = 0;
+local iterator = 1;
+local fileIter = 1;
+local filenames = {};
+
+local dirs = {
+  "/EDGELUA/ANIMS",
+  "/EDGELUA/COMMON",
+  "/EDGELUA/LIB",
+  "/EDGELUA/MODELS",
+  "/EDGELUA/RADIO",
+  "/SCRIPTS/TELEMETRY",
+  "/WIDGETS/ELUAAD",
+  "/WIDGETS/ELUAAN",
+  "/WIDGETS/ELUACO",
+  "/WIDGETS/ELUASW",
+  "/WIDGETS/ELUAWI",
+};
 
 local function run() 
+  lcd.drawText(0, 0, "Compiling ...", TEXT_COLOR);
   local t = getTime();
-  local baseDir = "/EDGELUA/";
   local dir = nil;
   if ((t - lastTime) > 50) then
     lastTime = t;
     if (state == 0) then
-      dir = baseDir .. "ANIMS";
-      compile(dir);
-      state = 1;
+      if (iterator <= #dirs) then
+        local d = dirs[iterator];
+        lcd.clear();
+        filenames = {};
+        gather(d, filenames);
+        lcd.drawText(0, 10, "D: " .. d, TEXT_COLOR);
+        lcd.drawText(0, 20, "n: " .. #filenames, TEXT_COLOR);
+        fileIter = 1;
+        state = 1;
+      else
+        state = 3;
+      end 
       return 0;
     elseif (state == 1) then  
-      dir = baseDir .. "COMMON";
-      compile(dir);
-      state = 2;
-      return 0;
-    elseif (state == 2) then  
-      dir = baseDir .. "LIB";
-      compile(dir);
-      state = 3;
+      if (fileIter <= #filenames) then
+        local filename = filenames[fileIter];
+        --  lcd.clear();
+        lcd.drawText(0, 30, "C: " .. filename, TEXT_COLOR);
+        compile(filename);
+        fileIter = fileIter + 1;
+      else
+        iterator = iterator + 1;
+        state = 0;
+      end
       return 0;
     elseif (state == 3) then  
-      dir = baseDir .. "MODELS";
-      compile(dir);
-      state = 4;
-      return 0;
-    elseif (state == 4) then  
-      dir = baseDir .. "RADIO";
-      compile(dir);
-      state = 5;
-      return 0;
+      return 1;
     end 
   else
     return 0;
   end 
   return 1;
 end
-
 
 return {
   init = init, 
