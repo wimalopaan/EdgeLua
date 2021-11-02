@@ -133,6 +133,103 @@ local function displayParamMenuBW(config, widget, pmenu, pheaders, state, paramS
   return pvalue;
 end
 
+local function displayParamMenuColorNoTheme(config, widget, pmenu, pheaders, state, paramScaler, event, help)
+  local activePageIndex = state[3];
+  local page = pmenu[activePageIndex];
+  local header = pheaders[activePageIndex];
+
+  lcd.clear()
+  lcd.drawText(widget.x, widget.y, header[1] .. " [" .. header[2] .."]", MIDSIZE);
+
+  displayHeader(widget, "Page " .. activePageIndex .. "/" .. #pmenu);
+
+  if (pmenu.footer) then
+    displayFooter(widget, pmenu.footer);
+  end
+
+  local maxParamsPerLine = 1;
+  for headerRow = 3, #header do -- Param header
+    local hline = header[headerRow];
+    if (#hline > maxParamsPerLine) then
+      maxParamsPerLine = #hline;
+    end
+  end
+  local fw = (widget.w - config[2]) / maxParamsPerLine;
+
+  for headerRow = 3, #header do 
+    local hline = header[headerRow];
+    local x = widget.x;
+    local y = widget.y + widget.y_offset + (headerRow - 3) * widget.fh;      
+    x = x + config[2];
+    for col, item in ipairs(hline) do
+      lcd.drawText(x, y, item[1], SMLSIZE);
+      x = x + fw;
+    end      
+  end
+
+  if (help) then
+    local htext = help[activePageIndex];
+    if (htext) then
+--      print("item:", htext, activePageIndex, #help);
+      lcd.drawText(widget.x, widget.y + widget.h - 2 * widget.fh, "Hilfe: " .. htext, SMLSIZE);
+    end 
+  end 
+
+  local pvalue, percent = paramScaler(config);
+  local x = widget.x;
+  local y = widget.y + widget.y_offset;
+  if ((state[4] > 0) and (state[5] > 0)) then
+    lcd.drawText(x, y, pvalue .. "[" .. percent .. "%]", SMLSIZE);
+    local item = page[state[4]];
+    item[2][state[5]] = pvalue;
+  else
+    lcd.drawText(x, y, pvalue .. "[" .. percent .. "%]", SMLSIZE);
+  end
+
+  for row, item in ipairs(page) do
+    item.rects = {};
+    local x = widget.x;
+    local y = widget.y + widget.y_offset + (#header + row - 3) * widget.fh;
+    local label = item[1][1];
+    if (item[3] > 1) then
+      label = "--" .. label;
+    end
+    if (row == state[1]) then
+      lcd.drawText(x, y, label, SMLSIZE + INVERS);
+    else
+      lcd.drawText(x, y, label, SMLSIZE);
+    end
+
+    x = x + config[2];
+    for col, st in ipairs(item[2]) do
+      rect = {xmin = x, ymin = y, xmax = x + fw, ymax = y + widget.fh};
+      item.rects[col] = rect;
+
+      if ((row == state[4]) and (col == state[5])) then
+        lcd.drawText(x, y, st, SMLSIZE + INVERS);
+--        if (event) then
+--          lcd.drawRectangle(x - 1, y - 1, fw - 1, widget.fh - 1);
+--        end
+      else
+        if ((row == state[1]) and (col == state[2])) then
+          lcd.drawText(x, y, st, SMLSIZE + INVERS + BLINK);
+--          if (event) then
+--            lcd.drawRectangle(x - 1, y - 1, fw - 1, widget.fh - 1);
+--          end
+        else
+          lcd.drawText(x, y, st, SMLSIZE);
+--          if (event) then
+--            lcd.drawRectangle(x - 1, y - 1, fw - 1, widget.fh - 1);
+--          end
+        end
+      end
+      x = x + fw;
+    end
+  end   
+  return pvalue;
+end
+
+
 local function displayParamMenuColor(config, widget, pmenu, pheaders, state, paramScaler, event, help)
   local activePageIndex = state[3];
   local page = pmenu[activePageIndex];
@@ -423,20 +520,20 @@ local function displayMenuColorNoTheme(config, widget, menu, overlays, state, ev
       item.rects[col] = rect;
       if (col == item[3]) then -- active
         lcd.drawText(x, y, st, SMLSIZE + INVERS);
-        if (event) then
-          lcd.drawRectangle(x - 1, y - 1, fw - 1, widget.fh - 1);
-        end
+--        if (event) then
+--          lcd.drawRectangle(x - 1, y - 1, fw - 1, widget.fh - 1);
+--        end
       else 
         if (state[2] == col) and (row == state[1]) then -- focus
           lcd.drawText(x, y, st, SMLSIZE + INVERS + BLINK);
-          if (event) then
-            lcd.drawRectangle(x - 1, y - 1, fw - 1, widget.fh - 1);
-          end
+--          if (event) then
+--            lcd.drawRectangle(x - 1, y - 1, fw - 1, widget.fh - 1);
+--          end
         else -- 
           lcd.drawText(x, y, st);
-          if (event) then
-            lcd.drawRectangle(x - 1, y - 1, fw - 1, widget.fh - 1);
-          end
+--          if (event) then
+--            lcd.drawRectangle(x - 1, y - 1, fw - 1, widget.fh - 1);
+--          end
         end
       end
       x = x + fw;
