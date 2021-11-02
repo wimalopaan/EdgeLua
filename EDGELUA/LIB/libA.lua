@@ -1,5 +1,5 @@
 --
--- WM OTXE - OpenTX Extensions 
+-- EdgeLUA - EdgeTx / OpenTx Extensions 
 -- Copyright (C) 2021 Wilhelm Meier <wilhelm.wm.meier@googlemail.com>
 --
 -- This work is licensed under the Creative Commons Attribution-NonCommercial-NoDerivatives 4.0 International License. 
@@ -11,15 +11,16 @@
 -- all further principals of tranferring state and other information.
 
 local function loadAnimations(config)
+  local basedir = "/EDGELUA/ANIMS/";
   local anims = {};
   local filename = model.getInfo().name .. ".lua";
-  local chunk = loadScript("/ANIMATIONS/" .. filename);
+  local chunk = loadScript(basedir .. filename);
   if (chunk) then
     anims = chunk();
   end
   if not(anims) or (#anims == 0) then
-    local filename = "anim.lua";
-    local chunk = loadScript("/ANIMATIONS/" .. filename);
+    local filename = "default.lua";
+    local chunk = loadScript(basedir .. filename);
     if (chunk) then
       anims = chunk();
     end

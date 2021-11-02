@@ -1,5 +1,5 @@
 --
--- WM OTXE - OpenTX Extensions 
+-- EdgeLUA - EdgeTx / OpenTx Extensions 
 -- Copyright (C) 2021 Wilhelm Meier <wilhelm.wm.meier@googlemail.com>
 --
 -- This work is licensed under the Creative Commons Attribution-NonCommercial-NoDerivatives 4.0 International License. 
@@ -9,6 +9,7 @@
 -- IMPORTANT
 -- Please note that the above license also covers the transfer protocol used and the encoding scheme and 
 -- all further principals of tranferring state and other information.
+
 
 local animation1 = {
   name = "Loop 1",

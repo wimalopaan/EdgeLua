@@ -1,5 +1,5 @@
 --
--- WM OTXE - OpenTX Extensions 
+-- EdgeLUA - EdgeTx / OpenTx Extensions 
 -- Copyright (C) 2021 Wilhelm Meier <wilhelm.wm.meier@googlemail.com>
 --
 -- This work is licensed under the Creative Commons Attribution-NonCommercial-NoDerivatives 4.0 International License. 
@@ -126,23 +126,24 @@ local function insertSettableSwitch(number)
 end 
 
 local function loadMenu()
+  local baseDir = "/EDGELUA/MODELS/"
   local filename = model.getInfo().name .. ".lua";
-  local menu = loadScript("/MODELS/" .. filename);
+  local menu = loadScript(baseDir .. filename);
   if not menu then
     if (LCD_W <= 128) then
-      filename = "swm1.lua";
-      menu = loadScript("/MODELS/" .. filename);
+      filename = "tiny.lua";
+      menu = loadScript(baseDir .. filename);
     elseif (LCD_W <= 212) then
-      filename = "swm2.lua";
-      menu = loadScript("/MODELS/" .. filename);
+      filename = "medium.lua";
+      menu = loadScript(baseDir .. filename);
     else
-      filename = "swm3.lua";
-      menu = loadScript("/MODELS/" .. filename);
+      filename = "large.lua";
+      menu = loadScript(baseDir .. filename);
     end
   end
 --   print("menu:", menu, filename);
   if (menu) then
-    local modchunk = loadScript("/RADIO/swmods.lua");
+    local modchunk = loadScript("/EDGELUA/COMMON/swmods.lua");
     if (modchunk) then
       local modules = modchunk();
       if (modules) then
@@ -155,18 +156,19 @@ local function loadMenu()
 end
 
 local function loadConfig()
-  local filename = "/RADIO/" .. model.getInfo().name .. ".lua";
+  local baseDir = "/EDGELUA/RADIO/"
+  local filename = baseDir .. model.getInfo().name .. ".lua";
   local cfg = loadScript(filename);
   if not (cfg) then
     if (LCD_W <= 128) then
 --      print("swc1");
-      cfg = loadScript("/RADIO/swc1.lua");
+      cfg = loadScript(baseDir .. "tiny.lua");
     elseif (LCD_W <= 212) then
 --      print("swc2");
-      cfg = loadScript("/RADIO/swc2.lua");
+      cfg = loadScript(baseDir .."medium.lua");
     else
 --      print("swc3");
-      cfg = loadScript("/RADIO/swc3.lua");
+      cfg = loadScript(baseDir .. "large.lua");
     end
   end
   if (cfg) then

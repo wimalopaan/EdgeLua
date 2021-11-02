@@ -1,5 +1,5 @@
 --
--- WM OTXE - OpenTX Extensions 
+-- EdgeLUA - EdgeTx / OpenTx Extensions 
 -- Copyright (C) 2021 Wilhelm Meier <wilhelm.wm.meier@googlemail.com>
 --
 -- This work is licensed under the Creative Commons Attribution-NonCommercial-NoDerivatives 4.0 International License. 
@@ -10,7 +10,8 @@
 -- Please note that the above license also covers the transfer protocol used and the encoding scheme and 
 -- all further principals of tranferring state and other information.
 
-local name = "WmSwAn";
+
+local name = "EL_Ani";
 local options = {};
 local widget = {};
 --local config = {};
@@ -24,30 +25,31 @@ local currentAnimation = nil;
 --__WmSw2Warning = nil;
 
 local function load()
+  local basedir = "/EDGELUA/LIB/";
   if not __libI then
 --      print("LOAD_I");
-    __libI = loadScript("/SCRIPTS/WM/libI.lua")();
+    __libI = loadScript(basedir .. "libI.lua")();
     if not __libI then
       errorCode = 1;
     end
   end
   if not __libD then
 --      print("LOAD_D");
-    __libD = loadScript("/SCRIPTS/WM/libD.lua")();
+    __libD = loadScript(basedir .. "libD.lua")();
     if not __libD then
       errorCode = 2;
     end
   end
   if not __libP then
 --      print("LOAD_P");
-    __libP = loadScript("/SCRIPTS/WM/libP.lua")();
+    __libP = loadScript(basedir .. "libP.lua")();
     if not __libP then
       errorCode = 3;
     end
   end
   if not __libA then
 --      print("LOAD_P");
-    __libA = loadScript("/SCRIPTS/WM/libA.lua")();
+    __libA = loadScript(basedir .. "libA.lua")();
     if not __libA then
       errorCode = 3.1;
     end
@@ -59,6 +61,8 @@ local function create(zone, options)
   widget.options = options;
 
   load();
+  load = nil;
+  collectgarbage();
 
   if (errorCode > 0) then
     return widget;
