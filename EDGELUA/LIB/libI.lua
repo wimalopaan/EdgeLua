@@ -18,6 +18,15 @@ local function isEdgeTx()
 end
 
 local function initWidgetBW(widget)
+  --[[
+  widget[1] = 0;
+  widget[2] = 0;
+  widget[3] = LCD_W;
+  widget[4] = LCD_H;
+  widget[5] = 8;
+  widget[6] = 8;
+  widget[7] = 16;
+  ]]
   widget.x = 0;
   widget.y = 0;
   widget.w = LCD_W;
