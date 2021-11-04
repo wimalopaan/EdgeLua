@@ -10,6 +10,8 @@
 -- Please note that the above license also covers the transfer protocol used and the encoding scheme and 
 -- all further principals of tranferring state and other information.
 
+#include "../../global.h"
+
 local function loadAnimations(config)
   local basedir = "/EDGELUA/ANIMS/";
   local anims = {};
@@ -239,46 +241,46 @@ end
 local function chooseAnimation(config, widget, anims, state, event, touch)
   lcd.clear();
   local rects = {};
-  local bh = 1.5 * widget.fh_l;
+  local bh = 1.5 * widget[W_FontHLarge];
   local border_h = 40;
-  local bw = widget.w - 2 * border_h;;
+  local bw = widget[W_Width] - 2 * border_h;;
   local vs = 5;
 
   if (#anims == 0) then
-    lcd.drawText(widget.x, widget.y + widget.h / 2 - widget.fh_l, "No animations", DBLSIZE);
+    lcd.drawText(widget[W_X], widget[W_Y] + widget[W_Height] / 2 - widget[W_FontHLarge], "No animations", DBLSIZE);
   elseif (#anims == 1) then
-    local rect = {xmin = widget.x + border_h, xmax = widget.x + bw,
-      ymin = widget.y + widget.h / 2 - bh / 2, ymax = widget.y + widget.h / 2 + bh / 2};
+    local rect = {xmin = widget[W_X] + border_h, xmax = widget[W_X] + bw,
+      ymin = widget[W_Y] + widget[W_Height] / 2 - bh / 2, ymax = widget[W_Y] + widget[W_Height] / 2 + bh / 2};
     rects[1] = rect;
   elseif (#anims == 2) then
-    local rect = {xmin = widget.x + border_h, xmax = widget.x + bw,
-      ymin = widget.y + widget.h / 2 - bh - vs, ymax = widget.y + widget.h / 2 - vs};
+    local rect = {xmin = widget[W_X] + border_h, xmax = widget[W_X] + bw,
+      ymin = widget[W_Y] + widget[W_Height] / 2 - bh - vs, ymax = widget[W_Y] + widget[W_Height] / 2 - vs};
     rects[1] = rect;
-    rect = {xmin = widget.x + border_h, xmax = widget.x + bw,
-      ymin = widget.y + widget.h / 2 + vs, ymax = widget.y + widget.h / 2 + bh + vs};
+    rect = {xmin = widget[W_X] + border_h, xmax = widget[W_X] + bw,
+      ymin = widget[W_Y] + widget[W_Height] / 2 + vs, ymax = widget[W_Y] + widget[W_Height] / 2 + bh + vs};
     rects[2] = rect;
   elseif (#anims == 3) then
-    local rect = {xmin = widget.x + border_h, xmax = widget.x + bw,
-      ymin = widget.y + widget.h / 2 - bh / 2, ymax = widget.y + widget.h / 2 + bh / 2};
+    local rect = {xmin = widget[W_X] + border_h, xmax = widget[W_X] + bw,
+      ymin = widget[W_Y] + widget[W_Height] / 2 - bh / 2, ymax = widget[W_Y] + widget[W_Height] / 2 + bh / 2};
     rects[1] = rect;
-    rect = {xmin = widget.x + border_h, xmax = widget.x + bw,
-      ymin = widget.y + widget.h / 2 - 3 * bh / 2 - vs, ymax = widget.y + widget.h / 2 - bh / 2 - vs};
+    rect = {xmin = widget[W_X] + border_h, xmax = widget[W_X] + bw,
+      ymin = widget[W_Y] + widget[W_Height] / 2 - 3 * bh / 2 - vs, ymax = widget[W_Y] + widget[W_Height] / 2 - bh / 2 - vs};
     rects[2] = rect;
-    rect = {xmin = widget.x + border_h, xmax = widget.x + bw,
-      ymin = widget.y + widget.h / 2 + bh / 2 + vs, ymax = widget.y + widget.h / 2 + 3 * bh / 2 + vs};
+    rect = {xmin = widget[W_X] + border_h, xmax = widget[W_X] + bw,
+      ymin = widget[W_Y] + widget[W_Height] / 2 + bh / 2 + vs, ymax = widget[W_Y] + widget[W_Height] / 2 + 3 * bh / 2 + vs};
     rects[3] = rect;
   elseif (#anims >= 4) then
-    local rect = {xmin = widget.x + border_h, xmax = widget.x + bw,
-      ymin = widget.y + widget.h / 2 - 2 * bh - 3 * vs / 2, ymax = widget.y + widget.h / 2 - bh - 3 * vs / 2};
+    local rect = {xmin = widget[W_X] + border_h, xmax = widget[W_X] + bw,
+      ymin = widget[W_Y] + widget[W_Height] / 2 - 2 * bh - 3 * vs / 2, ymax = widget[W_Y] + widget[W_Height] / 2 - bh - 3 * vs / 2};
     rects[1] = rect;
-    rect = {xmin = widget.x + border_h, xmax = widget.x + bw,
-      ymin = widget.y + widget.h / 2 - bh - vs / 2, ymax = widget.y + widget.h / 2 - vs / 2};
+    rect = {xmin = widget[W_X] + border_h, xmax = widget[W_X] + bw,
+      ymin = widget[W_Y] + widget[W_Height] / 2 - bh - vs / 2, ymax = widget[W_Y] + widget[W_Height] / 2 - vs / 2};
     rects[2] = rect;
-    rect = {xmin = widget.x + border_h, xmax = widget.x + bw,
-      ymin = widget.y + widget.h / 2 + vs / 2, ymax = widget.y + widget.h / 2 + bh + vs / 2};
+    rect = {xmin = widget[W_X] + border_h, xmax = widget[W_X] + bw,
+      ymin = widget[W_Y] + widget[W_Height] / 2 + vs / 2, ymax = widget[W_Y] + widget[W_Height] / 2 + bh + vs / 2};
     rects[3] = rect;
-    rect = {xmin = widget.x + border_h, xmax = widget.x + bw,
-      ymin = widget.y + widget.h / 2 + bh + 3 * vs / 2, ymax = widget.y + widget.h / 2 + 2 * bh + 3 * vs / 2};
+    rect = {xmin = widget[W_X] + border_h, xmax = widget[W_X] + bw,
+      ymin = widget[W_Y] + widget[W_Height] / 2 + bh + 3 * vs / 2, ymax = widget[W_Y] + widget[W_Height] / 2 + 2 * bh + 3 * vs / 2};
     rects[4] = rect;
   end
 

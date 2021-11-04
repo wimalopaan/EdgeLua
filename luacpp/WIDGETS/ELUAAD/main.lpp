@@ -10,10 +10,11 @@
 -- Please note that the above license also covers the transfer protocol used and the encoding scheme and 
 -- all further principals of tranferring state and other information.
 
+#include "../../global.h"
 
 local name = "EL_Adr";
 local options = {};
-local widget = {};
+local widget = nil;
 --local config = {};
 local encoder = nil;
 local menuState = {};
@@ -49,8 +50,8 @@ local function load()
 end
 
 local function create(zone, options)
-  widget.zone = zone;
-  widget.options = options;
+  widget[W_Zone] = zone;
+  widget[W_Options] = options;
 
   load();
   load = nil;
@@ -59,7 +60,7 @@ local function create(zone, options)
     return widget;
   end
 
-  __libI.initWidget(widget);
+  widget = __libI.initWidget();
   collectgarbage();
 
   if not(__WmSw2Config) then
@@ -90,7 +91,7 @@ local function create(zone, options)
 end
 
 local function update(widget, options)
-  widget.options = options;
+  widget[W_Options] = options;
 end
 
 local function background(widget)
@@ -110,7 +111,7 @@ local function refresh(widget, event, touch)
     __libD.displayAddressConfig(__WmSw2Config, widget, encoder, paramScaler, menuState, event, touch);
     background();
   else
-    lcd.drawText(widget.x, widget.y, "Error: " .. errorCode, DBLSIZE);
+    lcd.drawText(widget[W_X], widget[W_Y], "Error: " .. errorCode, DBLSIZE);
   end
 end
 

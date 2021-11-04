@@ -9,7 +9,8 @@ filelist.txt:
 copy: filelist.txt
 	tar cf - -T filelist.txt | (cd ../dist; tar xvf -)
 
-
+constants:
+	grep "^#define" constants.h | awk '{print $$2 " = nil;"}' > ../lib/symbols.lua
 
 subdirs = EDGELUA SCRIPTS WIDGETS
 

@@ -10,10 +10,11 @@
 -- Please note that the above license also covers the transfer protocol used and the encoding scheme and 
 -- all further principals of tranferring state and other information.
 
+#include "../../global.h"
 
 local name = "EL_Gui";
 local options = {};
-local widget = {};
+local widget = nil;
 local menuState = {1, 1, 1, 0, 0}; -- row, col, page
 local buttonState = {0, 0, 0, 0, 0, 0};
 --local config = {};
@@ -63,9 +64,6 @@ local function load()
 end
 
 local function create(zone, options)
-  widget.zone = zone;
-  widget.options = options;
-
   load();
   load = nil;
   collectgarbage();
@@ -74,7 +72,9 @@ local function create(zone, options)
     return widget;
   end
 
-  __libI.initWidget(widget);
+  widget = __libI.initWidget();
+  widget[W_Zone] = zone;
+  widget[W_Options] = options;
   collectgarbage();
 
   if not(__WmSw2Config) then
@@ -115,7 +115,7 @@ local function create(zone, options)
 end
 
 local function update(widget, options)
-  widget.options = options;
+  widget[W_Options] = options;
 end
 
 local function background(widget)
@@ -148,7 +148,7 @@ local function refresh(widget, event, touch)
 
     background();
   else
-    lcd.drawText(widget.x, widget.y, "Error: " .. errorCode, DBLSIZE);
+    lcd.drawText(widget[W_X], widget[W_Y], "Error: " .. errorCode, DBLSIZE);
   end
 end
 

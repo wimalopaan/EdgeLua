@@ -10,10 +10,11 @@
 -- Please note that the above license also covers the transfer protocol used and the encoding scheme and 
 -- all further principals of tranferring state and other information.
 
+#include "../../global.h"
 
 local name = "EL_Con";
 local options = {};
-local widget = {};
+local widget = nil;
 local menuState = {1, 1, 1, 0, 0}; -- row, col, page
 local buttonState = {0, 0, 0, 0, 0, 0};
 --local config = {};
@@ -58,8 +59,8 @@ local function load()
 end
 
 local function create(zone, options)
-  widget.zone = zone;
-  widget.options = options;
+  widget[W_Zone] = zone;
+  widget[W_Options] = options;
 
   load();
   load = nil;
@@ -69,7 +70,7 @@ local function create(zone, options)
     return widget; 
   end
  
-  __libI.initWidget(widget);
+  widget = __libI.initWidget();
   collectgarbage();
 
   if not(__WmSw2Config) then
@@ -111,7 +112,7 @@ local function create(zone, options)
   return widget;
 end
 
-local function update(widget, options) widget.options = options; end
+local function update(widget, options) widget[W_Options] = options; end
 
 local function background(widget)
   if (errorCode == 0) then
@@ -130,7 +131,7 @@ local function refresh(widget, event, touch)
     local pvalue = __libD.displayParamMenu(__WmSw2Config, widget, menu, headers, menuState, paramScaler, event, help);
     configFSM(__WmSw2Config, menu, headers, menuState, queue, fsmState, encoder, paramEncoder, pvalue);
   else
-    lcd.drawText(widget.x, widget.y, "Error: " .. errorCode, DBLSIZE);
+    lcd.drawText(widget[W_X], widget[W_Y], "Error: " .. errorCode, DBLSIZE);
   end
 end
  

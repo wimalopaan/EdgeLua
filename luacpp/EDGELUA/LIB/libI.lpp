@@ -17,52 +17,41 @@ local function isEdgeTx()
   return osname ~= nil;
 end
 
-local function initWidgetBW(widget)
-  -- widget = {0, 0, 0, 0, 0, 0, 0, 0, 0};
-  -- widget[W_X] = 0;
-  -- widget[W_Y] = 0;
-  -- widget[W_Width] = LCD_W;
-  -- widget[W_Height] = LCD_H;
-  -- widget[W_FontHeight] = 8;
-  -- widget[W_YOffset] = 8;
-  -- widget[W_YPOffset] = 16;
-
-  widget.x = 0;
-  widget.y = 0;
-  widget.w = LCD_W;
-  widget.h = LCD_H;
-  widget.fh = 8;
-  widget.y_offset = 8;
-  widget.y_poffset = 16;
+local function initWidgetBW()
+  local widget = {0, 0, 0, 0, 0, 0, 0};
+  widget[W_X] = 0;
+  widget[W_Y] = 0;
+  widget[W_Width] = LCD_W;
+  widget[W_Height] = LCD_H;
+  widget[W_FontHeight] = 8;
+  widget[W_YOffset] = 8;
+  widget[W_YPOffset] = 16;
+  return widget;
 end
 
-local function initWidgetColor(widget)
-  widget.x = 0;
-  widget.y = 0;
-  widget.w = LCD_W;
-  widget.h = LCD_H;
+local function initWidgetColor()
+  local widget = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+  widget[W_X] = 0;
+  widget[W_Y] = 0;
+  widget[W_Width] = LCD_W;
+  widget[W_Height] = LCD_H;
 
   if (isEdgeTx()) then
-    local w = 0;
-    local h = 0;
-    w, h = lcd.sizeText("A", SMLSIZE); 
-    widget.fh = h - 1;
-    widget.fh_s = h;
-    widget.fh_l = h * 3 / 2;
+    local w, h = lcd.sizeText("A", SMLSIZE); 
+    widget[W_FontHeight] = h - 1;
+    widget[W_FontHSmall] = h;
+    widget[W_FontHLarge] = h * 3 / 2;
     w, h = lcd.sizeText("A", MIDSIZE); 
-    widget.y_offset = h;
-    widget.y_poffset = h;
+    widget[W_YOffset] = h;
+    widget[W_YPOffset] = h;
   else
-    widget.x = 0;
-    widget.y = 0;
-    widget.w = LCD_W;
-    widget.h = LCD_H;
-    widget.fh = 16;
-    widget.fh_s = 16;
-    widget.fh_l = 32;
-    widget.y_offset = 16;
-    widget.y_poffset = 32;
+    widget[W_FontHeight] = 16;
+    widget[W_FontHSmall] = 16;
+    widget[W_FontHLarge] = 32;
+    widget[W_YOffset] = 16;
+    widget[W_YPOffset] = 32;
   end
+  return widget;
 end
 
 local function getLogicalSwitchFor(id)
