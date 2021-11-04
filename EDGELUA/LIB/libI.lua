@@ -10,7 +10,7 @@
 -- Please note that the above license also covers the transfer protocol used and the encoding scheme and 
 -- all further principals of tranferring state and other information.
 
-__version = "2.0";
+VERSION = "2.0";
 
 local function isEdgeTx()
   local ver, radio, maj, minor, rev, osname = getVersion();
@@ -205,7 +205,7 @@ local function initConfigBW(config)
   end
 
   if (config.parameterDial) then
-    info = getFieldInfo(config.parameterDial);
+    local info = getFieldInfo(config.parameterDial);
     if (info) then
       cfg[6] = info.id;
     end
@@ -325,7 +325,7 @@ local function initConfigColor(config)
     end
   end
 
-  local footer = "Vers: " .. __version;
+  local footer = "Vers: " .. VERSION;
   if (cfg[9] == 0) then
     footer = footer .. " Mod: xjt";
   elseif (cfg[9] == 1) then
@@ -557,7 +557,7 @@ local function initMenuBW(menu)
   end
   local switchUse = {};
 
-  local switchID = nil; 
+  local switchId = nil; 
   local lsmode = 0;
   for i, p in ipairs(menu) do
     cmenu[i] = {};

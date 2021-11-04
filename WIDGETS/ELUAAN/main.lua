@@ -81,7 +81,7 @@ local function create(zone, options)
   end
   collectgarbage();
 
-  animations = __libA.loadAnimations(__WmSw2Config);
+  local animations = __libA.loadAnimations(__WmSw2Config);
 
   if not(animations) then
     errorCode = 5;

@@ -95,7 +95,6 @@ local function create(zone, options)
   end
 
   encoder, paramScaler, paramEncoder = __libP.getEncoder(__WmSw2Config);
-  unused = nil;
   configFSM = __libP.getConfigFSM(__WmSw2Config);
 
   headers, menu, help = __libI.initParamMenu(__WmSw2Config, menu, map, modInfos, filename)

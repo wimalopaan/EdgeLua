@@ -202,7 +202,7 @@ local function displayParamMenuColorNoTheme(config, widget, pmenu, pheaders, sta
 
     x = x + config[2];
     for col, st in ipairs(item[2]) do
-      rect = {xmin = x, ymin = y, xmax = x + fw, ymax = y + widget.fh};
+      local rect = {xmin = x, ymin = y, xmax = x + fw, ymax = y + widget.fh};
       item.rects[col] = rect;
 
       if ((row == state[4]) and (col == state[5])) then
@@ -299,7 +299,7 @@ local function displayParamMenuColor(config, widget, pmenu, pheaders, state, par
 
     x = x + config[2];
     for col, st in ipairs(item[2]) do
-      rect = {xmin = x, ymin = y, xmax = x + fw, ymax = y + widget.fh};
+      local rect = {xmin = x, ymin = y, xmax = x + fw, ymax = y + widget.fh};
       item.rects[col] = rect;
 
       if ((row == state[4]) and (col == state[5])) then
@@ -438,7 +438,7 @@ local function displayMenuColor(config, widget, menu, overlays, state, event, re
     x = x + config[2];
 
     for col, st in ipairs(item[2]) do
-      rect = {xmin = x, ymin = y, xmax = x + fw, ymax = y + widget.fh};
+      local rect = {xmin = x, ymin = y, xmax = x + fw, ymax = y + widget.fh};
       item.rects[col] = rect;
       if (col == item[3]) then -- active
         lcd.drawText(x, y, st, SMLSIZE + INVERS + COLOR_THEME_SECONDARY2, COLOR_THEME_PRIMARY2);
@@ -516,7 +516,7 @@ local function displayMenuColorNoTheme(config, widget, menu, overlays, state, ev
     x = x + config[2];
 
     for col, st in ipairs(item[2]) do
-      rect = {xmin = x, ymin = y, xmax = x + fw, ymax = y + widget.fh};
+      local rect = {xmin = x, ymin = y, xmax = x + fw, ymax = y + widget.fh};
       item.rects[col] = rect;
       if (col == item[3]) then -- active
         lcd.drawText(x, y, st, SMLSIZE + INVERS);

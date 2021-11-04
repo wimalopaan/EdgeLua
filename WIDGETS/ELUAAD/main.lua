@@ -79,7 +79,7 @@ local function create(zone, options)
   end
 
   local unused;
-  unused, paramScaler, encoder = __libP.getEncoder(__WmSw2Config);
+  unused, unused, encoder = __libP.getEncoder(__WmSw2Config);
   unused = nil;
 
   __libI = nil; -- free memory
