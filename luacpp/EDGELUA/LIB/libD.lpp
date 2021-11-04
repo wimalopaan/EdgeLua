@@ -80,13 +80,13 @@ local function displayParamMenuBW(config, widget, pmenu, pheaders, state, paramS
       maxParamsPerLine = #hline;
     end
   end
-  local fw = (widget[W_Width] - config[2]) / maxParamsPerLine;
+  local fw = (widget[W_Width] - config[CFG_FirstColWidth]) / maxParamsPerLine;
 
   for headerRow = 3, #header do 
     local hline = header[headerRow];
     local x = widget[W_X];
     local y = widget[W_Y] + widget[W_YOffset] + (headerRow - 3) * widget[W_FontHeight];      
-    x = x + config[2];
+    x = x + config[CFG_FirstColWidth];
     for col, item in ipairs(hline) do
       lcd.drawText(x, y, item[1], SMLSIZE);
       x = x + fw;
@@ -115,7 +115,7 @@ local function displayParamMenuBW(config, widget, pmenu, pheaders, state, paramS
       lcd.drawText(x, y, label, SMLSIZE);
     end
 
-    x = x + config[2];
+    x = x + config[CFG_FirstColWidth];
     for col, st in ipairs(item[2]) do
       if ((row == state[4]) and (col == state[5])) then
         lcd.drawText(x, y, st, SMLSIZE + INVERS);
@@ -153,13 +153,13 @@ local function displayParamMenuColorNoTheme(config, widget, pmenu, pheaders, sta
       maxParamsPerLine = #hline;
     end
   end
-  local fw = (widget[W_Width] - config[2]) / maxParamsPerLine;
+  local fw = (widget[W_Width] - config[CFG_FirstColWidth]) / maxParamsPerLine;
 
   for headerRow = 3, #header do 
     local hline = header[headerRow];
     local x = widget[W_X];
     local y = widget[W_Y] + widget[W_YOffset] + (headerRow - 3) * widget[W_FontHeight];      
-    x = x + config[2];
+    x = x + config[CFG_FirstColWidth];
     for col, item in ipairs(hline) do
       lcd.drawText(x, y, item[1], SMLSIZE);
       x = x + fw;
@@ -199,7 +199,7 @@ local function displayParamMenuColorNoTheme(config, widget, pmenu, pheaders, sta
       lcd.drawText(x, y, label, SMLSIZE);
     end
 
-    x = x + config[2];
+    x = x + config[CFG_FirstColWidth];
     for col, st in ipairs(item[2]) do
       local rect = {xmin = x, ymin = y, xmax = x + fw, ymax = y + widget[W_FontHeight]};
       item.rects[col] = rect;
@@ -250,13 +250,13 @@ local function displayParamMenuColor(config, widget, pmenu, pheaders, state, par
       maxParamsPerLine = #hline;
     end
   end
-  local fw = (widget[W_Width] - config[2]) / maxParamsPerLine;
+  local fw = (widget[W_Width] - config[CFG_FirstColWidth]) / maxParamsPerLine;
 
   for headerRow = 3, #header do 
     local hline = header[headerRow];
     local x = widget[W_X];
     local y = widget[W_Y] + widget[W_YOffset] + (headerRow - 3) * widget[W_FontHeight];      
-    x = x + config[2];
+    x = x + config[CFG_FirstColWidth];
     for col, item in ipairs(hline) do
       lcd.drawText(x, y, item[1], SMLSIZE);
       x = x + fw;
@@ -296,7 +296,7 @@ local function displayParamMenuColor(config, widget, pmenu, pheaders, state, par
       lcd.drawText(x, y, label, SMLSIZE + COLOR_THEME_PRIMARY1);
     end
 
-    x = x + config[2];
+    x = x + config[CFG_FirstColWidth];
     for col, st in ipairs(item[2]) do
       local rect = {xmin = x, ymin = y, xmax = x + fw, ymax = y + widget[W_FontHeight]};
       item.rects[col] = rect;
@@ -332,7 +332,7 @@ local function displayMenuBW(config, widget, menu, overlays, state)
   local page = menu[activePageIndex];
   local overlay = overlays[activePageIndex];
 
-  lcd.drawScreenTitle(config[1], activePageIndex, #menu);
+  lcd.drawScreenTitle(config[CFG_Title], activePageIndex, #menu);
 
   for row, item in ipairs(page) do
     local x = widget[W_X];
@@ -355,8 +355,8 @@ local function displayMenuBW(config, widget, menu, overlays, state)
       lcd.drawText(x, y, label, SMLSIZE);
     end
 
-    local fw = (widget[W_Width] - config[2]) / #item[2];
-    x = x + config[2];
+    local fw = (widget[W_Width] - config[CFG_FirstColWidth]) / #item[2];
+    x = x + config[CFG_FirstColWidth];
 
     for col, st in ipairs(item[2]) do
       if (col == item[3]) then
@@ -405,7 +405,7 @@ local function displayMenuColor(config, widget, menu, overlays, state, event, re
     displayFooter(widget, menu.footer);
   end
 
-  if (config[8]) then
+  if (config[CFG_RemoteId]) then
     lcd.drawText(widget[W_X] + widget[W_Width] - 70, widget[W_Y] + widget[W_Height] - widget[W_FontHeight],
       "r[" .. remote[2] .. "," .. remote[3] .. "," .. remote[4] .. "]:" .. remote[1],
       SMLSIZE + COLOR_THEME_PRIMARY3);
@@ -433,8 +433,8 @@ local function displayMenuColor(config, widget, menu, overlays, state, event, re
       lcd.drawText(x, y, label, SMLSIZE + COLOR_THEME_PRIMARY1);
     end
 
-    local fw = (widget[W_Width] - config[2]) / #item[2];
-    x = x + config[2];
+    local fw = (widget[W_Width] - config[CFG_FirstColWidth]) / #item[2];
+    x = x + config[CFG_FirstColWidth];
 
     for col, st in ipairs(item[2]) do
       local rect = {xmin = x, ymin = y, xmax = x + fw, ymax = y + widget[W_FontHeight]};
@@ -511,8 +511,8 @@ local function displayMenuColorNoTheme(config, widget, menu, overlays, state, ev
       lcd.drawText(x, y, label, SMLSIZE);
     end
 
-    local fw = (widget[W_Width] - config[2]) / #item[2];
-    x = x + config[2];
+    local fw = (widget[W_Width] - config[CFG_FirstColWidth]) / #item[2];
+    x = x + config[CFG_FirstColWidth];
 
     for col, st in ipairs(item[2]) do
       local rect = {xmin = x, ymin = y, xmax = x + fw, ymax = y + widget[W_FontHeight]};
@@ -711,24 +711,24 @@ local function processOverlays(overlays, menuState, queue)
 end
 
 local function processTrims(config, menu, menuState, buttonState, queue, callback)
-  if (config[11]) then
-    local value = getValue(config[11]);
+  if (config[CFG_PreviousLsId]) then
+    local value = getValue(config[CFG_PreviousLsId]);
     if (value > buttonState[1]) then
       prevCol(menu, menuState);
       menuDeselect(menuState);
     end
     buttonState[1] = value;
   end
-  if (config[12]) then
-    local value = getValue(config[12]);
+  if (config[CFG_NextLsId]) then
+    local value = getValue(config[CFG_NextLsId]);
     if (value > buttonState[2]) then
       nextCol(menu, menuState);
       menuDeselect(menuState);
     end
     buttonState[2] = value;
   end
-  if (config[13]) then
-    local value = getValue(config[13]);
+  if (config[CFG_SelectLsId]) then
+    local value = getValue(config[CFG_SelectLsId]);
     if (value > buttonState[3]) then
 --	 print("cb", callback);
       callback(menu, menuState, queue);
@@ -738,10 +738,10 @@ local function processTrims(config, menu, menuState, buttonState, queue, callbac
 end
 
 local function processPots(config, menu, menuState, buttonState)
-  if (config[4]) then
+  if (config[CFG_ScrollUdId]) then
     local activePageIndex = menuState[3];
     local page = menu[activePageIndex];
-    local value = getValue(config[4]) + 1024;
+    local value = getValue(config[CFG_ScrollUdId]) + 1024;
     local row = #page - math.floor(value * #page / 2049);
     if (row ~= buttonState[5]) then
       menuState[1] = row;
@@ -749,11 +749,11 @@ local function processPots(config, menu, menuState, buttonState)
       menuDeselect(menuState);
     end
   end
-  if (config[5]) then
+  if (config[CFG_ScrollLrId]) then
     local activePageIndex = menuState[3];
     local page = menu[activePageIndex];
     local item = page[menuState[2]];
-    local value = getValue(config[5]) + 1024;
+    local value = getValue(config[CFG_ScrollLrId]) + 1024;
     if (item) then
       local col = math.floor(value * #item[2] / 2049) + 1;
       if (col ~= buttonState[6]) then
@@ -766,8 +766,8 @@ local function processPots(config, menu, menuState, buttonState)
 end
 
 local function processMenuSwitch(config, menu, menuState, buttonState)
-  if (config[7]) then
-    local ms = getValue(config[7]);
+  if (config[CFG_PageSwitchId]) then
+    local ms = getValue(config[CFG_PageSwitchId]);
     if (math.abs(ms - buttonState[4]) > 10) then
       local s = 1;
       for i = 0,5 do
@@ -852,11 +852,11 @@ local function processForeignInput(config, foreignInput, menu, queue)
 end
 
 local function processRemoteInput(config, menu, queue, remoteState)
-  if (not config[8]) then
+  if (not config[CFG_RemoteId]) then
     return;
   end
 
-  local r = (getValue(config[8]) + 1024) / 2;
+  local r = (getValue(config[CFG_RemoteId]) + 1024) / 2;
 
   if (r == remoteState[1]) then
     return;
@@ -880,7 +880,7 @@ end
 
 local function displayFmRssiWarningColor(config, widget, state)
   local fm = getFlightMode();
-  if (fm == config[15]) then
+  if (fm == config[CFG_SafeMode_FlightMode]) then
 --    print("safemode");
   end   
 end 
@@ -921,7 +921,7 @@ local function displayAddressConfigColor(config, widget, encoder, pScaler, state
     lcd.drawFilledRectangle(rect.xmin, rect.ymin, rect.xmax - rect.xmin + 1, rect.ymax - rect.ymin + 1, COLOR_THEME_ACTIVE);
     lcd.drawText(rect.xmin + 5, rect.ymin + 5, "Switch on RX and device", MIDSIZE + COLOR_THEME_PRIMARY2);
 
-    encoder(config[10], 14, adr);
+    encoder(config[CFG_MixerGlobalVariable], 14, adr);
 
     if (event == EVT_VIRTUAL_ENTER) then
       state[1] = 0;

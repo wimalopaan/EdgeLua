@@ -59,9 +59,6 @@ local function load()
 end
 
 local function create(zone, options)
-  widget[W_Zone] = zone;
-  widget[W_Options] = options;
-
   load();
   load = nil;
   collectgarbage();
@@ -71,6 +68,8 @@ local function create(zone, options)
   end
  
   widget = __libI.initWidget();
+  widget[W_Zone] = zone;
+  widget[W_Options] = options;
   collectgarbage();
 
   if not(__WmSw2Config) then

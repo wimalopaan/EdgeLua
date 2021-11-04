@@ -144,15 +144,15 @@ end
 
 local function sbusConfigFSM(config, menu, headers, menuState, queue, state, encoder, paramEncoder, pValue)
   local t = getTime();
-  if ((t - state[1]) > config[3]) then
+  if ((t - state[1]) > config[CFG_StateTimeout]) then
     if (state[2] == 0) then
       if (queue:size() > 0) then
         state[3] = queue:pop(); -- line
 --        print("cFSM: ", state[2], state[3][1][1]);
         state[2] = 1;
         state[1] = t;
---        print("cFSM:", paramEncoder, config, config[10]);
-        paramEncoder(config[10], 31, 31); -- bcast off (handles sbus correct)
+--        print("cFSM:", paramEncoder, config, config[CFG_MixerGlobalVariable]);
+        paramEncoder(config[CFG_MixerGlobalVariable], 31, 31); -- bcast off (handles sbus correct)
 --        print("x");
       end
     elseif (state[2] == 1) then -- broadcast off
@@ -161,7 +161,7 @@ local function sbusConfigFSM(config, menu, headers, menuState, queue, state, enc
         state[2] = 2;
         state[1] = t;
         local item = {[3] = 2, [4] = state[3][1][2], [5]  = state[3][1][3]};
-        encoder(config[10], item); -- set laston in module
+        encoder(config[CFG_MixerGlobalVariable], item); -- set laston in module
       end
     elseif (state[2] == 2) then -- select item
 --      print("cFSM: ", state[2]);
@@ -183,7 +183,7 @@ local function sbusConfigFSM(config, menu, headers, menuState, queue, state, enc
         local header = pageHeaders[itemLine + 2];
         local paramNumber = header[col][2];
 --        print("cFSM: ", state[2], "P:", paramNumber, "V:", value, header);
-        paramEncoder(config[10], paramNumber, value);
+        paramEncoder(config[CFG_MixerGlobalVariable], paramNumber, value);
       end
     elseif (state[2] == 4) then -- end
 --      print("cFSM: ", state[2]);
@@ -192,15 +192,15 @@ local function sbusConfigFSM(config, menu, headers, menuState, queue, state, enc
     end     
   end
   --[[
-  if ((t - state.lasttime) > config[3]) then
+  if ((t - state.lasttime) > config[CFG_StateTimeout]) then
     if (state.actual == 0) then
       if (queue:size() > 0) then
         state.line = queue:pop(); -- line
         print("cFSM: ", state.actual, state.line[1][1]);
         state.actual = 1;
         state.lasttime = t;
-        print("cFSM:", paramEncoder, config, config[10]);
-        paramEncoder(config[10], 31, 31); -- bcast off (handles sbus correct)
+        print("cFSM:", paramEncoder, config, config[CFG_MixerGlobalVariable]);
+        paramEncoder(config[CFG_MixerGlobalVariable], 31, 31); -- bcast off (handles sbus correct)
         print("x");
       end
     elseif (state.actual == 1) then -- broadcast off
@@ -209,7 +209,7 @@ local function sbusConfigFSM(config, menu, headers, menuState, queue, state, enc
         state.actual = 2;
         state.lasttime = t;
         local item = {[3] = 2, [4] = state.line[1][2], [5]  = state.line[1][3]};
-        encoder(config[10], item); -- set laston in module
+        encoder(config[CFG_MixerGlobalVariable], item); -- set laston in module
       end
     elseif (state.actual == 2) then -- select item
       print("cFSM: ", state.actual);
@@ -231,7 +231,7 @@ local function sbusConfigFSM(config, menu, headers, menuState, queue, state, enc
         local header = pageHeaders[itemLine + 2];
         local paramNumber = header[col][2];
         print("cFSM: ", state.actual, "P:", paramNumber, "V:", value, header);
-        paramEncoder(config[10], paramNumber, value);
+        paramEncoder(config[CFG_MixerGlobalVariable], paramNumber, value);
       end
     elseif (state.actual == 4) then -- end
       print("cFSM: ", state.actual);
@@ -250,7 +250,7 @@ end
 
 local function sbusSwitchFSM(config, menu, queue, state, encoder, exportValues)
   local t = getTime();
-  if ((t - state[1]) > config[3]) then
+  if ((t - state[1]) > config[CFG_StateTimeout]) then
     local item = nil;
     if (queue:size() > 0) then
       item = queue:pop();
@@ -269,7 +269,7 @@ local function sbusSwitchFSM(config, menu, queue, state, encoder, exportValues)
           queue:push(virt);
         end
       else
-        encoder(config[10], item);
+        encoder(config[CFG_MixerGlobalVariable], item);
         if (item[6]) then -- export
           local expValue = exportValues[ item[3] ] * 1024 / 100;
           model.setGlobalVariable(item[6], 0, expValue);
@@ -279,7 +279,7 @@ local function sbusSwitchFSM(config, menu, queue, state, encoder, exportValues)
     end 
   end
 --[[
-  if ((t - state.lasttime) > config[3]) then
+  if ((t - state.lasttime) > config[CFG_StateTimeout]) then
     local item = nil;
     if (queue:size() > 0) then
       item = queue:pop();
@@ -298,7 +298,7 @@ local function sbusSwitchFSM(config, menu, queue, state, encoder, exportValues)
           queue:push(virt);
         end
       else
-        encoder(config[10], item);
+        encoder(config[CFG_MixerGlobalVariable], item);
         if (item[6]) then -- export
           local expValue = exportValues[ item[3] ] * 1024 / 100;
           model.setGlobalVariable(item[6], 0, expValue);
@@ -413,7 +413,7 @@ local function percentOf(v)
 end
 
 local function parameterValueIbus(config)
-  local v = getValue(config[6]);
+  local v = getValue(config[CFG_ParamaterDialId]);
   local s = ((v + 1024) * 32) / 2048;
   if (s > 31) then
     s = 31;
@@ -425,7 +425,7 @@ end
 
 -- use half the range
 local function parameterValueSbus(config)
-  local v = getValue(config[6]);
+  local v = getValue(config[CFG_ParamaterDialId]);
   local s = ((v + 1024) * 16) / 2048;
   if (s > 15) then
     s = 15;

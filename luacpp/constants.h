@@ -17,7 +17,7 @@
 #define CFG_StateTimeout 3
 #define CFG_ScrollUdId 4
 #define CFG_ScrollLrId 5
-#define CFG ParamaterDialId 6
+#define CFG_ParamaterDialId 6
 #define CFG_PageSwitchId 7
 #define CFG_RemoteId 8
 #define CFG_Encoding 9
@@ -30,6 +30,7 @@
 #define CFG_SafeMode_Timeout 16
 #define CFG_SafeMode_LinkDropoutMax 17
 #define CFG_SafeMode_LsNumber 18
+#define CFG_Footer 19
 
 
 #define MENU_NAME 1

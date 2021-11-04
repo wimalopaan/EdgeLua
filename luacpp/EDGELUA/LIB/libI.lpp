@@ -178,25 +178,25 @@ end
 local function initConfigBW(config)
   local cfg = {};
   if (config.title) then
-    cfg[1] = config.title;
+    cfg[CFG_Title] = config.title;
   else
-    cfg[1] = "WmSw";
+    cfg[CFG_Title] = "WmSw";
   end
   if (config.firstColumnWidth) then
-    cfg[2] = config.firstColumnWidth;
+    cfg[CFG_FirstColWidth] = config.firstColumnWidth;
   else
-    cfg[2] = 40;
+    cfg[CFG_FirstColWidth] = 40;
   end
   if (config.stateTimeout) then
-    cfg[3] = config.stateTimeout;
+    cfg[CFG_StateTimeout] = config.stateTimeout;
   else
-    cfg[3] = 20;
+    cfg[CFG_StateTimeout] = 20;
   end
 
   if (config.parameterDial) then
     local info = getFieldInfo(config.parameterDial);
     if (info) then
-      cfg[6] = info.id;
+      cfg[CFG_ParamaterDialId] = info.id;
     end
   end
 
@@ -212,30 +212,30 @@ local function initConfigBW(config)
     local subproto = module.subProtocol;
     --print("gc m: ", type, proto, subproto);
     if (type == 2) then -- xjt
-      cfg[9] = 0; -- xjt
+      cfg[CFG_Encoding] = 0; -- xjt
     elseif (type == 6) then -- mpm
       if (proto == 28) then -- AFHDS2A
-        cfg[9] = 1; -- ibus
+        cfg[CFG_Encoding] = 1; -- ibus
       else
-        cfg[9] = 2; -- sbus
+        cfg[CFG_Encoding] = 2; -- sbus
       end
     else
-      cfg[9] = 2; --sbus
+      cfg[CFG_Encoding] = 2; --sbus
     end
   else
-    cfg[9] = 2; --sbus
+    cfg[CFG_Encoding] = 2; --sbus
   end
 
   if (config.mixerGlobalVariable >= 1) then
-    cfg[10] = config.mixerGlobalVariable - 1;
+    cfg[CFG_MixerGlobalVariable] = config.mixerGlobalVariable - 1;
   else
-    cfg[10] = 5; -- GV6
+    cfg[CFG_MixerGlobalVariable] = 5; -- GV6
   end
 
   if (config.backend >= 1) and (config.backend <= 3) then
-    cfg[14] = config.backend;
+    cfg[CFG_Backend] = config.backend;
   else  
-    cfg[14] = 1;
+    cfg[CFG_Backend] = 1;
   end 
 
 --  model.deleteMixes();
@@ -273,10 +273,10 @@ local function initConfigBW(config)
               model.setFlightMode(config.safeMode.flightMode, fm);
             end
           end 
-          cfg[15] = config.safeMode.flightMode;
-          cfg[16] = config.safeMode.timeOut * 100;
-          cfg[17] = config.safeMode.linkDropoutMax * 100;
-          cfg[18] = fmLsNumber;
+          cfg[CFG_SafeMode_FlightMode] = config.safeMode.flightMode;
+          cfg[CFG_SafeMode_Timeout] = config.safeMode.timeOut * 100;
+          cfg[CFG_SafeMode_LinkDropoutMax] = config.safeMode.linkDropoutMax * 100;
+          cfg[CFG_SafeMode_LsNumber] = fmLsNumber;
         end 
       end 
     end 
@@ -292,37 +292,37 @@ local function initConfigColor(config)
   if (config.scrollUpDn) then
     info = getFieldInfo(config.scrollUpDn);
     if (info) then
-      cfg[4] = info.id;
+      cfg[CFG_ScrollUdId] = info.id;
     end
   end
   if (config.scrollLR) then
     info = getFieldInfo(config.scrollLR);
     if (info) then
-      cfg[5] = info.id;
+      cfg[CFG_ScrollLrId] = info.id;
     end
   end
   if (config.pageSwitch) then
     info = getFieldInfo(config.pageSwitch);
     if (info) then
-      cfg[7] = info.id;
+      cfg[CFG_PageSwitchId] = info.id;
     end
   end
   if (config.remote) then
     info = getFieldInfo(config.remote);
     if (info) then
-      cfg[8] = info.id;
+      cfg[CFG_RemoteId] = info.id;
     end
   end
 
   local footer = "Vers: " .. VERSION;
-  if (cfg[9] == 0) then
+  if (cfg[CFG_Encoding] == 0) then
     footer = footer .. " Mod: xjt";
-  elseif (cfg[9] == 1) then
+  elseif (cfg[CFG_Encoding] == 1) then
     footer = footer .. " Mod: ibus";
   else
     footer = footer .. " Mod: sbus";
   end
-  cfg[19] = footer;
+  cfg[CFG_Footer] = footer;
 
   if (config.title) then
     footer = footer .. " Conf: " .. config.title;
@@ -330,15 +330,15 @@ local function initConfigColor(config)
 
   local lsfId = insertLogicalSwitchFor(config.previous);
   if (lsfId >= 0) then
-    cfg[11] = lsfId;
+    cfg[CFG_PreviousLsId] = lsfId;
   end 
   lsfId = insertLogicalSwitchFor(config.next);
   if (lsfId >= 0) then
-    cfg[12] = lsfId;
+    cfg[CFG_NextLsId] = lsfId;
   end 
   lsfId = insertLogicalSwitchFor(config.select);
   if (lsfId >= 0) then
-    cfg[13] = lsfId;
+    cfg[CFG_SelectLsId] = lsfId;
   end 
 
   if (config.removeTrimsFromFlightModes) then
@@ -524,8 +524,8 @@ local function initParamMenuColor(cfg, menu, map, modInfos, filename)
   end
   local headers, cmenu, help = initParamMenu(cfg, menu, map, modInfos, true);
 
-  if (cfg[19]) then
-    cmenu.footer = cfg[19];
+  if (cfg[CFG_Footer]) then
+    cmenu.footer = cfg[CFG_Footer];
     if (filename) then
       cmenu.footer = cmenu.footer .. " File:" .. filename;
     end
@@ -667,8 +667,8 @@ local function initMenuColor(cfg, menu, filename)
     end
   end
 
-  if (cfg[19]) then
-    cmenu.footer = cfg[19];
+  if (cfg[CFG_Footer]) then
+    cmenu.footer = cfg[CFG_Footer];
 
     if (filename) then
       cmenu.footer = cmenu.footer .. " File:" .. filename;
