@@ -1,0 +1,31 @@
+
+.PHONY: all clean subdirs ${subdirs} 
+
+subdirs: ${subdirs}
+
+all: subdirs  $(targets)
+
+%.lua: %.lpp
+	cpp -E -P $< > $@
+
+
+lppsources = $(wildcard *.lpp)
+luatargets = $(patsubst %.lpp, %.lua, $(lppsources))
+
+${subdirs}:
+	@if [ -d $@ ]; then \
+		${MAKE} -C $@ all; \
+	fi
+
+
+subclean:
+	@for d in ${subdirs}; do \
+		if [ -d $$d ]; then \
+			${MAKE} -C $$d clean; \
+		fi \
+	done
+
+clean: subclean
+	${RM} *~
+	${RM} *.lua
+
