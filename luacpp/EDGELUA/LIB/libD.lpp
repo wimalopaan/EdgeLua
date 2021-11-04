@@ -338,8 +338,8 @@ local function displayMenuBW(config, widget, menu, overlays, state)
     local x = widget[W_X];
     local y = widget[W_Y] + widget[W_YOffset] + (row - 1) * widget[W_FontHeight];
 
-    local label = item[1];
-    if (item[7]) then
+    local label = item[ITEM_Name];
+    if (item[ITEM_Virtual]) then
       label = label .. "#";
     end
 
@@ -355,11 +355,11 @@ local function displayMenuBW(config, widget, menu, overlays, state)
       lcd.drawText(x, y, label, SMLSIZE);
     end
 
-    local fw = (widget[W_Width] - config[CFG_FirstColWidth]) / #item[2];
+    local fw = (widget[W_Width] - config[CFG_FirstColWidth]) / #item[ITEM_States];
     x = x + config[CFG_FirstColWidth];
 
-    for col, st in ipairs(item[2]) do
-      if (col == item[3]) then
+    for col, st in ipairs(item[ITEM_States]) do
+      if (col == item[ITEM_State]) then
         lcd.drawText(x, y, st, SMLSIZE + INVERS);
       else 
         if (state[2] == col) and (row == state[1]) then
@@ -416,8 +416,8 @@ local function displayMenuColor(config, widget, menu, overlays, state, event, re
     local x = widget[W_X];
     local y = widget[W_Y] + widget[W_YOffset] + (row - 1) * widget[W_FontHeight];
 
-    local label = item[1];
-    if (item[7]) then
+    local label = item[ITEM_Name];
+    if (item[ITEM_Virtual]) then
       label = label .. "#";
     end
 
@@ -433,13 +433,13 @@ local function displayMenuColor(config, widget, menu, overlays, state, event, re
       lcd.drawText(x, y, label, SMLSIZE + COLOR_THEME_PRIMARY1);
     end
 
-    local fw = (widget[W_Width] - config[CFG_FirstColWidth]) / #item[2];
+    local fw = (widget[W_Width] - config[CFG_FirstColWidth]) / #item[ITEM_States];
     x = x + config[CFG_FirstColWidth];
 
-    for col, st in ipairs(item[2]) do
+    for col, st in ipairs(item[ITEM_States]) do
       local rect = {xmin = x, ymin = y, xmax = x + fw, ymax = y + widget[W_FontHeight]};
       item.rects[col] = rect;
-      if (col == item[3]) then -- active
+      if (col == item[ITEM_State]) then -- active
         lcd.drawText(x, y, st, SMLSIZE + INVERS + COLOR_THEME_SECONDARY2, COLOR_THEME_PRIMARY2);
         if (event) then
           lcd.drawRectangle(x - 1, y - 1, fw - 1, widget[W_FontHeight]- 1, COLOR_THEME_ACTIVE);
@@ -494,8 +494,8 @@ local function displayMenuColorNoTheme(config, widget, menu, overlays, state, ev
     local x = widget[W_X];
     local y = widget[W_Y] + widget[W_YOffset] + (row - 1) * widget[W_FontHeight];
 
-    local label = item[1];
-    if (item[7]) then
+    local label = item[ITEM_Name];
+    if (item[ITEM_Virtual]) then
       label = label .. "#";
     end
 
@@ -511,13 +511,13 @@ local function displayMenuColorNoTheme(config, widget, menu, overlays, state, ev
       lcd.drawText(x, y, label, SMLSIZE);
     end
 
-    local fw = (widget[W_Width] - config[CFG_FirstColWidth]) / #item[2];
+    local fw = (widget[W_Width] - config[CFG_FirstColWidth]) / #item[ITEM_States];
     x = x + config[CFG_FirstColWidth];
 
-    for col, st in ipairs(item[2]) do
+    for col, st in ipairs(item[ITEM_States]) do
       local rect = {xmin = x, ymin = y, xmax = x + fw, ymax = y + widget[W_FontHeight]};
       item.rects[col] = rect;
-      if (col == item[3]) then -- active
+      if (col == item[ITEM_State]) then -- active
         lcd.drawText(x, y, st, SMLSIZE + INVERS);
 --        if (event) then
 --          lcd.drawRectangle(x - 1, y - 1, fw - 1, widget[W_FontHeight]- 1);
@@ -614,7 +614,7 @@ local function selectItem(menu, menuState, queue)
   makeSelection(menuState);
   local page = menu[menuState[3]];
   local item = page[menuState[1]];
-  item[3] = menuState[2];
+  item[ITEM_State] = menuState[2];
   queue:push(item);
 end
 
@@ -755,7 +755,7 @@ local function processPots(config, menu, menuState, buttonState)
     local item = page[menuState[2]];
     local value = getValue(config[CFG_ScrollLrId]) + 1024;
     if (item) then
-      local col = math.floor(value * #item[2] / 2049) + 1;
+      local col = math.floor(value * #item[ITEM_States] / 2049) + 1;
       if (col ~= buttonState[6]) then
         menuState[2] = col;
         buttonState[6] = col;
@@ -828,7 +828,7 @@ end
 local function findItem(cmenu, fn, module) -- compressed-menu
   for ip, page in ipairs(cmenu) do
     for i, item in ipairs(page) do
-      if (item[4]) and (item[5]) and (item[4] == fn) and (item[5] == module) then
+      if (item[ITEM_Function]) and (item[ITEM_Module]) and (item[ITEM_Function] == fn) and (item[ITEM_Module] == module) then
         return item;
       end
     end
@@ -846,7 +846,7 @@ local function processForeignInput(config, foreignInput, menu, queue)
   local item = findItem(menu, fn, module);
   if (item) then
 --      print("foreign: ", module, fn, state);
-    item[3] = state;
+    item[ITEM_State] = state;
     queue:push(item);
   end
 end
@@ -873,7 +873,7 @@ local function processRemoteInput(config, menu, queue, remoteState)
     remoteState[3] = fn;
     remoteState[4] = state;
     print("remote: ", module, fn, state);
-    item[3] = state;
+    item[ITEM_State] = state;
     queue:push(item);
   end
 end

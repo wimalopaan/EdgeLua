@@ -32,7 +32,13 @@
 #define CFG_SafeMode_LsNumber 18
 #define CFG_Footer 19
 
+#define MENU_Name 1
 
-#define MENU_NAME 1
+#define ITEM_Name 1
+#define ITEM_States 2
+#define ITEM_State 3
+#define ITEM_Function 4
+#define ITEM_Module 5
+#define ITEM_Export 6
+#define ITEM_Virtual 7
 
-#define ITEM_NAME 1

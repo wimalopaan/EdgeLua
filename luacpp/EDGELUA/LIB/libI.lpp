@@ -369,7 +369,7 @@ end
 local function findItem(cmenu, fn, module) -- compressed-menu
   for ip, page in ipairs(cmenu) do
     for i, item in ipairs(page) do
-      if (item[4]) and (item[5]) and (item[4] == fn) and (item[5] == module) then
+      if (item[ITEM_Function]) and (item[ITEM_Module]) and (item[ITEM_Function] == fn) and (item[ITEM_Module] == module) then
         return item;
       end
     end
@@ -562,29 +562,29 @@ local function initMenuBW(menu)
           lsmode = item.lsmode;
         end
       end
-      local citem = {item[1], item.states, item.state, item.fn, item.module};
+      local citem = {item[ITEM_Name], item.states, item.state, item.fn, item.module};
       if (item.export) then
-        citem[6] = item.export;
+        citem[ITEM_Export] = item.export;
       end
       if (item.virtual) then
-        citem[7] = {};
+        citem[ITEM_Virtual] = {};
         for i, v in ipairs(item.virtual) do
           if (v.fn) and (v.fn > 0) and (v.module) and (v.module > 0) then		  
-            citem[7][i] = {v.fn, v.module};
+            citem[ITEM_Virtual][i] = {v.fn, v.module};
           end
         end
       end
 
       -- validity check
-      if (citem[1]) and
-      (citem[2]) and
+      if (citem[ITEM_Name]) and
+      (citem[ITEM_States]) and
       (
-        ((citem[4]) and (citem[5]) and (citem[4] > 0) and (citem[5] > 0)) or
-        ((citem[7]) and (#citem[7] > 0))
+        ((citem[ITEM_Function]) and (citem[ITEM_Module]) and (citem[ITEM_Function] > 0) and (citem[ITEM_Module] > 0)) or
+        ((citem[ITEM_Virtual]) and (#citem[ITEM_Virtual] > 0))
         ) then
         cmenu[i][k] = citem;
         if (switchId) then
-          citem[1] = citem[1] .. "/" .. item.switch;
+          citem[ITEM_Name] = citem[ITEM_Name] .. "/" .. item.switch;
           local use = {citem, lsmode};
           if not switchUse[switchId] then
             switchUse[switchId] = {use};
@@ -601,14 +601,14 @@ local function initMenuBW(menu)
   for ip, page in ipairs(cmenu) do
     for i, item in ipairs(page) do
       local virts = {};
-      if (item[7]) then
-        for iv, v in ipairs(item[7]) do
+      if (item[ITEM_Virtual]) then
+        for iv, v in ipairs(item[ITEM_Virtual]) do
           local vitem = findItem(cmenu, v[1], v[2]);
           if (vitem) then
             virts[#virts + 1] = vitem;
           end
         end
-        item[7] = virts;
+        item[ITEM_Virtual] = virts;
       end
     end
   end

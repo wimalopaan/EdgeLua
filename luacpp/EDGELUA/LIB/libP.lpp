@@ -257,22 +257,22 @@ local function sbusSwitchFSM(config, menu, queue, state, encoder, exportValues)
     else
       local page = menu[state[3]]; --page
       item = page[state[4]]; --item
-      if (item[7]) then -- virtuals are not cyclic pushed
+      if (item[ITEM_Virtual]) then -- virtuals are not cyclic pushed
         item = nil;
       end 
       nextItem(menu, state);
     end
     if (item) then
-      if (item[7]) then
-        for i, virt in ipairs(item[7]) do
-          virt[3] = item[3];
+      if (item[ITEM_Virtual]) then
+        for i, virt in ipairs(item[ITEM_Virtual]) do
+          virt[3] = item[ITEM_State];
           queue:push(virt);
         end
       else
         encoder(config[CFG_MixerGlobalVariable], item);
-        if (item[6]) then -- export
-          local expValue = exportValues[ item[3] ] * 1024 / 100;
-          model.setGlobalVariable(item[6], 0, expValue);
+        if (item[ITEM_Export]) then -- export
+          local expValue = exportValues[ item[ITEM_State] ] * 1024 / 100;
+          model.setGlobalVariable(item[ITEM_Export], 0, expValue);
         end
       end
       state[1] = t;
@@ -286,22 +286,22 @@ local function sbusSwitchFSM(config, menu, queue, state, encoder, exportValues)
     else
       local page = menu[state.cyclePage];
       item = page[state.cycleItem];
-      if (item[7]) then -- virtuals are not cyclic pushed
+      if (item[ITEM_Virtual]) then -- virtuals are not cyclic pushed
         item = nil;
       end 
       nextItem(menu, state);
     end
     if (item) then
-      if (item[7]) then
-        for i, virt in ipairs(item[7]) do
-          virt[3] = item[3];
+      if (item[ITEM_Virtual]) then
+        for i, virt in ipairs(item[ITEM_Virtual]) do
+          virt[3] = item[ITEM_State];
           queue:push(virt);
         end
       else
         encoder(config[CFG_MixerGlobalVariable], item);
-        if (item[6]) then -- export
-          local expValue = exportValues[ item[3] ] * 1024 / 100;
-          model.setGlobalVariable(item[6], 0, expValue);
+        if (item[ITEM_Export]) then -- export
+          local expValue = exportValues[ item[ITEM_State] ] * 1024 / 100;
+          model.setGlobalVariable(item[ITEM_Export], 0, expValue);
         end
       end
       state.lasttime = t;
@@ -379,19 +379,19 @@ local function encodeParamSBus(gv, paramNumber, paramValue)
 end 
 
 local function encodeXJT(gv, item)
-  local state = item[3];
-  local fn = item[4];;
-  local module = item[5];
---   print("xjt: ", item[1], module, fn, state);
+  local state = item[ITEM_State];
+  local fn = item[ITEM_Function];;
+  local module = item[ITEM_Module];
+--   print("xjt: ", item[ITEM_Name], module, fn, state);
 
   local sbusValue = (64 * (module - 1) + 8 * (fn - 1) +  2 * (state - 1)) * 2 - 1024;
   setXJT(gv, sbusValue);
 end
 
 local function encodeSBus(gv, item)
-  local state = item[3];
-  local fn = item[4];
-  local module = item[5];
+  local state = item[ITEM_State];
+  local fn = item[ITEM_Function];
+  local module = item[ITEM_Module];
   --print("sbus: ", module, fn, state);
 
   local sbusValue = (64 * (module - 1) + 8 * (fn - 1) +  2 * (state - 1)) * 2 - 1024;
@@ -399,9 +399,9 @@ local function encodeSBus(gv, item)
 end
 
 local function encodeIBus(gv, item)
-  local state = item[3];
-  local fn = item[4];
-  local module = item[5];
+  local state = item[ITEM_State];
+  local fn = item[ITEM_Function];
+  local module = item[ITEM_Module];
 --   print("ibus: ", module, fn, state);
 
   local ibusValue = (64 * (module - 1) + 8 * (fn - 1) + (state - 1)) * 2 - 1024;
