@@ -10,7 +10,7 @@
 -- Please note that the above license also covers the transfer protocol used and the encoding scheme and 
 -- all further principals of tranferring state and other information.
 
-#include "../../global.h"
+#include "../../widget.h"
 
 local name = "EL_Ani";
 local options = {};
@@ -25,29 +25,8 @@ local currentAnimation = nil;
 --__WmSw2foreignInput = 0;
 --__WmSw2Warning = nil;
 
-local function load()
+local function loadLibA()
   local basedir = "/EDGELUA/LIB/";
-  if not __libI then
---      print("LOAD_I");
-    __libI = loadScript(basedir .. "libI.lua")();
-    if not __libI then
-      errorCode = 1;
-    end
-  end
-  if not __libD then
---      print("LOAD_D");
-    __libD = loadScript(basedir .. "libD.lua")();
-    if not __libD then
-      errorCode = 2;
-    end
-  end
-  if not __libP then
---      print("LOAD_P");
-    __libP = loadScript(basedir .. "libP.lua")();
-    if not __libP then
-      errorCode = 3;
-    end
-  end
   if not __libA then
 --      print("LOAD_P");
     __libA = loadScript(basedir .. "libA.lua")();
@@ -62,7 +41,7 @@ local function create(zone, options)
   widget[W_Options] = options;
 
   load();
-  load = nil;
+  loadLibA();
   collectgarbage();
 
   if (errorCode > 0) then

@@ -1,5 +1,7 @@
 #pragma once
 
+#include "global.h"
+
 local function load()
   local basedir = "/EDGELUA/LIB/";
   if not __libI then

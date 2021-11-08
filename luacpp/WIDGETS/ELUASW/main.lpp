@@ -10,17 +10,18 @@
 -- Please note that the above license also covers the transfer protocol used and the encoding scheme and 
 -- all further principals of tranferring state and other information.
 
-#include "../../global.h"
+#include "../../widget.h"
 
 local name = "EL_Gui";
 local options = {};
 local widget = nil;
 local menuState = {1, 1, 1, 0, 0}; -- row, col, page
 local buttonState = {0, 0, 0, 0, 0, 0};
---local config = {};
 local menu = {};
 local shortCuts = {};
 local overlays = {};
+local pagetitles = {};
+local menudata = {};
 local queue = nil;
 local fsmState = {};
 local switchFSM = nil;
@@ -38,34 +39,8 @@ __WmSw2Warning2 = nil;
 local lastForeignInput = 0;
 local remoteInput = {0, 0, 0, 0};
 
-local function load()
-  local basedir = "/EDGELUA/LIB/";
-  if not __libI then
---      print("LOAD_I");
-    __libI = loadScript(basedir .. "libI.lua")();
-    if not __libI then
-      errorCode = 1;
-    end
-  end
-  if not __libD then
---      print("LOAD_D");
-    __libD = loadScript(basedir .. "libD.lua")();
-    if not __libD then
-      errorCode = 2;
-    end
-  end
-  if not __libP then
---      print("LOAD_P");
-    __libP = loadScript(basedir .. "libP.lua")();
-    if not __libP then
-      errorCode = 3;
-    end
-  end
-end
-
 local function create(zone, options)
   load();
-  load = nil;
   collectgarbage();
   
   if (errorCode > 0) then
@@ -102,7 +77,7 @@ local function create(zone, options)
   encoder = __libP.getEncoder(__WmSw2Config);
   switchFSM = __libP.getSwitchFSM(__WmSw2Config);
 
-  menu, shortCuts, overlays = __libI.initMenu(__WmSw2Config, menu, filename)      
+  menu, shortCuts, overlays, pagetitles, menudata = __libI.initMenu(__WmSw2Config, menu, filename);
   __libI.initFSM(fsmState);
 
   __libI = nil; -- free memory
@@ -142,7 +117,7 @@ local function refresh(widget, event, touch)
     __libD.processTouch(menu, menuState, event, touch);
     __libD.processButtons(__WmSw2Config, menu, menuState, buttonState, queue, __libD.selectItem);
     __libD.processOverlays(overlays, menuState, queue);
-    __libD.displayMenu(__WmSw2Config, widget, menu, overlays, menuState, event, remoteInput, __WmSw2Warning1, __WmSw2Warning2);
+    __libD.displayMenu(__WmSw2Config, widget, menu, overlays, menuState, event, remoteInput, __WmSw2Warning1, __WmSw2Warning2, pagetitles, menudata);
 
     __libD.displayFmRssiWarning(__WmSw2Config, widget, rssiState);
 

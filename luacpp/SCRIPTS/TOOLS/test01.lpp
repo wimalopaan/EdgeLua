@@ -1,9 +1,14 @@
-
+#include "../../global.h"
 
 local function init()
 end 
 
 local function run()
+  local value = 42;
+  ASSERT(value == 42);
+
+  TRACE("test", 1, 2, 3);
+
   local t5u = getFieldInfo("t5u");
 
   if (t5u) then

@@ -67,14 +67,14 @@ local function displayInfoNoTheme(widget, text)
 end
 
 local function displayParamMenuBW(config, widget, pmenu, pheaders, state, paramScaler)
-  local activePageIndex = state[3];
+  local activePageIndex = state[MENUSTATE_Page];
   local page = pmenu[activePageIndex];
   local header = pheaders[activePageIndex];
   lcd.clear()
-  lcd.drawScreenTitle(header[1] .. "/" .. header[2], activePageIndex, #pheaders);
+  lcd.drawScreenTitle(header[PHEADER_Title] .. "/" .. header[PHEADER_Module], activePageIndex, #pheaders);
 
   local maxParamsPerLine = 1;
-  for headerRow = 3, #header do -- Param header
+  for headerRow = PHEADER_LinesStart, #header do -- Param header
     local hline = header[headerRow];
     if (#hline > maxParamsPerLine) then
       maxParamsPerLine = #hline;
@@ -82,13 +82,13 @@ local function displayParamMenuBW(config, widget, pmenu, pheaders, state, paramS
   end
   local fw = (widget[W_Width] - config[CFG_FirstColWidth]) / maxParamsPerLine;
 
-  for headerRow = 3, #header do 
+  for headerRow = PHEADER_LinesStart, #header do 
     local hline = header[headerRow];
     local x = widget[W_X];
-    local y = widget[W_Y] + widget[W_YOffset] + (headerRow - 3) * widget[W_FontHeight];      
+    local y = widget[W_Y] + widget[W_YOffset] + (headerRow - PHEADER_LinesStart) * widget[W_FontHeight];      
     x = x + config[CFG_FirstColWidth];
     for col, item in ipairs(hline) do
-      lcd.drawText(x, y, item[1], SMLSIZE);
+      lcd.drawText(x, y, item[PHITEM_Name], SMLSIZE);
       x = x + fw;
     end      
   end
@@ -96,34 +96,34 @@ local function displayParamMenuBW(config, widget, pmenu, pheaders, state, paramS
   local pvalue, percent = paramScaler(config);
   local x = widget[W_X];
   local y = widget[W_Y] + widget[W_YOffset];
-  if ((state[4] > 0) and (state[5] > 0)) then
+  if ((state[MENUSTATE_SelRow] > 0) and (state[MENUSTATE_SelCol] > 0)) then
     lcd.drawText(x, y, pvalue .. "[" .. percent .. "%]", SMLSIZE + INVERS);
-    local item = page[state[4]];
-    item[2][state[5]] = pvalue;
+    local line = page[state[MENUSTATE_SelRow]];
+    line[PLINE_Values][state[MENUSTATE_SelCol]] = pvalue;
   else
     lcd.drawText(x, y, pvalue .. "[" .. percent .. "%]", SMLSIZE);
   end
 
-  for row, item in ipairs(page) do
+  for row, line in ipairs(page) do
     local x = widget[W_X];
-    local y = widget[W_Y] + widget[W_YOffset] + (#header + row - 3) * widget[W_FontHeight];
-    local label = item[1][1];
+    local y = widget[W_Y] + widget[W_YOffset] + (#header + row - PHEADER_LinesStart) * widget[W_FontHeight];
+    local label = line[PLINE_Item][PITEM_Name];
 
-    if (row == state[1]) then
+    if (row == state[MENUSTATE_Row]) then
       lcd.drawText(x, y, label, SMLSIZE + INVERS);
     else
       lcd.drawText(x, y, label, SMLSIZE);
     end
 
     x = x + config[CFG_FirstColWidth];
-    for col, st in ipairs(item[2]) do
-      if ((row == state[4]) and (col == state[5])) then
-        lcd.drawText(x, y, st, SMLSIZE + INVERS);
+    for col, pv in ipairs(line[PLINE_Values]) do
+      if ((row == state[MENUSTATE_SelRow]) and (col == state[MENUSTATE_SelCol])) then
+        lcd.drawText(x, y, pv, SMLSIZE + INVERS);
       else
-        if ((row == state[1]) and (col == state[2])) then
-          lcd.drawText(x, y, st, SMLSIZE + INVERS + BLINK);
+        if ((row == state[MENUSTATE_Row]) and (col == state[MENUSTATE_Col])) then
+          lcd.drawText(x, y, pv, SMLSIZE + INVERS + BLINK);
         else
-          lcd.drawText(x, y, st, SMLSIZE);
+          lcd.drawText(x, y, pv, SMLSIZE);
         end
       end
       x = x + fw;
@@ -133,12 +133,12 @@ local function displayParamMenuBW(config, widget, pmenu, pheaders, state, paramS
 end
 
 local function displayParamMenuColorNoTheme(config, widget, pmenu, pheaders, state, paramScaler, event, help)
-  local activePageIndex = state[3];
+  local activePageIndex = state[MENUSTATE_Page];
   local page = pmenu[activePageIndex];
   local header = pheaders[activePageIndex];
 
   lcd.clear()
-  lcd.drawText(widget[W_X], widget[W_Y], header[1] .. " [" .. header[2] .."]", MIDSIZE);
+  lcd.drawText(widget[W_X], widget[W_Y], header[PHEADER_Title] .. " [" .. header[PHEADER_Module] .."]", MIDSIZE);
 
   displayHeader(widget, "Page " .. activePageIndex .. "/" .. #pmenu);
 
@@ -147,7 +147,7 @@ local function displayParamMenuColorNoTheme(config, widget, pmenu, pheaders, sta
   end
 
   local maxParamsPerLine = 1;
-  for headerRow = 3, #header do -- Param header
+  for headerRow = PHEADER_LinesStart, #header do -- Param header
     local hline = header[headerRow];
     if (#hline > maxParamsPerLine) then
       maxParamsPerLine = #hline;
@@ -155,13 +155,13 @@ local function displayParamMenuColorNoTheme(config, widget, pmenu, pheaders, sta
   end
   local fw = (widget[W_Width] - config[CFG_FirstColWidth]) / maxParamsPerLine;
 
-  for headerRow = 3, #header do 
+  for headerRow = PHEADER_LinesStart, #header do 
     local hline = header[headerRow];
     local x = widget[W_X];
-    local y = widget[W_Y] + widget[W_YOffset] + (headerRow - 3) * widget[W_FontHeight];      
+    local y = widget[W_Y] + widget[W_YOffset] + (headerRow - PHEADER_LinesStart) * widget[W_FontHeight];      
     x = x + config[CFG_FirstColWidth];
     for col, item in ipairs(hline) do
-      lcd.drawText(x, y, item[1], SMLSIZE);
+      lcd.drawText(x, y, item[PHITEM_Name], SMLSIZE);
       x = x + fw;
     end      
   end
@@ -169,7 +169,6 @@ local function displayParamMenuColorNoTheme(config, widget, pmenu, pheaders, sta
   if (help) then
     local htext = help[activePageIndex];
     if (htext) then
---      print("item:", htext, activePageIndex, #help);
       lcd.drawText(widget[W_X], widget[W_Y] + widget[W_Height] - 2 * widget[W_FontHeight], "Hilfe: " .. htext, SMLSIZE);
     end 
   end 
@@ -177,20 +176,20 @@ local function displayParamMenuColorNoTheme(config, widget, pmenu, pheaders, sta
   local pvalue, percent = paramScaler(config);
   local x = widget[W_X];
   local y = widget[W_Y] + widget[W_YOffset];
-  if ((state[4] > 0) and (state[5] > 0)) then
+  if ((state[MENUSTATE_SelRow] > 0) and (state[MENUSTATE_SelCol] > 0)) then
     lcd.drawText(x, y, pvalue .. "[" .. percent .. "%]", SMLSIZE);
-    local item = page[state[4]];
-    item[2][state[5]] = pvalue;
+    local line = page[state[MENUSTATE_SelRow]];
+    line[PLINE_Values][state[MENUSTATE_SelCol]] = pvalue;
   else
     lcd.drawText(x, y, pvalue .. "[" .. percent .. "%]", SMLSIZE);
   end
 
-  for row, item in ipairs(page) do
-    item.rects = {};
+  for row, line in ipairs(page) do
+    line[PLINE_Rects] = {};
     local x = widget[W_X];
     local y = widget[W_Y] + widget[W_YOffset] + (#header + row - 3) * widget[W_FontHeight];
-    local label = item[1][1];
-    if (item[3] > 1) then
+    local label = line[1][1];
+    if (line[PLINE_Line] > 1) then
       label = "--" .. label;
     end
     if (row == state[1]) then
@@ -200,26 +199,17 @@ local function displayParamMenuColorNoTheme(config, widget, pmenu, pheaders, sta
     end
 
     x = x + config[CFG_FirstColWidth];
-    for col, st in ipairs(item[2]) do
+    for col, pv in ipairs(line[PLINE_Values]) do
       local rect = {xmin = x, ymin = y, xmax = x + fw, ymax = y + widget[W_FontHeight]};
-      item.rects[col] = rect;
+      line[PLINE_Rects][col] = rect;
 
-      if ((row == state[4]) and (col == state[5])) then
-        lcd.drawText(x, y, st, SMLSIZE + INVERS);
---        if (event) then
---          lcd.drawRectangle(x - 1, y - 1, fw - 1, widget[W_FontHeight]- 1);
---        end
+      if ((row == state[MENUSTATE_SelRow]) and (col == state[MENUSTATE_SelCol])) then
+        lcd.drawText(x, y, pv, SMLSIZE + INVERS);
       else
-        if ((row == state[1]) and (col == state[2])) then
-          lcd.drawText(x, y, st, SMLSIZE + INVERS + BLINK);
---          if (event) then
---            lcd.drawRectangle(x - 1, y - 1, fw - 1, widget[W_FontHeight]- 1);
---          end
+        if ((row == state[MENUSTATE_Row]) and (col == state[MENUSTATE_Col])) then
+          lcd.drawText(x, y, pv, SMLSIZE + INVERS + BLINK);
         else
-          lcd.drawText(x, y, st, SMLSIZE);
---          if (event) then
---            lcd.drawRectangle(x - 1, y - 1, fw - 1, widget[W_FontHeight]- 1);
---          end
+          lcd.drawText(x, y, pv, SMLSIZE);
         end
       end
       x = x + fw;
@@ -230,12 +220,12 @@ end
 
 
 local function displayParamMenuColor(config, widget, pmenu, pheaders, state, paramScaler, event, help)
-  local activePageIndex = state[3];
+  local activePageIndex = state[MENUSTATE_Page];
   local page = pmenu[activePageIndex];
   local header = pheaders[activePageIndex];
 
   lcd.clear()
-  lcd.drawText(widget[W_X], widget[W_Y], header[1] .. " [" .. header[2] .."]", MIDSIZE + COLOR_THEME_PRIMARY3);
+  lcd.drawText(widget[W_X], widget[W_Y], header[PHEADER_Title] .. " [" .. header[PHEADER_Module] .."]", MIDSIZE + COLOR_THEME_PRIMARY3);
 
   displayHeader(widget, "Page " .. activePageIndex .. "/" .. #pmenu);
 
@@ -244,7 +234,7 @@ local function displayParamMenuColor(config, widget, pmenu, pheaders, state, par
   end
 
   local maxParamsPerLine = 1;
-  for headerRow = 3, #header do -- Param header
+  for headerRow = PHEADER_LinesStart, #header do -- Param header
     local hline = header[headerRow];
     if (#hline > maxParamsPerLine) then
       maxParamsPerLine = #hline;
@@ -252,13 +242,13 @@ local function displayParamMenuColor(config, widget, pmenu, pheaders, state, par
   end
   local fw = (widget[W_Width] - config[CFG_FirstColWidth]) / maxParamsPerLine;
 
-  for headerRow = 3, #header do 
+  for headerRow = PHEADER_LinesStart, #header do 
     local hline = header[headerRow];
     local x = widget[W_X];
-    local y = widget[W_Y] + widget[W_YOffset] + (headerRow - 3) * widget[W_FontHeight];      
+    local y = widget[W_Y] + widget[W_YOffset] + (headerRow - PHEADER_LinesStart) * widget[W_FontHeight];      
     x = x + config[CFG_FirstColWidth];
     for col, item in ipairs(hline) do
-      lcd.drawText(x, y, item[1], SMLSIZE);
+      lcd.drawText(x, y, item[PHITEM_Name], SMLSIZE);
       x = x + fw;
     end      
   end
@@ -266,7 +256,6 @@ local function displayParamMenuColor(config, widget, pmenu, pheaders, state, par
   if (help) then
     local htext = help[activePageIndex];
     if (htext) then
---      print("item:", htext, activePageIndex, #help);
       lcd.drawText(widget[W_X], widget[W_Y] + widget[W_Height] - 2 * widget[W_FontHeight], "Hilfe: " .. htext, SMLSIZE + COLOR_THEME_PRIMARY1);
     end 
   end 
@@ -274,40 +263,40 @@ local function displayParamMenuColor(config, widget, pmenu, pheaders, state, par
   local pvalue, percent = paramScaler(config);
   local x = widget[W_X];
   local y = widget[W_Y] + widget[W_YOffset];
-  if ((state[4] > 0) and (state[5] > 0)) then
+  if ((state[MENUSTATE_SelRow] > 0) and (state[MENUSTATE_SelCol] > 0)) then
     lcd.drawText(x, y, pvalue .. "[" .. percent .. "%]", SMLSIZE + COLOR_THEME_WARNING);
-    local item = page[state[4]];
-    item[2][state[5]] = pvalue;
+    local line = page[state[MENUSTATE_SelRow]];
+    line[PLINE_Values][state[MENUSTATE_SelCol]] = pvalue;
   else
     lcd.drawText(x, y, pvalue .. "[" .. percent .. "%]", SMLSIZE + COLOR_THEME_PRIMARY3);
   end
 
-  for row, item in ipairs(page) do
-    item.rects = {};
+  for row, line in ipairs(page) do
+    line[PLINE_Rects] = {};
     local x = widget[W_X];
     local y = widget[W_Y] + widget[W_YOffset] + (#header + row - 3) * widget[W_FontHeight];
-    local label = item[1][1];
-    if (item[3] > 1) then
+    local label = line[PLINE_Item][PITEM_Name];
+    if (line[PLINE_Line] > 1) then
       label = "--" .. label;
     end
-    if (row == state[1]) then
+    if (row == state[MENUSTATE_Row]) then
       lcd.drawText(x, y, label, SMLSIZE + INVERS + COLOR_THEME_SECONDARY2, COLOR_THEME_PRIMARY2);
     else
       lcd.drawText(x, y, label, SMLSIZE + COLOR_THEME_PRIMARY1);
     end
 
     x = x + config[CFG_FirstColWidth];
-    for col, st in ipairs(item[2]) do
+    for col, st in ipairs(line[2]) do
       local rect = {xmin = x, ymin = y, xmax = x + fw, ymax = y + widget[W_FontHeight]};
-      item.rects[col] = rect;
+      line[PLINE_Rects][col] = rect;
 
-      if ((row == state[4]) and (col == state[5])) then
+      if ((row == state[MENUSTATE_SelRow]) and (col == state[MENUSTATE_SelCol])) then
         lcd.drawText(x, y, st, SMLSIZE + INVERS + COLOR_THEME_SECONDARY2, COLOR_THEME_PRIMARY2);
         if (event) then
           lcd.drawRectangle(x - 1, y - 1, fw - 1, widget[W_FontHeight]- 1, COLOR_THEME_ACTIVE);
         end
       else
-        if ((row == state[1]) and (col == state[2])) then
+        if ((row == state[MENUSTATE_Row]) and (col == state[MENUSTATE_Col])) then
           lcd.drawText(x, y, st, SMLSIZE + INVERS + BLINK + COLOR_THEME_SECONDARY2, COLOR_THEME_PRIMARY2);
           if (event) then
             lcd.drawRectangle(x - 1, y - 1, fw - 1, widget[W_FontHeight]- 1, COLOR_THEME_FOCUS);
@@ -326,13 +315,17 @@ local function displayParamMenuColor(config, widget, pmenu, pheaders, state, par
 end
 
 
-local function displayMenuBW(config, widget, menu, overlays, state)
+local function displayMenuBW(config, widget, menu, overlays, state, pagetitles)
   lcd.clear()
-  local activePageIndex = state[3];
+  local activePageIndex = state[MENUSTATE_Page];
   local page = menu[activePageIndex];
   local overlay = overlays[activePageIndex];
 
-  lcd.drawScreenTitle(config[CFG_Title], activePageIndex, #menu);
+  if (pagetitles[activePageIndex]) then
+    lcd.drawScreenTitle(pagetitles[activePageIndex], activePageIndex, #menu);
+  else
+    lcd.drawScreenTitle(config[CFG_Title], activePageIndex, #menu);
+  end
 
   for row, item in ipairs(page) do
     local x = widget[W_X];
@@ -349,7 +342,7 @@ local function displayMenuBW(config, widget, menu, overlays, state)
       end
     end
 
-    if (row == state[1]) then
+    if (row == state[MENUSTATE_Row]) then
       lcd.drawText(x, y, label, SMLSIZE + INVERS);
     else
       lcd.drawText(x, y, label, SMLSIZE);
@@ -362,7 +355,7 @@ local function displayMenuBW(config, widget, menu, overlays, state)
       if (col == item[ITEM_State]) then
         lcd.drawText(x, y, st, SMLSIZE + INVERS);
       else 
-        if (state[2] == col) and (row == state[1]) then
+        if (state[MENUSTATE_Col] == col) and (row == state[MENUSTATE_Row]) then
           lcd.drawText(x, y, st, SMLSIZE + INVERS + BLINK);
         else
           lcd.drawText(x, y, st);
@@ -373,7 +366,7 @@ local function displayMenuBW(config, widget, menu, overlays, state)
   end
 end
 
-local function displayMenuColor(config, widget, menu, overlays, state, event, remote, warning1, warning2)
+local function displayMenuColor(config, widget, menu, overlays, state, event, remote, warning1, warning2, pagetitles, menudata)
   lcd.clear()
 
   if (warning1) then
@@ -387,22 +380,22 @@ local function displayMenuColor(config, widget, menu, overlays, state, event, re
     end
   end
 
-  local activePageIndex = state[3];
+  local activePageIndex = state[MENUSTATE_Page];
   local page = menu[activePageIndex];
   local overlay = overlays[activePageIndex];
 
-  if (page.title) then
-    lcd.drawText(widget[W_X], widget[W_Y], page.title, MIDSIZE + COLOR_THEME_PRIMARY3);
+  if (pagetitles[activePageIndex]) then
+    lcd.drawText(widget[W_X], widget[W_Y], pagetitles[activePageIndex], MIDSIZE + COLOR_THEME_PRIMARY3);
   else
-    if (menu.title) then
-      lcd.drawText(widget[W_X], widget[W_Y], menu.title, MIDSIZE + COLOR_THEME_PRIMARY3);
+    if (menudata[MENUDATA_Title]) then
+      lcd.drawText(widget[W_X], widget[W_Y], menudata[MENUDATA_Title], MIDSIZE + COLOR_THEME_PRIMARY3);
     end
   end
 
   displayHeader(widget, "Page" .. activePageIndex .. "/" .. #menu);
 
-  if (menu.footer) then
-    displayFooter(widget, menu.footer);
+  if (menudata[MENUDATA_Footer]) then
+    displayFooter(widget, menudata[MENUDATA_Footer]);
   end
 
   if (config[CFG_RemoteId]) then
@@ -412,7 +405,7 @@ local function displayMenuColor(config, widget, menu, overlays, state, event, re
   end
 
   for row, item in ipairs(page) do
-    item.rects = {};
+    item[ITEM_Rects] = {};
     local x = widget[W_X];
     local y = widget[W_Y] + widget[W_YOffset] + (row - 1) * widget[W_FontHeight];
 
@@ -427,7 +420,7 @@ local function displayMenuColor(config, widget, menu, overlays, state, event, re
       end
     end
 
-    if (row == state[1]) then
+    if (row == state[MENUSTATE_Row]) then
       lcd.drawText(x, y, label, SMLSIZE + INVERS + COLOR_THEME_SECONDARY2, COLOR_THEME_PRIMARY2);
     else
       lcd.drawText(x, y, label, SMLSIZE + COLOR_THEME_PRIMARY1);
@@ -438,14 +431,14 @@ local function displayMenuColor(config, widget, menu, overlays, state, event, re
 
     for col, st in ipairs(item[ITEM_States]) do
       local rect = {xmin = x, ymin = y, xmax = x + fw, ymax = y + widget[W_FontHeight]};
-      item.rects[col] = rect;
+      item[ITEM_Rects][col] = rect;
       if (col == item[ITEM_State]) then -- active
         lcd.drawText(x, y, st, SMLSIZE + INVERS + COLOR_THEME_SECONDARY2, COLOR_THEME_PRIMARY2);
         if (event) then
           lcd.drawRectangle(x - 1, y - 1, fw - 1, widget[W_FontHeight]- 1, COLOR_THEME_ACTIVE);
         end
       else 
-        if (state[2] == col) and (row == state[1]) then -- focus
+        if (state[MENUSTATE_Col] == col) and (row == state[MENUSTATE_Row]) then -- focus
           lcd.drawText(x, y, st, SMLSIZE + INVERS + BLINK + COLOR_THEME_SECONDARY2, COLOR_THEME_PRIMARY2);
           if (event) then
             lcd.drawRectangle(x - 1, y - 1, fw - 1, widget[W_FontHeight]- 1, COLOR_THEME_FOCUS);
@@ -462,7 +455,7 @@ local function displayMenuColor(config, widget, menu, overlays, state, event, re
   end
 end
 
-local function displayMenuColorNoTheme(config, widget, menu, overlays, state, event, remote, warning1, warning2)
+local function displayMenuColorNoTheme(config, widget, menu, overlays, state, event, remote, warning1, warning2, pagetitles, menudata)
   lcd.clear()
 
   if (warning) then
@@ -471,26 +464,26 @@ local function displayMenuColorNoTheme(config, widget, menu, overlays, state, ev
       warning, XXLSIZE);
   end
 
-  local activePageIndex = state[3];
+  local activePageIndex = state[MENUSTATE_Page];
   local page = menu[activePageIndex];
   local overlay = overlays[activePageIndex];
 
-  if (page.title) then
-    lcd.drawText(widget[W_X], widget[W_Y], page.title, MIDSIZE);
+  if (pagetitles[activePageIndex]) then
+    lcd.drawText(widget[W_X], widget[W_Y], pagetitles[activePageIndex], MIDSIZE);
   else
-    if (menu.title) then
-      lcd.drawText(widget[W_X], widget[W_Y], menu.title, MIDSIZE);
+    if (menudata[MENUDATA_Title]) then
+      lcd.drawText(widget[W_X], widget[W_Y], menudata[MENUDATA_Title], MIDSIZE);
     end
   end
 
   displayHeaderNoTheme(widget, activePageIndex .. "/" .. #menu);
 
-  if (menu.footer) then
-    displayFooterNoTheme(widget, menu.footer);
+  if (menudata[MENUDATA_Footer]) then
+    displayFooterNoTheme(widget, menudata[MENUDATA_Footer]);
   end
 
   for row, item in ipairs(page) do
-    item.rects = {};
+    item[ITEM_Rects] = {};
     local x = widget[W_X];
     local y = widget[W_Y] + widget[W_YOffset] + (row - 1) * widget[W_FontHeight];
 
@@ -505,7 +498,7 @@ local function displayMenuColorNoTheme(config, widget, menu, overlays, state, ev
       end
     end
 
-    if (row == state[1]) then
+    if (row == state[MENUSTATE_Row]) then
       lcd.drawText(x, y, label, SMLSIZE + INVERS);
     else
       lcd.drawText(x, y, label, SMLSIZE);
@@ -516,23 +509,14 @@ local function displayMenuColorNoTheme(config, widget, menu, overlays, state, ev
 
     for col, st in ipairs(item[ITEM_States]) do
       local rect = {xmin = x, ymin = y, xmax = x + fw, ymax = y + widget[W_FontHeight]};
-      item.rects[col] = rect;
+      item[ITEM_Rects][col] = rect;
       if (col == item[ITEM_State]) then -- active
         lcd.drawText(x, y, st, SMLSIZE + INVERS);
---        if (event) then
---          lcd.drawRectangle(x - 1, y - 1, fw - 1, widget[W_FontHeight]- 1);
---        end
       else 
-        if (state[2] == col) and (row == state[1]) then -- focus
+        if (state[MENUSTATE_Col] == col) and (row == state[MENUSTATE_Row]) then -- focus
           lcd.drawText(x, y, st, SMLSIZE + INVERS + BLINK);
---          if (event) then
---            lcd.drawRectangle(x - 1, y - 1, fw - 1, widget[W_FontHeight]- 1);
---          end
         else -- 
           lcd.drawText(x, y, st);
---          if (event) then
---            lcd.drawRectangle(x - 1, y - 1, fw - 1, widget[W_FontHeight]- 1);
---          end
         end
       end
       x = x + fw;
@@ -805,8 +789,7 @@ local function processTouch(menu, menuState, event, touch)
     local page = menu[activePageIndex];
     if (event == EVT_TOUCH_TAP) then
       for row, item in ipairs(page) do
---	    print("rect", item.rects);
-        for col, rect in ipairs(item.rects) do   
+        for col, rect in ipairs(item[ITEM_Rects]) do   
           if (covers(touch, rect)) then
             menuState[1] = row;
             menuState[2] = col;

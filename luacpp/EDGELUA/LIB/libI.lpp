@@ -124,7 +124,7 @@ local function insertSettableSwitch(number)
 end 
 
 local function loadMenu()
-  local baseDir = "/EDGELUA/MODELS/"
+  local baseDir = BASE_DIR .. "/MODELS/";
   local filename = model.getInfo().name .. ".lua";
   local menu = loadScript(baseDir .. filename);
   if not menu then
@@ -139,9 +139,9 @@ local function loadMenu()
       menu = loadScript(baseDir .. filename);
     end
   end
---   print("menu:", menu, filename);
+  TRACE("loadMenu:", menu, filename);
   if (menu) then
-    local modchunk = loadScript("/EDGELUA/COMMON/swmods.lua");
+    local modchunk = loadScript(BASE_DIR .. "/COMMON/swmods.lua");
     if (modchunk) then
       local modules = modchunk();
       if (modules) then
@@ -154,18 +154,16 @@ local function loadMenu()
 end
 
 local function loadConfig()
-  local baseDir = "/EDGELUA/RADIO/"
+  local baseDir = BASE_DIR .. "/RADIO/"
   local filename = baseDir .. model.getInfo().name .. ".lua";
+  TRACE("loadConfig:", filename)
   local cfg = loadScript(filename);
   if not (cfg) then
     if (LCD_W <= 128) then
---      print("swc1");
       cfg = loadScript(baseDir .. "tiny.lua");
     elseif (LCD_W <= 212) then
---      print("swc2");
       cfg = loadScript(baseDir .."medium.lua");
     else
---      print("swc3");
       cfg = loadScript(baseDir .. "large.lua");
     end
   end
@@ -432,7 +430,10 @@ local function initParamMenu(cfg, menu, map, modInfos, mode)
     if (#items > 0) then
       local modInfo = findModuleInfo(imodule, map, modInfos); -- full module info table 
       if (modInfo) then
-        local header = {modInfo.description, imodule}; -- header[1] = title, header[2] =  moduleNumber
+        local header = {nil, nil, nil}; -- header[1] = title, header[2] =  moduleNumber
+        header[PHEADER_Title] = modInfo.description;
+        header[PHEADER_Module] = imodule;
+        header[PHEADER_LinesStart] = nil;
         for l, hline in ipairs(modInfo.moduleParams) do -- header[3...] = {{shortName, pId}, ...}
           local line = {};
           for ip, param in ipairs(hline) do
@@ -442,19 +443,23 @@ local function initParamMenu(cfg, menu, map, modInfos, mode)
               line[ip] = {param[2], param[3]}; -- short label
             end
           end
-          header[l + 2] = line;
+          header[(l - 1) + PHEADER_LinesStart] = line;
         end        
 
         local page = {};
-        local citem = {"Module", 1, imodule}; -- {name, fn, module}, Dummy Eintrag um ein lastOn im Modul auszulösen
+        local citem = {nil, nil, nil}; -- {name, fn, module}, Dummy Eintrag um ein lastOn im Modul auszulösen
+        citem[PITEM_Name] = "Module";
+        citem[PITEM_Function] = 1;
+        citem[PITEM_Module] = imodule;
         for itemLineNumber = 1, #modInfo.moduleParams do
-          local line = {citem}; -- {citem, {v0, v1, v2, ...}, itemLine}
+          local line = {nil, nil, nil}; -- {citem, {v0, v1, v2, ...}, itemLine}
           local values = {};
           for valueNumber = 1, #modInfo.moduleParams[itemLineNumber] do
             values[valueNumber] = 0;
           end
-          line[2] = values;
-          line[3] = itemLineNumber;
+          line[PLINE_Item] = citem;
+          line[PLINE_Values] = values;
+          line[PLINE_Line] = itemLineNumber;
           page[#page + 1] = line;
         end
         headers[#headers + 1] = header;
@@ -463,7 +468,10 @@ local function initParamMenu(cfg, menu, map, modInfos, mode)
           help[#cmenu] = modInfo.help;
         end
 
-        header = {modInfo.description, imodule}; -- header[1] = title header[2] =  moduleNumber
+        header = {nil, nil, nil}; -- header[1] = title, header[2] =  moduleNumber
+        header[PHEADER_Title] = modInfo.description;
+        header[PHEADER_Module] = imodule;
+        header[PHEADER_LinesStart] = nil;
         for l, hline in ipairs(modInfo.functionParams) do -- header[3...] = {{shortName, pId}, ...}
           local line = {};
           for ip, param in ipairs(hline) do
@@ -473,7 +481,7 @@ local function initParamMenu(cfg, menu, map, modInfos, mode)
               line[ip] = {param[2], param[3]}; -- short label
             end
           end
-          header[l + 2] = line;
+          header[(l - 1) + PHEADER_LinesStart] = line;
         end
 
         local maxItemLines = 8 - #header; -- possible lines usable for function-parameters
@@ -486,15 +494,19 @@ local function initParamMenu(cfg, menu, map, modInfos, mode)
           for inlineNumber = 1, itemsPerPage do
             local item = items[itemNumber];
             if (item) then
-              local citem = {item[1], itemNumber, imodule}; -- {name, fn, module}
+              local citem = {nil, nil, nil}; -- {name, fn, module}
+              citem[PITEM_Name] = item[1];
+              citem[PITEM_Function] = itemNumber;
+              citem[PITEM_Module] = imodule;
               for itemLineNumber = 1, #modInfo.functionParams do
-                local line = {citem}; -- {citem, {v0, v1, v2, ...}, itemLine}
+                local line = {nil, nil, nil}; -- {citem, {v0, v1, v2, ...}, itemLine}
                 local values = {};
                 for valueNumber = 1, #modInfo.functionParams[itemLineNumber] do
                   values[valueNumber] = 0;
                 end
-                line[2] = values;
-                line[3] = itemLineNumber;
+                line[PLINE_Item] = citem;
+                line[PLINE_Values] = values;
+                line[PLINE_Line] = itemLineNumber;
                 page[#page + 1] = line;
               end
             else
@@ -541,6 +553,8 @@ local function initMenuBW(menu)
   local cmenu = {};
   local shortCuts = {};
   local overlays = {};
+  local pagetitles = {};
+
   for i, p in ipairs(menu) do
     overlays[i] = {};
   end
@@ -549,6 +563,9 @@ local function initMenuBW(menu)
   local switchId = nil; 
   local lsmode = 0;
   for i, p in ipairs(menu) do
+    if (p.title) then
+      pagetitles[i] = p.title;
+    end
     cmenu[i] = {};
     for k, item in ipairs(p) do
       switchId = nil;
@@ -562,17 +579,19 @@ local function initMenuBW(menu)
           lsmode = item.lsmode;
         end
       end
-      local citem = {item[ITEM_Name], item.states, item.state, item.fn, item.module};
+      local citem = {item[ITEM_Name], item.states, item.state, item.fn, item.module, nil, nil};
       if (item.export) then
         citem[ITEM_Export] = item.export;
       end
       if (item.virtual) then
         citem[ITEM_Virtual] = {};
         for i, v in ipairs(item.virtual) do
+          TRACE("virt: ", i, v.fn, v.module);
           if (v.fn) and (v.fn > 0) and (v.module) and (v.module > 0) then		  
             citem[ITEM_Virtual][i] = {v.fn, v.module};
           end
         end
+        TRACE("virts4:", citem[ITEM_Name], citem[ITEM_Virtual]);
       end
 
       -- validity check
@@ -600,12 +619,14 @@ local function initMenuBW(menu)
   -- resolve virtuals
   for ip, page in ipairs(cmenu) do
     for i, item in ipairs(page) do
-      local virts = {};
+      TRACE("virts3:", item[ITEM_Name], item[ITEM_Virtual]);
       if (item[ITEM_Virtual]) then
+        local virts = {};
+        TRACE("virt2:", item[ITEM_Virtual]);
         for iv, v in ipairs(item[ITEM_Virtual]) do
           local vitem = findItem(cmenu, v[1], v[2]);
           if (vitem) then
-            virts[#virts + 1] = vitem;
+            ADD(virts, vitem);
           end
         end
         item[ITEM_Virtual] = virts;
@@ -632,51 +653,32 @@ local function initMenuBW(menu)
       shortCuts[#shortCuts + 1] = {switchid, item, lsmode};
     end
   end
-
---   for si, use in ipairs(shortCuts) do
---      print("sc:", use[1], use[2][1], use[3]);
---   end
---   for p, o in ipairs(overlays) do
---      print("op:", p);
---      for r, use in ipairs(o) do
---	 print("ovl:", use[1], use[2][1], use[3]);
---      end
---   end
-
   menu = nil;
   switchUse = nil;
   collectgarbage();
-  --print("initMenuBW E");
-  return cmenu, shortCuts, overlays;
+  return cmenu, shortCuts, overlays, pagetitles;
 end
 
 local function initMenuColor(cfg, menu, filename)
-  --print("initMenuColor A");
   if not menu then
     return;
   end
-  local cmenu, shortCuts, overlays = initMenuBW(menu);
+  local cmenu, shortCuts, overlays, pagetitles = initMenuBW(menu);
+
+  local menudata = {};
 
   if (menu.title) then
-    cmenu.title = menu.title;
-  end
-
-  for i, p in ipairs(menu) do
-    if (p.title) then
-      cmenu[i].title = p.title;
-    end
+    menudata[MENUDATA_Title] = menu.title;
   end
 
   if (cfg[CFG_Footer]) then
-    cmenu.footer = cfg[CFG_Footer];
+    menudata[MENUDATA_Footer] = cfg[CFG_Footer];
 
     if (filename) then
-      cmenu.footer = cmenu.footer .. " File:" .. filename;
+      menudata[MENUDATA_Footer] = menudata[MENUDATA_Footer] .. " File:" .. filename;
     end
   end
-
-  --print("initMenuColor A");
-  return cmenu, shortCuts, overlays;
+  return cmenu, shortCuts, overlays, pagetitles, menudata;
 end
 
 

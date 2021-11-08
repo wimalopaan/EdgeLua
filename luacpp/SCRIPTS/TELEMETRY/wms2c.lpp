@@ -53,7 +53,7 @@ local function init_telemetry()
     return;
   end
 
-  __libI.initWidget(widget);
+  widget = __libI.initWidget();
   collectgarbage();
 
   if not(__WmSw2Config) then

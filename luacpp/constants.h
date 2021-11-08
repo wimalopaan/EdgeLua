@@ -1,5 +1,7 @@
 #pragma once
 
+#define BASE_DIR "/EDGELUA"
+
 #define W_X 1
 #define W_Y 2
 #define W_Width 3
@@ -32,7 +34,16 @@
 #define CFG_SafeMode_LsNumber 18
 #define CFG_Footer 19
 
-#define MENU_Name 1
+#define MENUDATA_Title 1
+#define MENUDATA_Footer 2
+
+#define PAGEDATA_Title 1
+
+#define MENUSTATE_Row 1
+#define MENUSTATE_Col 2
+#define MENUSTATE_Page 3
+#define MENUSTATE_SelRow 4
+#define MENUSTATE_SelCol 5
 
 #define ITEM_Name 1
 #define ITEM_States 2
@@ -41,4 +52,25 @@
 #define ITEM_Module 5
 #define ITEM_Export 6
 #define ITEM_Virtual 7
+#define ITEM_Rects 8
 
+#define PHEADER_Title 1
+#define PHEADER_Module 2
+#define PHEADER_LinesStart 3
+
+#define PHITEM_Name 1
+#define PHITEM_ParamId 2
+
+#define PITEM_Name 1
+#define PITEM_Function 2
+#define PITEM_Module 3
+
+#define PLINE_Item 1
+#define PLINE_Values 2
+#define PLINE_Line 3
+#define PLINE_Rects ITEM_Rects
+
+#define REMOTE_LastValue = 1
+#define REMOTE_Module = 2
+#define REMOTE_Function = 3
+#define REMOTE_State = 4

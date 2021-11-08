@@ -18,13 +18,17 @@ local gstates2 = {"stop", "auf", "ab", "NA"};
 local gstates3 = {"Pos1", "Pos2", "Pos3", "Pos4"};
 
 local menu = {
-   { -- template for digital multiswitch RC-MultiSwitch-D @ Address(1)
+    { -- template for digital multiswitch RC-MultiSwitch-D @ Address(1)
+        title = "Deck 1/1",
         {"M1A", states = gstates1, state = 1, switch = "sa", fn = 1, module = 1},
         {"M1B", states = gstates1, state = 1, switch = "sb", fn = 2, module = 1},
         {"M1C", states = gstates1, state = 1, switch = nil,  fn = 3, module = 1},
         {"M1D", states = gstates1, state = 1, switch = "se", virtual = { {fn = 7, module = 1} } },
         {"M1E", states = gstates1, state = 1, switch = nil,  fn = 5, module = 1},
         {"M1F", states = gstates1, state = 1, switch = "ls1", fn = 6, module = 1, lsmode = 1},
+    },
+    {
+        title = "Deck 1/2",
         {"M1G", states = gstates1, state = 1, switch = nil, fn = 7, module = 1},
         {"M1H", states = gstates1, state = 1, switch = nil, fn = 8, module = 1},
     },
@@ -42,9 +46,11 @@ local menu = {
         {"M2D", states = gstates3, state = 1, switch = "se", fn = 4, module = 2},
         {"M2E", states = gstates1, state = 1, switch = nil,  fn = 5, module = 2},
         {"M2F", states = gstates1, state = 1, switch = nil,  fn = 6, module = 2},
+    },
+    {
         {"M2G", states = gstates1, state = 1, switch = nil,  fn = 7, module = 2},
         {"M2H", states = gstates1, state = 1, switch = nil,  fn = 8, module = 2},
-    },
+    }
 }   
 
 local exportValues = {0, -50, 50, 100}; -- values for states

@@ -14,10 +14,10 @@
 
 local widget = {};
 local menuState = {1, 1, 1, 0, 0}; -- row, col, page
---local config = {};
 local menu = {};
 local shortCuts = {};
 local overlays = {};
+local pagetitles = {};
 local queue = nil;
 local fsmState = {};
 local switchFSM = {};
@@ -32,7 +32,7 @@ local function run_telemetry(event)
   if (errorCode == 0) then
     __libD.processEvents(__WmSw2Config, menu, menuState, event, queue, __libD.selectItem);
     __libD.processOverlays(overlays, menuState, queue);
-    __libD.displayMenu(__WmSw2Config, widget, menu, overlays, menuState);
+    __libD.displayMenu(__WmSw2Config, widget, menu, overlays, menuState, pagetitles);
   else
     lcd.clear();
     lcd.drawText(0, 0, "Error: " .. errorCode, DBLSIZE);
@@ -48,7 +48,7 @@ local function init_telemetry()
     return;
   end
 
-  __libI.initWidget(widget);
+  widget = __libI.initWidget();
   collectgarbage();
 
   if not(__WmSw2Config) then
@@ -78,7 +78,7 @@ local function init_telemetry()
     return;
   end
 
-  menu, shortCuts, overlays = __libI.initMenu(menu)      
+  menu, shortCuts, overlays, pagetitles = __libI.initMenu(menu)      
   collectgarbage();
 
   __libI.initFSM(fsmState);
