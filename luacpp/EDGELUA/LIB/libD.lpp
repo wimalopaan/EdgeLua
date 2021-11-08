@@ -610,9 +610,9 @@ local function processEventsBW(config, menu, menuState, event, queue, callback)
       menuDeselect(menuState);
     end
     if (event == EVT_VIRTUAL_INC) then
-      prevCol(menu, menuState);
+      prevRow(menu, menuState);
     elseif (event == EVT_VIRTUAL_DEC) then
-      nextCol(menu, menuState);
+      nextRow(menu, menuState);
     elseif (event == EVT_VIRTUAL_PREV) or (event == 101) then
       prevCol(menu, menuState);
     elseif (event == EVT_VIRTUAL_NEXT) or (event == 100) then
