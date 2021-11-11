@@ -61,4 +61,4 @@ local map = {
    {module = 8, type = 3},
 };
 
-return menu, map, exportValues, backend;
+return menu, map, exportValues;

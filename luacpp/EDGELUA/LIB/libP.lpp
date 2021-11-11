@@ -43,30 +43,17 @@ end
 Class.Queue = Queue;
 
 local function nextItem(menu, state)
-  local page = menu[state[3]];
-  if (state[4] == #page) then
-    state[4] = 1;
-    if (state[3] == #menu) then
-      state[3] = 1;
+  local page = menu[state[FSMSWITCH_CyclePage]];
+  if (state[FSMSWITCH_CycleRow] == #page) then
+    state[FSMSWITCH_CycleRow] = 1;
+    if (state[FSMSWITCH_CyclePage] == #menu) then
+      state[FSMSWITCH_CyclePage] = 1;
     else
-      state[3] = state[3] + 1;
+      state[FSMSWITCH_CyclePage] = state[FSMSWITCH_CyclePage] + 1;
     end
   else
-    state[4] = state[4] + 1;
+    state[FSMSWITCH_CycleRow] = state[FSMSWITCH_CycleRow] + 1;
   end
-  --[[
-  local page = menu[state.cyclePage];
-  if (state.cycleItem == #page) then
-    state.cycleItem = 1;
-    if (state.cyclePage == #menu) then
-      state.cyclePage = 1;
-    else
-      state.cyclePage = state.cyclePage + 1;
-    end
-  else
-    state.cycleItem = state.cycleItem + 1;
-  end
-  ]]
 end
 
 local function setSwitchOn(lsNumber) 
@@ -90,50 +77,49 @@ local function setSwitchOff(lsNumber)
 end 
 
 local function rssiState(cfg, state)
-  if (cfg[18]) then
+  if (cfg[CFG_SafeMode_LsNumber]) then
     local t = getTime();
 
-    if not(state[1]) then
-      state[1] = 0;
-      state[2] = t;
-      setSwitchOff(cfg[18]);
+    if not(state[FSMRSSI_State]) then
+      state[FSMRSSI_State] = 0;
+      state[FSMRSSI_LastTime] = t;
+      setSwitchOff(cfg[CFG_SafeMode_LsNumber]);
     end 
---    print("RSSIState:", state[1]);
-    if (state[1] == 0) then -- safeMode
+    if (state[FSMRSSI_State] == FSMRSSI_STATE_SafeMode) then -- safeMode
       if (getRSSI() > 10) then
---        print("smode A");
-        state[1] = 1;
-        state[2] = t;
+        TRACE("safemode: on");
+        state[FSMRSSI_State] = FSMRSSI_STATE_WaitUp;
+        state[FSMRSSI_LastTime] = t;
       end 
-    elseif (state[1] == 1) then -- wait rssi
+    elseif (state[FSMRSSI_State] == FSMRSSI_STATE_WaitUp) then -- wait rssi
       if (getRSSI() < 10) then
---        print("smode B");
-        state[2] = t;
-        state[1] = 0;
+        TRACE("safemode: wait up: down");
+        state[FSMRSSI_LastTime] = t;
+        state[FSMRSSI_State] = FSMRSSI_STATE_SafeMode;
       end 
-      if ((t - state[2]) > cfg[16]) then
-        setSwitchOn(cfg[18]);
---        print("smode C");
-        state[2] = t;
-        state[1] = 2;
+      if ((t - state[FSMRSSI_LastTime]) > cfg[CFG_SafeMode_Timeout]) then
+        setSwitchOn(cfg[CFG_SafeMode_LsNumber]);
+        TRACE("safemode: wait up: up");
+        state[FSMRSSI_LastTime] = t;
+        state[FSMRSSI_State] = FSMRSSI_STATE_Normal;
       end
-    elseif (state[1] == 2) then -- normal
+    elseif (state[FSMRSSI_State] == FSMRSSI_STATE_Normal) then -- normal
       if (getRSSI() < 10) then
---        print("smode D");
-        state[2] = t;
-        state[1] = 3;
+        TRACE("safemode normal: down");
+        state[FSMRSSI_LastTime] = t;
+        state[FSMRSSI_State] = FSMRSSI_STATE_WaitDown;
       end 
-    elseif (state[1] == 3) then -- wait normal
+    elseif (state[FSMRSSI_State] == FSMRSSI_STATE_WaitDown) then -- wait normal
       if (getRSSI() > 10) then
---        print("smode E");
-        state[2] = t;
-        state[1] = 2;
+        TRACE("safemode: wait down: up");
+        state[FSMRSSI_LastTime] = t;
+        state[FSMRSSI_State] = FSMRSSI_STATE_Normal;
       end 
-      if ((t - state[2]) > cfg[17]) then
-        setSwitchOff(cfg[18]);
---        print("smode F");
-        state[2] = t;
-        state[1] = 1;
+      if ((t - state[FSMRSSI_LastTime]) > cfg[CFG_SafeMode_LinkDropoutMax]) then
+        setSwitchOff(cfg[CFG_SafeMode_LsNumber]);
+        TRACE("safemode: wait down: down");
+        state[FSMRSSI_LastTime] = t;
+        state[FSMRSSI_State] = FSMRSSI_STATE_SafeMode;
       end
     end
   end 
@@ -144,102 +130,56 @@ end
 
 local function sbusConfigFSM(config, menu, headers, menuState, queue, state, encoder, paramEncoder, pValue)
   local t = getTime();
-  if ((t - state[1]) > config[CFG_StateTimeout]) then
-    if (state[2] == 0) then
+  if ((t - state[FSMCONF_LastTime]) > config[CFG_StateTimeout]) then
+    if (state[FSMCONF_State] == FSMCONF_STATE_Wait) then
       if (queue:size() > 0) then
-        state[3] = queue:pop(); -- line
---        print("cFSM: ", state[2], state[3][1][1]);
-        state[2] = 1;
-        state[1] = t;
---        print("cFSM:", paramEncoder, config, config[CFG_MixerGlobalVariable]);
+        state[FSMCONF_Row] = queue:pop(); -- line
+        TRACE("cFSM: ", state[FSMCONF_State], state[FSMCONF_Row][PLINE_Item][PITEM_Name]);
+        state[FSMCONF_State] = FSMCONF_STATE_BCastOff;
+        state[FSMCONF_LastTime] = t;
         paramEncoder(config[CFG_MixerGlobalVariable], 31, 31); -- bcast off (handles sbus correct)
---        print("x");
       end
-    elseif (state[2] == 1) then -- broadcast off
---      print("cFSM: ", state[2]);
-      if ((t - state[1]) > 50) then
-        state[2] = 2;
-        state[1] = t;
-        local item = {[3] = 2, [4] = state[3][1][2], [5]  = state[3][1][3]};
+    elseif (state[FSMCONF_State] == FSMCONF_STATE_BCastOff) then -- broadcast off
+      TRACE("cFSM: ", state[FSMCONF_State]);
+      if ((t - state[FSMCONF_LastTime]) > 50) then
+        state[FSMCONF_State] = FSMCONF_STATE_SelectOn;
+        state[FSMCONF_LastTime] = t;
+--        local item = {[3] = 2, [4] = state[3][1][2], [5]  = state[3][1][3]};
+        local item = {
+          [ITEM_State] = 2, -- state = on
+          [ITEM_Function] = state[FSMCONF_Row][PLINE_Item][PITEM_Function],
+          [ITEM_Module] = state[FSMCONF_Row][PLINE_Item][PITEM_Module]
+        }
         encoder(config[CFG_MixerGlobalVariable], item); -- set laston in module
       end
-    elseif (state[2] == 2) then -- select item
---      print("cFSM: ", state[2]);
-      if ((t - state[1]) > 50) then
-        state[2] = 3;
-        state[1] = t;
+    elseif (state[FSMCONF_State] == FSMCONF_STATE_SelectOn) then -- select item
+      TRACE("cFSM: ", state[FSMCONF_State]);
+      if ((t - state[FSMCONF_LastTime]) > 50) then
+        state[FSMCONF_State] = FSMCONF_STATE_SendValue;
+        state[FSMCONF_LastTime] = t;
       end
-    elseif (state[2] == 3) then -- send pvalue
-      if (menuState[4] == 0) and (menuState[5] == 0) then
-        state[2] = 4;
-        state[1] = t;
+    elseif (state[FSMCONF_State] == FSMCONF_STATE_SendValue) then -- send pvalue
+      if (menuState[MENUSTATE_SelRow] == 0) and (menuState[MENUSTATE_SelCol] == 0) then
+        state[FSMCONF_State] = FSMCONF_STATE_End;
+        state[FSMCONF_LastTime] = t;
       else
-        local item = state[3][1];
-        local values = state[3][2];
-        local col = menuState[5];
+        local item = state[FSMCONF_Row][PLINE_Item];
+        local values = state[FSMCONF_Row][PLINE_Values];
+        local col = menuState[MENUSTATE_SelCol];
         local value = values[col];
-        local itemLine = state[3][3];
-        local pageHeaders = headers[ menuState[3] ];
-        local header = pageHeaders[itemLine + 2];
-        local paramNumber = header[col][2];
---        print("cFSM: ", state[2], "P:", paramNumber, "V:", value, header);
+        local itemLine = state[FSMCONF_Row][PLINE_Line];
+        local pageHeaders = headers[ menuState[MENUSTATE_Page] ];
+        local header = pageHeaders[itemLine + PHEADER_LinesStart - 1];
+        local paramNumber = header[col][PHITEM_ParamId];
+        TRACE("cFSM: ", state[FSMCONF_State], "P:", paramNumber, "V:", value, header);
         paramEncoder(config[CFG_MixerGlobalVariable], paramNumber, value);
       end
-    elseif (state[2] == 4) then -- end
---      print("cFSM: ", state[2]);
-      state[2] = 0;
-      state[1] = t;
+    elseif (state[FSMCONF_State] == FSMCONF_STATE_End) then -- end
+      TRACE("cFSM: ", state[FSMCONF_State]);
+      state[FSMCONF_State] = FSMCONF_STATE_Wait;
+      state[FSMSWITCH_LastTime] = t;
     end     
   end
-  --[[
-  if ((t - state.lasttime) > config[CFG_StateTimeout]) then
-    if (state.actual == 0) then
-      if (queue:size() > 0) then
-        state.line = queue:pop(); -- line
-        print("cFSM: ", state.actual, state.line[1][1]);
-        state.actual = 1;
-        state.lasttime = t;
-        print("cFSM:", paramEncoder, config, config[CFG_MixerGlobalVariable]);
-        paramEncoder(config[CFG_MixerGlobalVariable], 31, 31); -- bcast off (handles sbus correct)
-        print("x");
-      end
-    elseif (state.actual == 1) then -- broadcast off
-      print("cFSM: ", state.actual);
-      if ((t - state.lasttime) > 50) then
-        state.actual = 2;
-        state.lasttime = t;
-        local item = {[3] = 2, [4] = state.line[1][2], [5]  = state.line[1][3]};
-        encoder(config[CFG_MixerGlobalVariable], item); -- set laston in module
-      end
-    elseif (state.actual == 2) then -- select item
-      print("cFSM: ", state.actual);
-      if ((t - state.lasttime) > 50) then
-        state.actual = 3;
-        state.lasttime = t;
-      end
-    elseif (state.actual == 3) then -- send pvalue
-      if (menuState[4] == 0) and (menuState[5] == 0) then
-        state.actual = 4;
-        state.lasttime = t;
-      else
-        local item = state.line[1];
-        local values = state.line[2];
-        local col = menuState[5];
-        local value = values[col];
-        local itemLine = state.line[3];
-        local pageHeaders = headers[ menuState[3] ];
-        local header = pageHeaders[itemLine + 2];
-        local paramNumber = header[col][2];
-        print("cFSM: ", state.actual, "P:", paramNumber, "V:", value, header);
-        paramEncoder(config[CFG_MixerGlobalVariable], paramNumber, value);
-      end
-    elseif (state.actual == 4) then -- end
-      print("cFSM: ", state.actual);
-      state.actual = 0;
-      state.lasttime = t;
-    end     
-  end
-  ]]
 end
 
 local function sportSwitchFSM()
@@ -250,13 +190,13 @@ end
 
 local function sbusSwitchFSM(config, menu, queue, state, encoder, exportValues)
   local t = getTime();
-  if ((t - state[1]) > config[CFG_StateTimeout]) then
+  if ((t - state[FSMSWITCH_LastTime]) > config[CFG_StateTimeout]) then
     local item = nil;
     if (queue:size() > 0) then
       item = queue:pop();
     else
-      local page = menu[state[3]]; --page
-      item = page[state[4]]; --item
+      local page = menu[state[FSMSWITCH_CyclePage]]; 
+      item = page[state[FSMSWITCH_CycleRow]]; 
       if (item[ITEM_Virtual]) then -- virtuals are not cyclic pushed
         item = nil;
       end 
@@ -265,7 +205,7 @@ local function sbusSwitchFSM(config, menu, queue, state, encoder, exportValues)
     if (item) then
       if (item[ITEM_Virtual]) then
         for i, virt in ipairs(item[ITEM_Virtual]) do
-          virt[3] = item[ITEM_State];
+          virt[ITEM_State] = item[ITEM_State];
           queue:push(virt);
         end
       else
@@ -275,39 +215,9 @@ local function sbusSwitchFSM(config, menu, queue, state, encoder, exportValues)
           model.setGlobalVariable(item[ITEM_Export], 0, expValue);
         end
       end
-      state[1] = t;
+      state[FSMSWITCH_LastTime] = t;
     end 
   end
---[[
-  if ((t - state.lasttime) > config[CFG_StateTimeout]) then
-    local item = nil;
-    if (queue:size() > 0) then
-      item = queue:pop();
-    else
-      local page = menu[state.cyclePage];
-      item = page[state.cycleItem];
-      if (item[ITEM_Virtual]) then -- virtuals are not cyclic pushed
-        item = nil;
-      end 
-      nextItem(menu, state);
-    end
-    if (item) then
-      if (item[ITEM_Virtual]) then
-        for i, virt in ipairs(item[ITEM_Virtual]) do
-          virt[3] = item[ITEM_State];
-          queue:push(virt);
-        end
-      else
-        encoder(config[CFG_MixerGlobalVariable], item);
-        if (item[ITEM_Export]) then -- export
-          local expValue = exportValues[ item[ITEM_State] ] * 1024 / 100;
-          model.setGlobalVariable(item[ITEM_Export], 0, expValue);
-        end
-      end
-      state.lasttime = t;
-    end 
-  end
-  ]]
 end
 
 local function setXJT(gv, sbusValue)
@@ -442,8 +352,8 @@ local function encodeTipTip(gv, item)
 end
 
 local function getEncoder(cfg)
-  if not(cfg[14]) or (cfg[14] <= 1) then 
-    local type = cfg[9];
+  if not(cfg[CFG_Backend]) or (cfg[CFG_Backend] <= 1) then 
+    local type = cfg[CFG_Encoding];
     if (type == 0) then
       return encodeXJT, parameterValueSbus, encodeParamXJT;
     elseif (type == 1) then
@@ -453,18 +363,18 @@ local function getEncoder(cfg)
     end
     return encodeSBus, parameterValueSbus, encodeParamSBus;
   else
-    if (cfg[14] == 2) then
+    if (cfg[CFG_Backend] == 2) then
       return encodeSPort, parameterValueSPort, encodeParamSPort;
-    elseif (cfg[14] == 3) then
+    elseif (cfg[CFG_Backend] == 3) then
       return encodeTipTip;
     end
   end
 end
 
 local function getConfigFSM(cfg)
-  if (cfg[14] <= 1) then
+  if (cfg[CFG_Backend] <= 1) then
     return sbusConfigFSM;
-  elseif (cfg[14] == 2) then
+  elseif (cfg[CFG_Backend] == 2) then
     return sportConfigFSM;
   else
     return function() end;
@@ -472,9 +382,9 @@ local function getConfigFSM(cfg)
 end
 
 local function getSwitchFSM(cfg)
-  if (cfg[14] <= 1) then
+  if (cfg[CFG_Backend] <= 1) then
     return sbusSwitchFSM;
-  elseif (cfg[14] == 2) then
+  elseif (cfg[CFG_Backend] == 2) then
     return sportSwitchFSM;
   else
     return tiptipSwitchFSM;

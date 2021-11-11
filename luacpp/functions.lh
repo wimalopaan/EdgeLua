@@ -3,23 +3,20 @@
 #include "global.h"
 
 local function load()
-  local basedir = "/EDGELUA/LIB/";
+  local basedir = BASE_DIR .. "/LIB/";
   if not __libI then
---      print("LOAD_I");
     __libI = loadScript(basedir .. "libI.lua")();
     if not __libI then
       errorCode = 1;
     end
   end
   if not __libD then
---      print("LOAD_D");
     __libD = loadScript(basedir .. "libD.lua")();
     if not __libD then
       errorCode = 2;
     end
   end
   if not __libP then
---      print("LOAD_P");
     __libP = loadScript(basedir .. "libP.lua")();
     if not __libP then
       errorCode = 3;

@@ -10,12 +10,49 @@
 -- Please note that the above license also covers the transfer protocol used and the encoding scheme and 
 -- all further principals of tranferring state and other information.
 
+#include "../../global.h"
 
-local output = { "sgvar" };
+local output = { "sw_var" };
+
+#ifndef USE_SHM
+
+local errorCode = 0;
+local gvar = 0;
+local function init()
+   if not(__WmSw2Config) then
+      local basedir = BASE_DIR .. "/LIB/";
+      if not __libI then
+        __libI = loadScript(basedir .. "libI.lua")();
+        if not __libI then
+          errorCode = 1;
+        else   
+         local config = __libI.loadConfig();
+         if not(config) then
+            errorCode = 4;
+            return;
+         end
+         __WmSw2Config = __libI.initConfig(config);
+         gvar = __WmSw2Config[CFG_MixerGlobalVariable];
+         collectgarbage();
+        end
+      end
+   end
+ end
+
+ #endif
 
 local function run()
-   local v = model.getGlobalVariable(5, 0);
-   return v;
+   #ifdef USE_SHM
+      return getShmVar(SHM_VAR);
+   #else
+      return model.getGlobalVariable(gvar, 0);
+   #endif
 end
 
-return {output=output, run=run}
+return {
+   #ifndef USE_SHM
+   init = init,
+   #endif
+   output = output, 
+   run = run
+}

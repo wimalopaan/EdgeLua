@@ -188,11 +188,11 @@ local function displayParamMenuColorNoTheme(config, widget, pmenu, pheaders, sta
     line[PLINE_Rects] = {};
     local x = widget[W_X];
     local y = widget[W_Y] + widget[W_YOffset] + (#header + row - 3) * widget[W_FontHeight];
-    local label = line[1][1];
+    local label = line[PLINE_Item][ITEM_Name];
     if (line[PLINE_Line] > 1) then
       label = "--" .. label;
     end
-    if (row == state[1]) then
+    if (row == state[MENUSTATE_Row]) then
       lcd.drawText(x, y, label, SMLSIZE + INVERS);
     else
       lcd.drawText(x, y, label, SMLSIZE);
@@ -286,7 +286,7 @@ local function displayParamMenuColor(config, widget, pmenu, pheaders, state, par
     end
 
     x = x + config[CFG_FirstColWidth];
-    for col, st in ipairs(line[2]) do
+    for col, st in ipairs(line[PLINE_Values]) do
       local rect = {xmin = x, ymin = y, xmax = x + fw, ymax = y + widget[W_FontHeight]};
       line[PLINE_Rects][col] = rect;
 
@@ -337,7 +337,7 @@ local function displayMenuBW(config, widget, menu, overlays, state, pagetitles)
     end
 
     for io, o in ipairs(overlay) do
-      if (o[2] == item) then
+      if (o[OVERLAY_Item] == item) then
         label = label .. "*";
       end
     end
@@ -400,7 +400,7 @@ local function displayMenuColor(config, widget, menu, overlays, state, event, re
 
   if (config[CFG_RemoteId]) then
     lcd.drawText(widget[W_X] + widget[W_Width] - 70, widget[W_Y] + widget[W_Height] - widget[W_FontHeight],
-      "r[" .. remote[2] .. "," .. remote[3] .. "," .. remote[4] .. "]:" .. remote[1],
+      "r[" .. remote[REMOTE_Function] .. "," .. remote[REMOTE_Module] .. "," .. remote[REMOTE_State] .. "]:" .. remote[REMOTE_LastValue],
       SMLSIZE + COLOR_THEME_PRIMARY3);
   end
 
@@ -415,7 +415,7 @@ local function displayMenuColor(config, widget, menu, overlays, state, event, re
     end
 
     for io, o in ipairs(overlay) do
-      if (o[2] == item) then
+      if (o[OVERLAY_Item] == item) then
         label = label .. "*";
       end
     end
@@ -493,7 +493,7 @@ local function displayMenuColorNoTheme(config, widget, menu, overlays, state, ev
     end
 
     for io, o in ipairs(overlay) do
-      if (o[2] == item) then
+      if (o[OVERLAY_Item] == item) then
         label = label .. "*";
       end
     end
@@ -525,80 +525,80 @@ local function displayMenuColorNoTheme(config, widget, menu, overlays, state, ev
 end
 
 local function prevPage(menu, menuState)
-  if (menuState[3] == 1) then
-    menuState[3] = #menu;
+  if (menuState[MENUSTATE_Page] == 1) then
+    menuState[MENUSTATE_Page] = #menu;
   else
-    menuState[3] = menuState[3] - 1;
+    menuState[MENUSTATE_Page] = menuState[MENUSTATE_Page] - 1;
   end
 end
 
 local function nextPage(menu, menuState)
-  if (menuState[3] == #menu) then
-    menuState[3] = 1;
+  if (menuState[MENUSTATE_Page] == #menu) then
+    menuState[MENUSTATE_Page] = 1;
   else
-    menuState[3] = menuState[3] + 1;
+    menuState[MENUSTATE_Page] = menuState[MENUSTATE_Page] + 1;
   end
 end
 
 local function prevRow(menu, menuState)
-  if (menuState[1] == 1) then
+  if (menuState[MENUSTATE_Row] == 1) then
     prevPage(menu, menuState);
-    menuState[1] = #menu[menuState[3]];
+    menuState[MENUSTATE_Row] = #menu[menuState[MENUSTATE_Page]];
   else
-    menuState[1] = menuState[1] - 1;
+    menuState[MENUSTATE_Row] = menuState[MENUSTATE_Row] - 1;
   end
 end
 
 local function nextRow(menu, menuState)
-  if (menuState[1] == #menu[menuState[3]]) then
+  if (menuState[MENUSTATE_Row] == #menu[menuState[MENUSTATE_Page]]) then
     nextPage(menu, menuState);
-    menuState[1] = 1;
+    menuState[MENUSTATE_Row] = 1;
   else
-    menuState[1] = menuState[1] + 1; 
+    menuState[MENUSTATE_Row] = menuState[MENUSTATE_Row] + 1; 
   end
 end
 
 local function prevCol(menu, menuState)
-  if (menuState[2] == 1) then
+  if (menuState[MENUSTATE_Col] == 1) then
     prevRow(menu, menuState);
-    menuState[2] = #menu[menuState[3]][menuState[1]][2];
+    menuState[MENUSTATE_Col] = #menu[menuState[MENUSTATE_Page]][menuState[MENUSTATE_Row]][MENUSTATE_Col];
   else
-    menuState[2] = menuState[2] - 1;
+    menuState[MENUSTATE_Col] = menuState[MENUSTATE_Col] - 1;
   end
 end
 
 local function nextCol(menu, menuState)
-  if (menuState[2] == #menu[menuState[3]][menuState[1]][2]) then
+  if (menuState[MENUSTATE_Col] == #menu[menuState[MENUSTATE_Page]][menuState[MENUSTATE_Row]][MENUSTATE_Col]) then
     nextRow(menu, menuState);
-    menuState[2] = 1;
+    menuState[MENUSTATE_Col] = 1;
   else
-    menuState[2] = menuState[2] + 1;
+    menuState[MENUSTATE_Col] = menuState[MENUSTATE_Col] + 1;
   end
 end
 
 local function menuDeselect(menuState)
-  menuState[4] = 0;
-  menuState[5] = 0;
+  menuState[MENUSTATE_SelRow] = 0;
+  menuState[MENUSTATE_SelCol] = 0;
 end
 
 local function makeSelection(menuState)
-  menuState[4] = menuState[1]; -- selection
-  menuState[5] = menuState[2];
+  menuState[MENUSTATE_SelRow] = menuState[MENUSTATE_Row]; -- selection
+  menuState[MENUSTATE_SelCol] = menuState[MENUSTATE_Col];
 end
 
 local function selectParamItem(menu, menuState, queue)
   makeSelection(menuState);
-  local page = menu[menuState[3]];
-  local pitem = page[menuState[1]];
+  local page = menu[menuState[MENUSTATE_Page]];
+  local pitem = page[menuState[MENUSTATE_Row]];
   local item = pitem;
   queue:push(item);
 end
 
 local function selectItem(menu, menuState, queue)
   makeSelection(menuState);
-  local page = menu[menuState[3]];
-  local item = page[menuState[1]];
-  item[ITEM_State] = menuState[2];
+  local page = menu[menuState[MENUSTATE_Page]];
+  local item = page[menuState[MENUSTATE_Row]];
+  item[ITEM_State] = menuState[MENUSTATE_Col];
   queue:push(item);
 end
 
@@ -679,70 +679,74 @@ end
 
 local function processShortCuts(shortCuts, queue)
   for i, sc in ipairs(shortCuts) do
-    local v = getSwitchValue(sc[1], sc[3]);
-    if not (v == sc[4]) then
-      sc[4] = v;
-      sc[2][3] = v;
-      queue:push(sc[2]);
+    local v = getSwitchValue(sc[SHORTCUT_SwitchID], sc[SHORTCUT_LSMode]);
+    if not (v == sc[SHORTCUT_LastValue]) then
+      sc[SHORTCUT_LastValue] = v;
+      local item = sc[SHORTCUT_Item];
+      item[ITEM_State] = v;
+      queue:push(item);
     end
   end
 end
 
 local function processOverlays(overlays, menuState, queue)
-  local activePageIndex = menuState[3];
+  local activePageIndex = menuState[MENUSTATE_Page];
   local overlay = overlays[activePageIndex];
   processShortCuts(overlay, queue);
 end
 
 local function processTrims(config, menu, menuState, buttonState, queue, callback)
+--  TRACE("processTrims");
   if (config[CFG_PreviousLsId]) then
     local value = getValue(config[CFG_PreviousLsId]);
-    if (value > buttonState[1]) then
+--    TRACE("processTrims prev", config[CFG_PreviousLsId], value);
+    if (value > buttonState[BUTTONS_PREV]) then
       prevCol(menu, menuState);
       menuDeselect(menuState);
     end
-    buttonState[1] = value;
+    buttonState[BUTTONS_PREV] = value;
   end
   if (config[CFG_NextLsId]) then
     local value = getValue(config[CFG_NextLsId]);
-    if (value > buttonState[2]) then
+--    TRACE("processTrims next", config[CFG_NextLsId], value);
+    if (value > buttonState[BUTTONS_NEXT]) then
       nextCol(menu, menuState);
       menuDeselect(menuState);
     end
-    buttonState[2] = value;
+    buttonState[BUTTONS_NEXT] = value;
   end
   if (config[CFG_SelectLsId]) then
     local value = getValue(config[CFG_SelectLsId]);
-    if (value > buttonState[3]) then
---	 print("cb", callback);
+--    TRACE("processTrims select", config[CFG_SelectLsId], value);
+    if (value > buttonState[BUTTONS_SELECT]) then
       callback(menu, menuState, queue);
     end
-    buttonState[3] = value;
+    buttonState[BUTTONS_SELECT] = value;
   end
 end
 
 local function processPots(config, menu, menuState, buttonState)
   if (config[CFG_ScrollUdId]) then
-    local activePageIndex = menuState[3];
+    local activePageIndex = menuState[MENUSTATE_Page];
     local page = menu[activePageIndex];
     local value = getValue(config[CFG_ScrollUdId]) + 1024;
     local row = #page - math.floor(value * #page / 2049);
-    if (row ~= buttonState[5]) then
-      menuState[1] = row;
-      buttonState[5] = row;
+    if (row ~= buttonState[BUTTONS_SLIDER_UD]) then
+      menuState[MENUSTATE_Row] = row;
+      buttonState[BUTTONS_SLIDER_UD] = row;
       menuDeselect(menuState);
     end
   end
   if (config[CFG_ScrollLrId]) then
-    local activePageIndex = menuState[3];
+    local activePageIndex = menuState[MENUSTATE_Page];
     local page = menu[activePageIndex];
-    local item = page[menuState[2]];
+    local item = page[menuState[MENUSTATE_Row]];
     local value = getValue(config[CFG_ScrollLrId]) + 1024;
     if (item) then
       local col = math.floor(value * #item[ITEM_States] / 2049) + 1;
-      if (col ~= buttonState[6]) then
-        menuState[2] = col;
-        buttonState[6] = col;
+      if (col ~= buttonState[BUTTONS_SLIDER_LR]) then
+        menuState[MENUSTATE_Col] = col;
+        buttonState[BUTTONS_SLIDER_LR] = col;
         menuDeselect(menuState);
       end
     end
@@ -752,7 +756,7 @@ end
 local function processMenuSwitch(config, menu, menuState, buttonState)
   if (config[CFG_PageSwitchId]) then
     local ms = getValue(config[CFG_PageSwitchId]);
-    if (math.abs(ms - buttonState[4]) > 10) then
+    if (math.abs(ms - buttonState[BUTTONS_MENUSELECT]) > 10) then
       local s = 1;
       for i = 0,5 do
         if (ms <= (-1024 + (2 * i  + 1) * (2048 / 6))) then
@@ -761,9 +765,9 @@ local function processMenuSwitch(config, menu, menuState, buttonState)
         end
       end
       if (s <= #menu) then
-        menuState[3] = s;
+        menuState[MENUSTATE_Page] = s;
       end
-      buttonState[4] = ms;
+      buttonState[BUTTONS_MENUSELECT] = ms;
       menuDeselect(menuState);
     end
   end
@@ -785,14 +789,14 @@ end
 
 local function processTouch(menu, menuState, event, touch)
   if (touch) then
-    local activePageIndex = menuState[3];
+    local activePageIndex = menuState[MENUSTATE_Page];
     local page = menu[activePageIndex];
     if (event == EVT_TOUCH_TAP) then
       for row, item in ipairs(page) do
         for col, rect in ipairs(item[ITEM_Rects]) do   
           if (covers(touch, rect)) then
-            menuState[1] = row;
-            menuState[2] = col;
+            menuState[MENUSTATE_Row] = row;
+            menuState[MENUSTATE_Col] = col;
           end
         end
       end
@@ -841,10 +845,10 @@ local function processRemoteInput(config, menu, queue, remoteState)
 
   local r = (getValue(config[CFG_RemoteId]) + 1024) / 2;
 
-  if (r == remoteState[1]) then
+  if (r == remoteState[REMOTE_LastValue]) then
     return;
   end
-  remoteState[1] = r;
+  remoteState[REMOTE_LastValue] = r;
 
   local state = bit32.extract(r, 0, 3) + 1;
   local fn = bit32.extract(r, 3, 3) + 1;
@@ -852,10 +856,10 @@ local function processRemoteInput(config, menu, queue, remoteState)
 
   local item = findItem(menu, fn, module);
   if (item) then
-    remoteState[2] = module;
-    remoteState[3] = fn;
-    remoteState[4] = state;
-    print("remote: ", module, fn, state);
+    remoteState[REMOTE_Module] = module;
+    remoteState[REMOTE_Function] = fn;
+    remoteState[REMOTE_State] = state;
+    TRACE("remote: ", module, fn, state);
     item[ITEM_State] = state;
     queue:push(item);
   end
@@ -881,17 +885,16 @@ local function displayAddressConfigColor(config, widget, encoder, pScaler, state
   local rect = {xmin = widget[W_X] + border_h, xmax = widget[W_X] + bw,
     ymin = widget[W_Y] + widget[W_Height] / 2 - bh / 2, ymax = widget[W_Y] + widget[W_Height] / 2 + bh / 2};
 
---   print("Adr: state: ", state[0]);
-  if not(state[1]) or (state[1] == 0) then
+  if (state[FSMADR_State] == FSMADR_STATE_Initial) then
 
     lcd.drawText(widget[W_X] + border_h, widget[W_Y] + widget[W_FontHLarge], "Attach only one device to the RX.", SMLSIZE + COLOR_THEME_PRIMARY1);
 
     lcd.drawFilledRectangle(rect.xmin, rect.ymin, rect.xmax - rect.xmin + 1, rect.ymax - rect.ymin + 1, COLOR_THEME_FOCUS);
     lcd.drawText(rect.xmin + 5, rect.ymin + 5, "Press [Enter] to start learning", MIDSIZE + COLOR_THEME_PRIMARY1);
     if (event == EVT_VIRTUAL_ENTER) then
-      state[1] = 1;
+      state[FSMADR_State] = FSMADR_STATE_Output;
     end
-  elseif (state[1] == 1) then    
+  elseif (state[FSMADR_State] == FSMADR_STATE_Output) then    
     local adr = pScaler(config) + 1;
     if (adr > 8) then
       adr = 8;
@@ -907,7 +910,7 @@ local function displayAddressConfigColor(config, widget, encoder, pScaler, state
     encoder(config[CFG_MixerGlobalVariable], 14, adr);
 
     if (event == EVT_VIRTUAL_ENTER) then
-      state[1] = 0;
+      state[FSMADR_State] = FSMADR_STATE_Initial;
     end
   else
   end

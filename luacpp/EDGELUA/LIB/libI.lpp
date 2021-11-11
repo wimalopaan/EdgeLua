@@ -62,7 +62,7 @@ local function getLogicalSwitchFor(id)
   for lsNumber = 63, 0, -1 do
     local ls = model.getLogicalSwitch(lsNumber);
     if (ls) then
-      if (ls.func == 3) and (ls.v1 == maxId) and (ls.v2 == 0) and (ls["and"] == id) then
+      if (ls.func == LSFUNC_A_GT_X) and (ls.v1 == maxId) and (ls.v2 == 0) and (ls["and"] == id) then
         return lsNumber;
       end
     end
@@ -81,6 +81,18 @@ local function getFirstFreeLogicalSwitch()
 end
 
 local function insertLogicalSwitchFor(id)
+  TRACE("insertLogicalSwitchFor", id);
+
+  #ifdef USE_TRIM_NAMES
+  if (type(id) == "string") then
+    local swinfo = getFieldInfo(id);
+    if (swinfo) then
+      TRACE("insertLogicalSwitchFor swinfo", id, swinfo.id);
+      id = swinfo.id;
+    end
+  end
+  #endif
+
   local max = getFieldInfo("max");
   if (max) then
     local maxId = max.id;
@@ -89,12 +101,13 @@ local function insertLogicalSwitchFor(id)
       if (lsNumber < 0) then
         lsNumber = getFirstFreeLogicalSwitch();
         if (lsNumber >= 0) then
-          model.setLogicalSwitch(lsNumber, {func = 3, v1 = maxId, v2 = 0, ["and"] = id});
+          model.setLogicalSwitch(lsNumber, {func = LSFUNC_A_GT_X, v1 = maxId, v2 = 0, ["and"] = id});
         end
       end
       if (lsNumber >= 0) then
         local lsf = getFieldInfo("ls" .. (lsNumber + 1));
         if (lsf) then
+          TRACE("insertLogicalSwitchFor", lsNumber, lsf.id)
           return lsf.id;
         end
       end
@@ -104,41 +117,55 @@ local function insertLogicalSwitchFor(id)
 end 
 
 local function insertSettableSwitch(number)
+  TRACE("insertSettableSwitch");
   local max = getFieldInfo("max");
   if (max) then
     local maxId = max.id;
 
     for n = 63, 0, -1 do
       local ls = model.getLogicalSwitch(n);
-      if ((ls.func == 1) or (ls.func == 3)) and (ls.v1 == maxId) and (ls.v2 == number) then
+      if ((ls.func == LSFUNC_A_EQ_X) or (ls.func == LSFUNC_A_GT_X)) and (ls.v1 == maxId) and (ls.v2 == number) then
         return n;
       end
     end 
     local lsNumber = getFirstFreeLogicalSwitch();
     if (lsNumber >= 0) then
-      model.setLogicalSwitch(lsNumber, {func = 1, v1 = maxId, v2 = number}); -- func: 1: a == 0, 3: a > x 
+      model.setLogicalSwitch(lsNumber, {func = LSFUNC_A_EQ_X, v1 = maxId, v2 = number}); -- func: 1: a == 0, 3: a > x 
       return lsNumber;
     end 
   end 
   return -1;
 end 
 
-local function loadMenu()
-  local baseDir = BASE_DIR .. "/MODELS/";
-  local filename = model.getInfo().name .. ".lua";
-  local menu = loadScript(baseDir .. filename);
-  if not menu then
+
+local function loadFile(baseDir)
+  local content = nil;
+  if (#model.getInfo().name > 0) then
+    local filename = model.getInfo().name .. ".lua";
+    TRACE("loadFile", baseDir .. filename);
+    content = loadScript(baseDir .. filename);      
+  end
+  if not content then
     if (LCD_W <= 128) then
-      filename = "tiny.lua";
-      menu = loadScript(baseDir .. filename);
+      local filename = "tiny.lua";
+      TRACE("loadFile", baseDir .. filename);
+      content = loadScript(baseDir .. filename);
     elseif (LCD_W <= 212) then
-      filename = "medium.lua";
-      menu = loadScript(baseDir .. filename);
+      local filename = "medium.lua";
+      TRACE("loadFile", baseDir .. filename);
+      content = loadScript(baseDir .. filename);
     else
-      filename = "large.lua";
-      menu = loadScript(baseDir .. filename);
+      local filename = "large.lua";
+      TRACE("loadFile", baseDir .. filename);
+      content = loadScript(baseDir .. filename);
     end
   end
+  return content, filename;
+end
+
+local function loadMenu()
+  local baseDir = BASE_DIR .. "/MODELS/";
+  local menu, filename = loadFile(baseDir);
   TRACE("loadMenu:", menu, filename);
   if (menu) then
     local modchunk = loadScript(BASE_DIR .. "/COMMON/swmods.lua");
@@ -154,19 +181,9 @@ local function loadMenu()
 end
 
 local function loadConfig()
-  local baseDir = BASE_DIR .. "/RADIO/"
-  local filename = baseDir .. model.getInfo().name .. ".lua";
-  TRACE("loadConfig:", filename)
-  local cfg = loadScript(filename);
-  if not (cfg) then
-    if (LCD_W <= 128) then
-      cfg = loadScript(baseDir .. "tiny.lua");
-    elseif (LCD_W <= 212) then
-      cfg = loadScript(baseDir .."medium.lua");
-    else
-      cfg = loadScript(baseDir .. "large.lua");
-    end
-  end
+  local baseDir = BASE_DIR .. "/RADIO/";
+  local cfg = loadFile(baseDir);
+  TRACE("loadCOnfig", cfg);
   if (cfg) then
     return cfg();
   end
@@ -174,6 +191,7 @@ local function loadConfig()
 end
 
 local function initConfigBW(config)
+  TRACE("initConfigBW");
   local cfg = {};
   if (config.title) then
     cfg[CFG_Title] = config.title;
@@ -243,6 +261,7 @@ local function initConfigBW(config)
       if (config.safeMode.timeOut > 0) and (config.safeMode.linkDropoutMax > 0) then
         local fmLsNumber = insertSettableSwitch(1);
         if (fmLsNumber >= 0) then
+          TRACE("safemode ls number", fmLsNumber)
           for ch = 0,63 do
             local lines = model.getMixesCount(ch);
             for line = 0, lines do
@@ -259,17 +278,28 @@ local function initConfigBW(config)
           end
           local fm = model.getFlightMode(config.safeMode.flightMode);
           if (fm) then
-            local ls = getFieldInfo("ls" .. (fmLsNumber + 1));            
-            if (ls) then
+            #ifdef USE_TRIM_NAMES
+              local ls = getFieldInfo("sl" .. (fmLsNumber + 1)); -- patch: ls switch id from name          
+              if (ls) then
+                if (config.safeMode.name) then
+                  fm.name = config.safeMode.name;
+                else
+                  fm.name = "SafeMode";
+                end
+                TRACE("safeMode ls.id", ls.id);
+                fm.switch = -ls.id; -- inverted
+                model.setFlightMode(config.safeMode.flightMode, fm);
+              end
+            #else
               if (config.safeMode.name) then
                 fm.name = config.safeMode.name;
               else
                 fm.name = "SafeMode";
               end
---              fm.switch = ls.id; -- inverted
-              fm.switch = -(fmLsNumber + 73); -- inverted
+              TRACE("safeMode !LS63";
+              fm.switch = -136; -- inverted LS63
               model.setFlightMode(config.safeMode.flightMode, fm);
-            end
+              #endif
           end 
           cfg[CFG_SafeMode_FlightMode] = config.safeMode.flightMode;
           cfg[CFG_SafeMode_Timeout] = config.safeMode.timeOut * 100;
@@ -284,6 +314,7 @@ local function initConfigBW(config)
 end
 
 local function initConfigColor(config)
+  TRACE("initConfigColor");
   local cfg = initConfigBW(config);
 
   local info = {};
@@ -342,7 +373,7 @@ local function initConfigColor(config)
   if (config.removeTrimsFromFlightModes) then
     for mi, modeline in ipairs(config.removeTrimsFromFlightModes) do
       local mode = modeline.mode;
---      print("Mode:", mode);
+      TRACE("Mode:", mode);
       local fm = model.getFlightMode(mode);      
       if (fm) and (modeline.trims) then
         local tmodes = {0, 0, 0, 0, 0, 0};
@@ -353,8 +384,8 @@ local function initConfigColor(config)
         end 
         ]]
         for itr, tr in ipairs(modeline.trims) do
---          print("Trims:", tr);
-          tmodes[tr] = 31; -- disable
+          TRACE("Disable Trim:", itr, tr);
+          tmodes[tr] = TRIMS_MODE_DISABLE_TRIM; -- disable
         end
         fm.trimsModes = tmodes;
         model.setFlightMode(mode, fm);
@@ -683,30 +714,20 @@ end
 
 
 local function initFSM(state)
-  if not(state[1]) then
-    state[1] = getTime();;
-    state[2] = 0
-    state[3] = 1;
-    state[4] = 1;
+  if not(state[FSMSWITCH_LastTime]) then
+    state[FSMSWITCH_LastTime] = getTime();
+    state[FSMSWITCH_State] = 0;
+    state[FSMSWITCH_CyclePage] = 1;
+    state[FSMSWITCH_CycleRow] = 1;
     return;
   end
-  --[[
-  if not (state.lasttime) then
-    --print("initFSM");
-    state.lasttime = getTime();;
-    state.actual = 0
-    state.cyclePage = 1;
-    state.cycleItem = 1;
-    return;
-  end
-  ]]
 end
 
 local function initConfigFSM(state)
-  if not(state[1]) then
-    state[1] = getTime();;
-    state[2] = 0 -- actual state
-    state[3] = nil; --line
+  if not(state[FSMCONF_LastTime]) then
+    state[FSMCONF_LastTime] = getTime();
+    state[FSMCONF_State] = FSMCONF_STATE_Wait; 
+    state[FSMCONF_Row] = 0; -- nil 
     return;
   end
 end

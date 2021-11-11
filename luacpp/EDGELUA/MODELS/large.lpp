@@ -54,9 +54,9 @@ local menu = {
 local exportValues = {0, -50, 50, 100}; -- values for states
 
 local map = {
-  {module = 1, type = 1, description = "Das Modul mit dem roten Aufkleber"},
+  {module = 1, type = 1, description = "Das Modul mit dem roten Aufkleber", saveparams = true},
   {module = 2, type = 2, description = "Im Ruderhaus"},
-  {module = 8, type = 3},
+  {module = 8, type = 3, saveparams = true},
 };
 
-return menu, map, exportValues, backend;
+return menu, map, exportValues;

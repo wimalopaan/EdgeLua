@@ -47,7 +47,6 @@ end
 
 local function init_telemetry()
   load();
-  load = nil;
   collectgarbage();
   if (errorCode > 0) then
     return;

@@ -11,6 +11,7 @@ copy: filelist.txt
 
 constants:
 	grep "^#define" constants.h | awk '{print $$2 " = nil;"}' > ../lib/symbols.lua
+	grep "^#define" global.h | awk '{print $$2 " = nil;"}' >> ../lib/symbols.lua
 
 subdirs = EDGELUA SCRIPTS WIDGETS
 
