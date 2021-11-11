@@ -18,7 +18,7 @@ local output = { "sw_var" };
 
 local errorCode = 0;
 local gvar = 0;
-local function init()
+local function initGV()
    if not(__WmSw2Config) then
       local basedir = BASE_DIR .. "/LIB/";
       if not __libI then
@@ -39,20 +39,45 @@ local function init()
    end
  end
 
- #endif
+ #else
 
-local function run()
-   #ifdef USE_SHM
-      return getShmVar(SHM_VAR);
-   #else
-      return model.getGlobalVariable(gvar, 0);
-   #endif
+GLOBAL_LUA_MIX_VAR = 0;
+
+#endif
+
+local function transportGlobalLua()
+   return GLOBAL_LUA_MIX_VAR;
 end
 
-return {
-   #ifndef USE_SHM
-   init = init,
-   #endif
-   output = output, 
-   run = run
-}
+local function transportGV()
+   return model.getGlobalVariable(gvar, 0);
+end
+
+local function transportShm()
+   return getShmVar(SHM_VAR);
+end
+
+if (LCD_W <= 212) then
+   TRACE("sgvar: use transportGlobalLua");
+   return {
+      output = output,
+      run = transportGlobalLua
+   };
+else
+   if (getShmVar) then
+      TRACE("sgvar: use transportShm");
+      return {
+         output = output,
+         run = transportShm
+      };
+      else
+         return {
+            TRACE("sgvar: use transportGV");
+            #ifndef USE_SHM
+            init = initGV,
+            #endif
+            output = output,
+            run = transportGV
+         };
+      end
+end

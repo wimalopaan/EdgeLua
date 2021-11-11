@@ -140,22 +140,23 @@ end
 
 local function loadFile(baseDir)
   local content = nil;
+  local filename = nil;
   if (#model.getInfo().name > 0) then
-    local filename = model.getInfo().name .. ".lua";
+    filename = model.getInfo().name .. ".lua";
     TRACE("loadFile", baseDir .. filename);
     content = loadScript(baseDir .. filename);      
   end
   if not content then
     if (LCD_W <= 128) then
-      local filename = "tiny.lua";
+      filename = "tiny.lua";
       TRACE("loadFile", baseDir .. filename);
       content = loadScript(baseDir .. filename);
     elseif (LCD_W <= 212) then
-      local filename = "medium.lua";
+      filename = "medium.lua";
       TRACE("loadFile", baseDir .. filename);
       content = loadScript(baseDir .. filename);
     else
-      local filename = "large.lua";
+      filename = "large.lua";
       TRACE("loadFile", baseDir .. filename);
       content = loadScript(baseDir .. filename);
     end

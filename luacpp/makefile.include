@@ -5,9 +5,10 @@ subdirs: ${subdirs}
 
 all: subdirs  $(targets)
 
-%.lua: %.lpp
-	cpp -E -P $< > $@
+#CPPFLAGS = -DDEBUG
 
+%.lua: %.lpp
+	cpp $(CPPFLAGS) -E -P $< > $@
 
 lppsources = $(wildcard *.lpp)
 luatargets = $(patsubst %.lpp, %.lua, $(lppsources))

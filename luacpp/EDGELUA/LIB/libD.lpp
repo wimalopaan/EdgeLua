@@ -943,7 +943,8 @@ elseif (LCD_W <= 212) then
   };
 else
   if (isEdgeTx()) then
-    return { isFullScreen = isFullScreen,
+    return { 
+      isFullScreen = isFullScreen,
       updateWidgetDimensions = updateWidgetDimensions,
       displayParamMenu = displayParamMenuColor,
       displayMenu = displayMenuColor,
@@ -960,7 +961,8 @@ else
       displayFmRssiWarning = displayFmRssiWarningColor,
     };
   else
-    return { isFullScreen = isFullScreen,
+    return { 
+      isFullScreen = isFullScreen,
       updateWidgetDimensions = updateWidgetDimensions,
       displayParamMenu = displayParamMenuColorNoTheme,
       displayMenu = displayMenuColorNoTheme,

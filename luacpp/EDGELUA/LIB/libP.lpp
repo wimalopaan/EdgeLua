@@ -125,6 +125,9 @@ local function rssiState(cfg, state)
   end 
 end
 
+local function transportToMixer(gv, value)
+end
+
 local function sportConfigFSM()
 end
 
@@ -220,32 +223,45 @@ local function sbusSwitchFSM(config, menu, queue, state, encoder, exportValues)
   end
 end
 
+local function transportGV(gv, value)
+  model.setGlobalVariable(gv, 0, value);
+end
+
+local function transportShm(gv, value)
+  setShmVar(SHM_VAR, value)
+end
+
+local function transportGlobalLua(gv, value)
+  GLOBAL_LUA_MIX_VAR = math.floor(value);
+--  TRACE("transportGlobalLua", GLOBAL_LUA_MIX_VAR);
+end
+
 local function setXJT(gv, sbusValue)
   local b = bit32.extract(sbusValue, 4);
   if (sbusValue >= 0) then
-    model.setGlobalVariable(gv, 0, (sbusValue * 1024) / 1638 + 0.5);
+    transportToMixer(gv, (sbusValue * 1024) / 1638 + 0.5);
   else
     if (b == 0) then
-      model.setGlobalVariable(gv, 0, (sbusValue * 1024) / 1638 - 0.5);
+      transportToMixer(gv, (sbusValue * 1024) / 1638 - 0.5);
     else
-      model.setGlobalVariable(gv, 0, (sbusValue * 1024) / 1638 + 0.5);
+      transportToMixer(gv, (sbusValue * 1024) / 1638 + 0.5);
     end
   end
 end 
 
 local function setIBus(gv, ibusValue)
   if (ibusValue >= 0) then
-    model.setGlobalVariable(gv, 0, ibusValue + 1);
+    transportToMixer(gv, ibusValue + 1);
   else
-    model.setGlobalVariable(gv, 0, ibusValue);
+    transportToMixer(gv, ibusValue);
   end
 end 
 
 local function setSBus(gv, sbusValue)
   if (sbusValue >= 0) then
-    model.setGlobalVariable(gv, 0, (sbusValue * 1024) / 1638 + 1.5);
+    transportToMixer(gv, (sbusValue * 1024) / 1638 + 1.5);
   else
-    model.setGlobalVariable(gv, 0, (sbusValue * 1024) / 1638 + 0.5);
+    transportToMixer(gv, (sbusValue * 1024) / 1638 + 0.5);
   end   
 end 
 
@@ -288,33 +304,32 @@ local function encodeParamSBus(gv, paramNumber, paramValue)
   setSBus(gv, sbusValue);
 end 
 
-local function encodeXJT(gv, item)
+local function encodeFunctionSBus(item)
   local state = item[ITEM_State];
   local fn = item[ITEM_Function];;
   local module = item[ITEM_Module];
---   print("xjt: ", item[ITEM_Name], module, fn, state);
+  return (64 * (module - 1) + 8 * (fn - 1) +  2 * (state - 1)) * 2 - 1024;
+end
 
-  local sbusValue = (64 * (module - 1) + 8 * (fn - 1) +  2 * (state - 1)) * 2 - 1024;
+local function encodeFunctionIBus(item)
+  local state = item[ITEM_State];
+  local fn = item[ITEM_Function];
+  local module = item[ITEM_Module];
+  return (64 * (module - 1) + 8 * (fn - 1) + (state - 1)) * 2 - 1024;
+end
+
+local function encodeXJT(gv, item)
+  local sbusValue  = encodeFunctionSBus(item);
   setXJT(gv, sbusValue);
 end
 
 local function encodeSBus(gv, item)
-  local state = item[ITEM_State];
-  local fn = item[ITEM_Function];
-  local module = item[ITEM_Module];
-  --print("sbus: ", module, fn, state);
-
-  local sbusValue = (64 * (module - 1) + 8 * (fn - 1) +  2 * (state - 1)) * 2 - 1024;
+  local sbusValue  = encodeFunctionSBus(item);
   setSBus(gv, sbusValue);
 end
 
 local function encodeIBus(gv, item)
-  local state = item[ITEM_State];
-  local fn = item[ITEM_Function];
-  local module = item[ITEM_Module];
---   print("ibus: ", module, fn, state);
-
-  local ibusValue = (64 * (module - 1) + 8 * (fn - 1) + (state - 1)) * 2 - 1024;
+  local ibusValue = encodeFunctionIBus(item);
   setIBus(gv, ibusValue);
 end
 
@@ -391,10 +406,30 @@ local function getSwitchFSM(cfg)
   end
 end
 
-return {
-  Class = Class,
-  getSwitchFSM = getSwitchFSM,
-  getConfigFSM = getConfigFSM,
-  getEncoder = getEncoder,
-  rssiState = rssiState,
-};
+if (LCD_W <= 212) then -- BW radio
+  TRACE("libP: use transportGlobalLua");
+  GLOBAL_LUA_MIX_VAR = 0;
+  transportToMixer = transportGlobalLua;
+  return {
+    Class = Class,
+    getSwitchFSM = getSwitchFSM,
+    getConfigFSM = getConfigFSM,
+    getEncoder = getEncoder,
+    rssiState = rssiState,
+  };
+else -- color radio
+  if (getShmVar) then
+    TRACE("libP: use transportShm");
+    transportToMixer = transportShm;
+  else
+    TRACE("libP: use transportGV");
+    transportToMixer = transportGV;
+  end
+  return {
+    Class = Class,
+    getSwitchFSM = getSwitchFSM,
+    getConfigFSM = getConfigFSM,
+    getEncoder = getEncoder,
+    rssiState = rssiState,
+  };
+end

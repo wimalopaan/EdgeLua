@@ -2,6 +2,7 @@
 
 #define BASE_DIR "/EDGELUA"
 #define SHM_VAR 1
+#define GLOBAL_LUA_MIX_VAR __Sw2MixerValue
 
 #define W_X 1
 #define W_Y 2
