@@ -4,6 +4,9 @@
 #define SHM_VAR 1
 #define GLOBAL_LUA_MIX_VAR __Sw2MixerValue
 
+#define EVENT_X9E_MENU 96
+#define EVENT_X9E_EXIT 97
+
 #define W_X 1
 #define W_Y 2
 #define W_Width 3

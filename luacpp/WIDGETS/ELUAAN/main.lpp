@@ -37,9 +37,6 @@ local function loadLibA()
 end
 
 local function create(zone, options)
-  widget[W_Zone] = zone;
-  widget[W_Options] = options;
-
   load();
   loadLibA();
   collectgarbage();
@@ -48,7 +45,7 @@ local function create(zone, options)
     return widget;
   end
 
-  widget = __libI.initWidget();
+  widget = __libI.initWidget(zone, options);
   collectgarbage();
 
   if not(__WmSw2Config) then

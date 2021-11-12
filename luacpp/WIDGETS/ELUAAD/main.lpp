@@ -25,15 +25,12 @@ local lastRun = 0;
 __stopWmSw2 = false; -- stop sending out
 
 local function create(zone, options)
-  widget[W_Zone] = zone;
-  widget[W_Options] = options;
-
   load();
   if (errorCode > 0) then
     return widget;
   end
 
-  widget = __libI.initWidget();
+  widget = __libI.initWidget(zone, options);
   collectgarbage();
 
   if not(__WmSw2Config) then

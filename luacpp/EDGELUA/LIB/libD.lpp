@@ -27,6 +27,9 @@ local function isColorLCD()
 end
 
 local function updateWidgetDimensions(widget, event)
+end
+
+local function updateWidgetDimensionsEdgeTx(widget, event)
   if (isFullScreen(event)) then
     widget[W_X] = 0;
     widget[W_Y] = 0;
@@ -40,6 +43,9 @@ local function updateWidgetDimensions(widget, event)
     widget[W_Height] = widget[W_Zone].h;
     widget[W_FontHeight]= widget[W_FontHSmall];
   end
+end
+
+local function updateWidgetDimensionsOpenTx(widget, event)
 end
 
 local function displayFooter(widget, text)
@@ -137,13 +143,13 @@ local function displayParamMenuColorNoTheme(config, widget, pmenu, pheaders, sta
   local page = pmenu[activePageIndex];
   local header = pheaders[activePageIndex];
 
-  lcd.clear()
+--  lcd.clear()
   lcd.drawText(widget[W_X], widget[W_Y], header[PHEADER_Title] .. " [" .. header[PHEADER_Module] .."]", MIDSIZE);
 
-  displayHeader(widget, "Page " .. activePageIndex .. "/" .. #pmenu);
+  displayHeaderNoTheme(widget, "Page " .. activePageIndex .. "/" .. #pmenu);
 
   if (pmenu.footer) then
-    displayFooter(widget, pmenu.footer);
+    displayFooterNoTheme(widget, pmenu.footer);
   end
 
   local maxParamsPerLine = 1;
@@ -177,7 +183,7 @@ local function displayParamMenuColorNoTheme(config, widget, pmenu, pheaders, sta
   local x = widget[W_X];
   local y = widget[W_Y] + widget[W_YOffset];
   if ((state[MENUSTATE_SelRow] > 0) and (state[MENUSTATE_SelCol] > 0)) then
-    lcd.drawText(x, y, pvalue .. "[" .. percent .. "%]", SMLSIZE);
+    lcd.drawText(x, y, pvalue .. "[" .. percent .. "%]", SMLSIZE + INVERS);
     local line = page[state[MENUSTATE_SelRow]];
     line[PLINE_Values][state[MENUSTATE_SelCol]] = pvalue;
   else
@@ -456,7 +462,8 @@ local function displayMenuColor(config, widget, menu, overlays, state, event, re
 end
 
 local function displayMenuColorNoTheme(config, widget, menu, overlays, state, event, remote, warning1, warning2, pagetitles, menudata)
-  lcd.clear()
+--  lcd.clear()
+--  TRACE("displayMenuColorNoTheme", widget[W_X], widget[W_Y], widget[W_Width], widget[W_Height]);
 
   if (warning) then
     local ww, wh = lcd.sizeText(warning, DBLSIZE);
@@ -516,7 +523,7 @@ local function displayMenuColorNoTheme(config, widget, menu, overlays, state, ev
         if (state[MENUSTATE_Col] == col) and (row == state[MENUSTATE_Row]) then -- focus
           lcd.drawText(x, y, st, SMLSIZE + INVERS + BLINK);
         else -- 
-          lcd.drawText(x, y, st);
+          lcd.drawText(x, y, st, SMLSIZE);
         end
       end
       x = x + fw;
@@ -602,10 +609,45 @@ local function selectItem(menu, menuState, queue)
   queue:push(item);
 end
 
-local function processEventsBW(config, menu, menuState, event, queue, callback)
+#ifdef DEBUG
+local lastEvent = 0;
+#endif
+local function processEventsBWScroll(config, menu, menuState, event, queue, callback)
   if (event == EVT_VIRTUAL_ENTER) then
     callback(menu, menuState, queue);
   else
+    #ifdef DEBUG
+    if (event ~= lastEvent) then
+      TRACE("processEventsBWScroll", event);
+      lastEvent = event;      
+    end
+    #endif
+    if (event > 0) then
+      menuDeselect(menuState);
+    end
+    if (event == EVT_VIRTUAL_INC) then -- same as EVT_VIRTUAL_NEXT
+      prevCol(menu, menuState);
+    elseif (event == EVT_VIRTUAL_DEC) then -- same as EVT_VIRTUAL_PREV
+      nextCol(menu, menuState);
+    elseif (event == EVENT_X9E_MENU) then
+      prevRow(menu, menuState);
+    elseif (event == EVENT_X9E_EXIT) then
+      nextRow(menu, menuState);
+    end
+  end
+end
+
+local function processEventsBWKeys(config, menu, menuState, event, queue, callback)
+  if (event == EVT_VIRTUAL_ENTER) then
+    callback(menu, menuState, queue);
+  else
+    #ifdef DEBUG
+    if (event ~= lastEvent) then
+      TRACE("processEventsBWKeys", event);
+--      TRACE("processEventsBWKeys", EVT_VIRTUAL_INC, EVT_VIRTUAL_DEC, EVT_VIRTUAL_PREV, EVT_VIRTUAL_NEXT, EVT_VIRTUAL_MENU, EVT_VIRTUAL_NEXT_PAGE);
+      lastEvent = event;      
+    end
+    #endif
     if (event > 0) then
       menuDeselect(menuState);
     end
@@ -919,6 +961,15 @@ end
 local function displayAddressConfigColorNoTheme(config, widget, encoder, pScaler, state, event, touch)
 end
 
+local function processEventsBW()
+end 
+
+if (EVT_VIRTUAL_INC == EVT_VIRTUAL_NEXT) then
+  processEventsBW = processEventsBWScroll;
+else  
+  processEventsBW = processEventsBWKeys;
+end
+
 if (LCD_W <= 128) then
   return {  
     displayMenu = displayMenuBW,
@@ -945,7 +996,7 @@ else
   if (isEdgeTx()) then
     return { 
       isFullScreen = isFullScreen,
-      updateWidgetDimensions = updateWidgetDimensions,
+      updateWidgetDimensions = updateWidgetDimensionsEdgeTx,
       displayParamMenu = displayParamMenuColor,
       displayMenu = displayMenuColor,
       processEvents = processEventsColor,
@@ -963,7 +1014,7 @@ else
   else
     return { 
       isFullScreen = isFullScreen,
-      updateWidgetDimensions = updateWidgetDimensions,
+      updateWidgetDimensions = updateWidgetDimensionsOpenTx,
       displayParamMenu = displayParamMenuColorNoTheme,
       displayMenu = displayMenuColorNoTheme,
       processEvents = processEventsColor,
@@ -976,6 +1027,7 @@ else
       processForeignInput = processForeignInput,
       processRemoteInput = processRemoteInput,
       displayAddressConfig = displayAddressConfigColorNoTheme,
+      displayFmRssiWarning = displayFmRssiWarningColor,
     };
   end
 end
