@@ -29,14 +29,20 @@ local errorCode = 0;
 __stopWmSw2 = false; -- stop sending out
 
 local function run_telemetry(event)
-  if (errorCode == 0) then
-    __libD.processEvents(__WmSw2Config, menu, menuState, event, queue, __libD.selectItem);
-    __libD.processOverlays(overlays, menuState, queue);
-    __libD.displayMenu(__WmSw2Config, widget, menu, overlays, menuState, pagetitles);
-  else
+  #ifdef TEST1
     lcd.clear();
     lcd.drawText(0, 0, "Error: " .. errorCode, DBLSIZE);
-  end
+    lcd.drawText(0, 50, "gc: " .. collectgarbage("count"), SMLSIZE);
+  #else
+    if (errorCode == 0) then
+      __libD.processEvents(__WmSw2Config, menu, menuState, event, queue, __libD.selectItem);
+      __libD.processOverlays(overlays, menuState, queue);
+      __libD.displayMenu(__WmSw2Config, widget, menu, overlays, menuState, pagetitles);
+    else
+      lcd.clear();
+      lcd.drawText(0, 0, "Error: " .. errorCode, DBLSIZE);
+    end
+    #endif
 end
 
 local function init_telemetry()
@@ -59,7 +65,12 @@ local function init_telemetry()
     __WmSw2Config = __libI.initConfig(config);
   end 
   collectgarbage();
- 
+
+  if not(__WmSw2Config) then
+    errorCode = 4.1;
+    return;
+  end
+
   local filename = {};
   local map = {};
   local modules = {};
@@ -87,7 +98,7 @@ local function init_telemetry()
   queue = __libP.Class.Queue.new();
 
   collectgarbage();
---  print("gc6: ", collectgarbage("count"));
+  TRACE("gc6: ", collectgarbage("count"));
 end
 
 local function background_telemetry()

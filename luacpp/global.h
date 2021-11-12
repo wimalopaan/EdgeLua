@@ -2,6 +2,8 @@
 
 #define DEBUG 
 
+// #define TEST1
+
 #define USE_VALUE_STORAGE
 
 // can query "t5u", ..., "sl1".."sl62" as switch-source
