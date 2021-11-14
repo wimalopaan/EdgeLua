@@ -13,12 +13,14 @@
        
        
 local function loadAnimations(config)
-  local basedir = "/EDGELUA/ANIMS/";
+  local basedir = "/EDGELUA" .. "/ANIMS/";
   local anims = {};
-  local filename = model.getInfo().name .. ".lua";
-  local chunk = loadScript(basedir .. filename);
-  if (chunk) then
-    anims = chunk();
+  if (#model.getInfo().name > 0) then
+    local filename = model.getInfo().name .. ".lua";
+    local chunk = loadScript(basedir .. filename);
+    if (chunk) then
+      anims = chunk();
+    end
   end
   if not(anims) or (#anims == 0) then
     local filename = "default.lua";
@@ -28,6 +30,16 @@ local function loadAnimations(config)
     end
   end
   return anims;
+end
+local function sort(table, key)
+  for i = 1, (#table - 1) do
+    if (table[i][key] > table[i + 1][key]) then
+      local tmp = table[i];
+      table[i] = transition[i + 1];
+      table[i + 1] = tmp;
+      i = 1;
+    end
+  end
 end
 local function initAnimations(anims)
   local canims = {};
@@ -39,6 +51,7 @@ local function initAnimations(anims)
     else
       canim[2] = math.floor(anim.length * 100);
     end
+    print("TRACE: ", "init anim", ia, canim[1], canim[2] );
     if (anim.switches) then
       local swt = {};
       local sws = {};
@@ -47,19 +60,12 @@ local function initAnimations(anims)
           local sw = {};
           sw[1] = s.fn;
           sw[2] = s.module;
-          sw[3] = {};
-          local transitions = sw[3];
+          local transitions = {};
           for it, t in ipairs(s.transitions) do
             transitions[it] = {math.floor(t.at * 100), t.state, 0};
           end
-          for i = 1, (#transitions - 1) do
-            if (transitions[i][1] > transitions[i + 1][1]) then
-              local tmp = transitions[i];
-              transitions[i] = transition[i + 1];
-              transitions[i + 1] = tmp;
-              i = 1;
-            end
-          end
+          sort(transitions, 1);
+          sw[3] = transitions;
           if (#transitions > 1) then
             swt[#swt + 1] = sw;
           end
@@ -67,11 +73,12 @@ local function initAnimations(anims)
           local sw = {};
           sw[1] = s.fn;
           sw[2] = s.module;
-          sw[3] = {};
+          local durations = {};
           for is, s in ipairs(s.sequence) do
-            sw[3][is] = {math.floor(s.duration * 100), s.state, 0};
+            durations[is] = {math.floor(s.duration * 100), s.state, 0};
           end
-          if (#sw[3] > 1) then
+          sw[3] = durations;
+          if (#durations > 1) then
             sws[#sws + 1] = sw;
           end
         end
@@ -79,10 +86,12 @@ local function initAnimations(anims)
       canim[3] = swt;
       canim[4] = sws;
     end
-    if (canim[1]) and (canim[2]) and (canim[3] or canim[4]) then
+    if (canim[1]) and (canim[2])
+          and (canim[3] or canim[4]) then
       canims[#canims + 1] = canim;
     end
   end
+  print("TRACE: ", "init anims: number", #canims );
   return canims;
 end
 local function setItem(fn, module, state)
@@ -108,7 +117,7 @@ local function runAnimation(widget, anim, state)
   if (state[2] == 0) then -- state: init
     __WmSw2Warning1 = "Animation";
     __WmSw2Warning2 = anim[1];
-    print("Anim:", anim[1], anim[2], #anim[3], #anim[4]);
+    print("TRACE: ", "Anim:", anim[1], anim[2], #anim[3], #anim[4] );
     state[2] = 1;
     state[3] = t; -- start of anim
     state[4] = t; -- last seq point
@@ -124,10 +133,9 @@ local function runAnimation(widget, anim, state)
         for it, transition in ipairs(swt[3]) do
           if (transition[3] == 0) and (diffTime >= transition[1]) then
             transition[3] = 1;
-            -- print("swt:", swt[1], swt[2], transition[1], diffTime, transition[2]);
             setItem(fn, module, transition[2]);
             if (it == #swt[3]) then
-              print("last t");
+              print("TRACE: ", "last t" );
               state[7] = state[7] + 1;
             end
             break;
@@ -142,10 +150,9 @@ local function runAnimation(widget, anim, state)
           if (seqpoint[3] == 0) and (diffTime >= seqpoint[1]) then
             seqpoint[3] = 1;
             state[4] = t;
-            -- print("sws:", sws[1], sws[2], seqpoint[1], diffTime, seqpoint[2]);
             setItem(fn, module, seqpoint[2]);
             if (it == #sws[3]) then
-              print("last s");
+              print("TRACE: ", "last s" );
               state[7] = state[7] + 1;
             end
             break;
@@ -157,11 +164,11 @@ local function runAnimation(widget, anim, state)
     if (anim[2] > 0) and ((t - state[3]) >= anim[2]) then
       state[3] = t; -- restart
       state[4] = t;
-      print("restart");
+      print("TRACE: ", "restart" );
       clearAnim(anim);
     end
     if (anim[2] == 0) and (state[7] >= 2) then
-      print("stop");
+      print("TRACE: ", "stop" );
       state[2] = 0;
       state[5] = 0;
       __WmSw2Warning1 = nil;
@@ -172,10 +179,11 @@ local function runAnimation(widget, anim, state)
   return anim;
 end
 local function resetState(state)
-  state[1] = getTime(); -- timepoint for statemachine
+  local t = getTime();
+  state[1] = t; -- timepoint for statemachine
   state[2] = 0; -- state of statemachine
-  state[3] = state[1]; -- start time of anim
-  state[4] = state[1]; -- last sequencepoint start time
+  state[3] = t; -- start time of anim
+  state[4] = t; -- last sequencepoint start time
 end
 local function initAnimationFSM(state)
   resetState(state);
@@ -213,7 +221,7 @@ local function processEvents(rects, state, event, touch)
       end
     end
   elseif (event == EVT_VIRTUAL_ENTER) then
-    print("PE2:", state[5], state[6]);
+    print("TRACE: ", "PE2:", state[5], state[6] );
     if (state[6] == state[5]) then
       state[5] = 0;
       return 0;
@@ -231,6 +239,9 @@ local function chooseAnimation(config, widget, anims, state, event, touch)
   local border_h = 40;
   local bw = widget[3] - 2 * border_h;;
   local vs = 5;
+  if not(anims) then
+    return;
+  end
   if (#anims == 0) then
     lcd.drawText(widget[1], widget[2] + widget[4] / 2 - widget[9], "No animations", DBLSIZE);
   elseif (#anims == 1) then

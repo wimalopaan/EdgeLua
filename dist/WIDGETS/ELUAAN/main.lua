@@ -37,9 +37,7 @@ local function load()
 end
 local name = "EL_Ani";
 local options = {};
-local widget = nil;
---local config = {};
-local menu = {};
+local animations = nil;
 local errorCode = 0;
 local fsmState = {};
 local currentAnimation = nil;
@@ -47,9 +45,9 @@ local currentAnimation = nil;
 --__WmSw2foreignInput = 0;
 --__WmSw2Warning = nil;
 local function loadLibA()
-  local basedir = "/EDGELUA/LIB/";
+  local basedir = "/EDGELUA" .. "/LIB/";
   if not __libA then
--- print("LOAD_P");
+      print("TRACE: ", "LOAD_A", basedir );
     __libA = loadScript(basedir .. "libA.lua")();
     if not __libA then
       errorCode = 3.1;
@@ -60,11 +58,14 @@ local function create(zone, options)
   load();
   loadLibA();
   collectgarbage();
+  print("TRACE: ", "A0" );
   if (errorCode > 0) then
-    return widget;
+    return {};
   end
-  widget = __libI.initWidget(zone, options);
+  print("TRACE: ", "A1" );
+  local widget = __libI.initWidget(zone, options);
   collectgarbage();
+  print("TRACE: ", "A2" );
   if not(__WmSw2Config) then
     local config = __libI.loadConfig();
     if not(config) then
@@ -74,17 +75,21 @@ local function create(zone, options)
     __WmSw2Config = __libI.initConfig(config);
   end
   collectgarbage();
-  local animations = __libA.loadAnimations(__WmSw2Config);
+  print("TRACE: ", "A3" );
+  animations = __libA.loadAnimations(__WmSw2Config);
+  print("TRACE: ", "A4" );
   if not(animations) then
     errorCode = 5;
     return widget;
   end
   animations = __libA.initAnimations(animations);
+  print("TRACE: ", "A5" );
   if not(animations) then
     errorCode = 6;
     return widget;
   end
   __libA.initAnimationFSM(fsmState);
+  print("TRACE: ", "A6" );
   __libI = nil; -- free memory
   collectgarbage();
   return widget;
@@ -109,7 +114,8 @@ local function refresh(widget, event, touch)
     lcd.drawText(widget[1], widget[2], "Error: " .. errorCode, DBLSIZE);
   end
 end
-return { name=name,
+return {
+  name=name,
   options=options,
   create=create,
   update=update,

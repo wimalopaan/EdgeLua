@@ -83,7 +83,9 @@ local function create(zone, options)
   return widget;
 end
 
-local function update(widget, options) widget[W_Options] = options; end
+local function update(widget, options) 
+  widget[W_Options] = options; 
+end
 
 local function background(widget)
   if (errorCode == 0) then

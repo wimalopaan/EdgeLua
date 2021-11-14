@@ -90,7 +90,9 @@ local function create(zone, options)
 -- print("gc6: ", collectgarbage("count"));
   return widget;
 end
-local function update(widget, options) widget[11] = options; end
+local function update(widget, options)
+  widget[11] = options;
+end
 local function background(widget)
   if (errorCode == 0) then
     if ((getTime() - lastRun) > 100) then __stopWmSw2 = false; end

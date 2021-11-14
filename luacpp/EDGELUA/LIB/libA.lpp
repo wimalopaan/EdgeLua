@@ -13,12 +13,14 @@
 #include "../../global.h"
 
 local function loadAnimations(config)
-  local basedir = "/EDGELUA/ANIMS/";
+  local basedir = BASE_DIR .. "/ANIMS/";
   local anims = {};
-  local filename = model.getInfo().name .. ".lua";
-  local chunk = loadScript(basedir .. filename);
-  if (chunk) then
-    anims = chunk();
+  if (#model.getInfo().name > 0) then
+    local filename = model.getInfo().name .. ".lua";
+    local chunk = loadScript(basedir .. filename);
+    if (chunk) then
+      anims = chunk();
+    end
   end
   if not(anims) or (#anims == 0) then
     local filename = "default.lua";
@@ -30,17 +32,30 @@ local function loadAnimations(config)
   return anims;
 end
 
+local function sort(table, key)
+  for i = 1, (#table - 1) do
+    if (table[i][key] > table[i + 1][key]) then
+      local tmp = table[i];
+      table[i] = transition[i + 1];
+      table[i + 1] = tmp;
+      i = 1;
+    end
+  end
+end
+
 local function initAnimations(anims)
   local canims = {};
   for ia, anim in ipairs(anims) do
     local canim = {};
-    canim[1] = anim.name;
+    canim[ANIM_Name] = anim.name;
 
     if not(anim.length) or (anim.length == 0) then
-      canim[2] = 0;
+      canim[ANIM_Length] = 0;
     else  
-      canim[2] = math.floor(anim.length * 100);
+      canim[ANIM_Length] = math.floor(anim.length * 100);
     end
+
+    TRACE("init anim", ia, canim[ANIM_Name], canim[ANIM_Length]);
 
     if (anim.switches) then
       local swt = {};
@@ -48,44 +63,40 @@ local function initAnimations(anims)
       for si, s in ipairs(anim.switches) do
         if (s.transitions) then
           local sw = {};
-          sw[1] = s.fn;
-          sw[2] = s.module;
-          sw[3] = {};
-          local transitions = sw[3];
+          sw[ASTATEPOINT_Function] = s.fn;
+          sw[ASTATEPOINT_Module] = s.module;
+          local transitions = {};
           for it, t in ipairs(s.transitions) do
             transitions[it] = {math.floor(t.at * 100), t.state, 0};
           end
-          for i = 1, (#transitions - 1) do
-            if (transitions[i][1] > transitions[i + 1][1]) then
-              local tmp = transitions[i];
-              transitions[i] = transition[i + 1];
-              transitions[i + 1] = tmp;
-              i = 1;
-            end
-          end
+          sort(transitions, ATIMESTATE_Time);
+          sw[ASTATEPOINT_TimeStates] = transitions;
           if (#transitions > 1) then
-            swt[#swt + 1] = sw;
+            ADD(swt, sw);
           end
         elseif (s.sequence) then
           local sw = {};
-          sw[1] = s.fn;
-          sw[2] = s.module;
-          sw[3] = {};
+          sw[ASTATEDUR_Function] = s.fn;
+          sw[ASTATEDUR_Module] = s.module;
+          local durations = {};
           for is, s in ipairs(s.sequence) do
-            sw[3][is] = {math.floor(s.duration * 100), s.state, 0};
+            durations[is] = {math.floor(s.duration * 100), s.state, 0};
           end
-          if (#sw[3] > 1) then
-            sws[#sws + 1] = sw;
+          sw[ASTATEDUR_DurationStates] = durations;
+          if (#durations > 1) then
+            ADD(sws, sw);
           end
         end
       end
-      canim[3] = swt;
-      canim[4] = sws;
+      canim[ANIM_StatePoints] = swt;
+      canim[ANIM_StateDurations] = sws;
     end
-    if (canim[1]) and (canim[2]) and (canim[3] or canim[4]) then
-      canims[#canims + 1] = canim;
+    if (canim[ANIM_Name]) and (canim[ANIM_Length]) 
+          and (canim[ANIM_StatePoints] or canim[ANIM_StateDurations]) then
+      ADD(canims, canim);
     end
   end
+  TRACE("init anims: number", #canims);
   return canims;
 end
 
@@ -94,14 +105,14 @@ local function setItem(fn, module, state)
 end
 
 local function clearAnim(anim)
-  for i, swt in ipairs(anim[3]) do
-    for it, transition in ipairs(swt[3]) do
-      transition[3] = 0;
+  for i, swt in ipairs(anim[ANIM_StatePoints]) do
+    for it, transition in ipairs(swt[ASTATEPOINT_TimeStates]) do
+      transition[ATIMESTATE_Done] = 0;
     end
   end
-  for i, sws in ipairs(anim[4]) do
-    for is, seqpoint in ipairs(sws[3]) do
-      seqpoint[3] = 0;
+  for i, sws in ipairs(anim[ANIM_StateDurations]) do
+    for is, seqpoint in ipairs(sws[ASTATEDUR_DurationStates]) do
+      seqpoint[ADURSTATE_Done] = 0;
     end
   end
 end 
@@ -112,65 +123,63 @@ local function runAnimation(widget, anim, state)
   end
   local t = getTime();
 
-  if (state[2] == 0) then -- state: init
+  if (state[FSMANIM_State] == FSMANIM_STATE_Init) then -- state: init
     __WmSw2Warning1 = "Animation";
-    __WmSw2Warning2 = anim[1];
-    print("Anim:", anim[1], anim[2], #anim[3], #anim[4]);
-    state[2] = 1;
-    state[3] = t; -- start of anim
-    state[4] = t; -- last seq point
-    state[7] = 0; -- last trans or seq reached
+    __WmSw2Warning2 = anim[ANIM_Name];
+    TRACE("Anim:", anim[ANIM_Name], anim[ANIM_Length], #anim[ANIM_StatePoints], #anim[ANIM_StateDurations]);
+    state[FSMANIM_State] = FSMANIM_STATE_Run;
+    state[FSMANIM_StartTime] = t; -- start of anim
+    state[FSMANIM_LastSwitch] = t; -- last seq point
+    state[FSMANIM_LastReached] = 0; -- last trans or seq reached
     clearAnim(anim);
-  elseif (state[2] == 1) then -- state: run
-    if ((t - state[1]) >= 10) then
-      local diffTime = t - state[3];
+  elseif (state[FSMANIM_State] == FSMANIM_STATE_Run) then -- state: run
+    if ((t - state[FSMANIM_LastTime]) >= 10) then
+      local diffTime = t - state[FSMANIM_StartTime];
       __WmSw2Warning1 = "Animation [" .. math.floor(diffTime / 100) .. "/" .. math.floor(anim[2] / 100) .. "]";
-      for i, swt in ipairs(anim[3]) do
-        local fn = swt[1];
-        local module = swt[2];
-        for it, transition in ipairs(swt[3]) do
-          if (transition[3] == 0) and (diffTime >= transition[1]) then
-            transition[3] = 1;
-            --		  print("swt:", swt[1], swt[2], transition[1], diffTime, transition[2]);
-            setItem(fn, module, transition[2]);
-            if (it == #swt[3]) then
-              print("last t");
-              state[7] = state[7] + 1;
+      for i, swt in ipairs(anim[ANIM_StatePoints]) do
+        local fn = swt[ASTATEPOINT_Function];
+        local module = swt[ASTATEPOINT_Module];
+        for it, transition in ipairs(swt[ASTATEPOINT_TimeStates]) do
+          if (transition[ATIMESTATE_Done] == 0) and (diffTime >= transition[ATIMESTATE_Time]) then
+            transition[ATIMESTATE_Done] = 1;
+            setItem(fn, module, transition[ATIMESTATE_State]);
+            if (it == #swt[ASTATEPOINT_TimeStates]) then
+              TRACE("last t");
+              state[FSMANIM_LastReached] = state[FSMANIM_LastReached] + 1;
             end
             break;
           end
         end
       end
-      diffTime = t - state[4];
-      for i, sws in ipairs(anim[4]) do
-        local fn = sws[1];
-        local module = sws[2];
-        for it, seqpoint in ipairs(sws[3]) do
-          if (seqpoint[3] == 0) and (diffTime >= seqpoint[1]) then
-            seqpoint[3] = 1;
-            state[4] = t;
-            --		  print("sws:", sws[1], sws[2], seqpoint[1], diffTime, seqpoint[2]);
-            setItem(fn, module, seqpoint[2]);
-            if (it == #sws[3]) then
-              print("last s");
-              state[7] = state[7] + 1;
+      diffTime = t - state[FSMANIM_LastSwitch];
+      for i, sws in ipairs(anim[ANIM_StateDurations]) do
+        local fn = sws[ASTATEDUR_Function];
+        local module = sws[ASTATEDUR_Module];
+        for it, seqpoint in ipairs(sws[ASTATEDUR_DurationStates]) do
+          if (seqpoint[ADURSTATE_Done] == 0) and (diffTime >= seqpoint[ADURSTATE_Duration]) then
+            seqpoint[ADURSTATE_Done] = 1;
+            state[FSMANIM_LastSwitch] = t;
+            setItem(fn, module, seqpoint[ADURSTATE_State]);
+            if (it == #sws[ASTATEDUR_DurationStates]) then
+              TRACE("last s");
+              state[FSMANIM_LastReached] = state[FSMANIM_LastReached] + 1;
             end
             break;
           end
         end
       end
-      state[1] = t;
+      state[FSMANIM_LastTime] = t;
     end
-    if (anim[2] > 0) and ((t - state[3]) >= anim[2]) then
-      state[3] = t; -- restart
-      state[4] = t;
-      print("restart");
+    if (anim[ANIM_Length] > 0) and ((t - state[FSMANIM_StartTime]) >= anim[ANIM_Length]) then
+      state[FSMANIM_StartTime] = t; -- restart
+      state[FSMANIM_LastSwitch] = t;
+      TRACE("restart");
       clearAnim(anim);
     end 
-    if (anim[2] == 0) and (state[7] >= 2) then
-      print("stop");
-      state[2] = 0;
-      state[5] = 0;
+    if (anim[ANIM_Length] == 0) and (state[FSMANIM_LastReached] >= 2) then
+      TRACE("stop");
+      state[FSMANIM_State] = FSMANIM_STATE_Init;
+      state[FSMANIM_ActiveAnim] = 0;
       __WmSw2Warning1 = nil;
       __WmSw2Warning2 = nil;
       return nil;
@@ -180,31 +189,32 @@ local function runAnimation(widget, anim, state)
 end
 
 local function resetState(state)
-  state[1] = getTime(); -- timepoint for statemachine
-  state[2] = 0; -- state of statemachine
-  state[3] = state[1]; -- start time of anim
-  state[4] = state[1]; -- last sequencepoint start time
+  local t = getTime();
+  state[FSMANIM_LastTime] = t; -- timepoint for statemachine
+  state[FSMANIM_State] = FSMANIM_STATE_Init; -- state of statemachine
+  state[FSMANIM_StartTime] = t; -- start time of anim
+  state[FSMANIM_LastSwitch] = t; -- last sequencepoint start time
 end 
 
 local function initAnimationFSM(state)
   resetState(state);
-  state[5] = 0; -- active anim [1...4]
-  state[6] = 0; -- selection
+  state[FSMANIM_ActiveAnim] = 0; -- active anim [1...4]
+  state[FSMANIM_Selection] = 0; -- selection
 end
 
 local function drawButtons(anims, rects, state)
   for i, rect in ipairs(rects) do
-    if (state[5] == i) then
+    if (state[FSMANIM_ActiveAnim] == i) then
       lcd.drawFilledRectangle(rect.xmin, rect.ymin, rect.xmax - rect.xmin + 1, rect.ymax - rect.ymin + 1, COLOR_THEME_ACTIVE);
     else
-      if (state[6] == i) then
+      if (state[FSMANIM_Selection] == i) then
         lcd.drawFilledRectangle(rect.xmin, rect.ymin, rect.xmax - rect.xmin + 1, rect.ymax - rect.ymin + 1, COLOR_THEME_FOCUS);
         lcd.drawRectangle(rect.xmin, rect.ymin, rect.xmax - rect.xmin + 1, rect.ymax - rect.ymin + 1, COLOR_THEME_PRIMARY1);
       else
         lcd.drawFilledRectangle(rect.xmin, rect.ymin, rect.xmax - rect.xmin + 1, rect.ymax - rect.ymin + 1, COLOR_THEME_SECONDARY2);
       end
     end
-    lcd.drawText(rect.xmin + 5, rect.ymin + 5, anims[i][1], COLOR_THEME_PRIMARY1);
+    lcd.drawText(rect.xmin + 5, rect.ymin + 5, anims[i][ANIM_Name], COLOR_THEME_PRIMARY1);
   end
 end
 
@@ -220,18 +230,18 @@ local function processEvents(rects, state, event, touch)
   if (event == EVT_TOUCH_TAP) then
     for bi, rect in ipairs(rects) do
       if (covers(touch, rect)) then
-        state[6] = bi;
+        state[FSMANIM_Selection] = bi;
         break;
       end
     end
   elseif (event ==  EVT_VIRTUAL_ENTER) then
-    print("PE2:", state[5], state[6]);
-    if (state[6] == state[5]) then
-      state[5] = 0;
+    TRACE("PE2:", state[FSMANIM_ActiveAnim], state[FSMANIM_Selection]);
+    if (state[FSMANIM_Selection] == state[FSMANIM_ActiveAnim]) then
+      state[FSMANIM_ActiveAnim] = 0;
       return 0;
     end 
-    if (state[6]) and (state[6] <= #rects) then
-      return state[6];
+    if (state[FSMANIM_Selection]) and (state[FSMANIM_Selection] <= #rects) then
+      return state[FSMANIM_Selection];
     end
   end
   return 0;
@@ -246,6 +256,9 @@ local function chooseAnimation(config, widget, anims, state, event, touch)
   local bw = widget[W_Width] - 2 * border_h;;
   local vs = 5;
 
+  if not(anims) then
+    return;
+  end
   if (#anims == 0) then
     lcd.drawText(widget[W_X], widget[W_Y] + widget[W_Height] / 2 - widget[W_FontHLarge], "No animations", DBLSIZE);
   elseif (#anims == 1) then
@@ -289,11 +302,11 @@ local function chooseAnimation(config, widget, anims, state, event, touch)
 
   if (selection > 0) then
     resetState(state);
-    state[5] = selection;
+    state[FSMANIM_ActiveAnim] = selection;
     return anims[selection];
   else
-    if (state[5] > 0) and (state[5] <= #anims) then
-      return anims[state[5]];
+    if (state[FSMANIM_ActiveAnim] > 0) and (state[FSMANIM_ActiveAnim] <= #anims) then
+      return anims[state[FSMANIM_ActiveAnim]];
     end
   end
 

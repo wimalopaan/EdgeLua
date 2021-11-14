@@ -85,6 +85,38 @@
 #define PLINE_Line 3
 #define PLINE_Rects ITEM_Rects
 
+#define ANIM_Name 1
+#define ANIM_Length 2
+#define ANIM_StatePoints 3
+#define ANIM_StateDurations 4
+
+#define ASTATEPOINT_Function 1
+#define ASTATEPOINT_Module 2
+#define ASTATEPOINT_TimeStates 3
+
+#define ATIMESTATE_Time 1
+#define ATIMESTATE_State 2
+#define ATIMESTATE_Done 3
+
+#define ASTATEDUR_Function 1
+#define ASTATEDUR_Module 2
+#define ASTATEDUR_DurationStates 3
+
+#define ADURSTATE_Duration 1
+#define ADURSTATE_State 2
+#define ADURSTATE_Done 3
+
+#define FSMANIM_LastTime 1
+#define FSMANIM_State 2
+#define FSMANIM_StartTime 3
+#define FSMANIM_LastSwitch 4
+#define FSMANIM_ActiveAnim 5
+#define FSMANIM_Selection 6
+#define FSMANIM_LastReached 7
+
+#define FSMANIM_STATE_Init 0
+#define FSMANIM_STATE_Run 1
+
 #define REMOTE_LastValue  1
 #define REMOTE_Module  2
 #define REMOTE_Function  3
