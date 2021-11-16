@@ -95,7 +95,7 @@ local function initAnimations(anims)
   return canims;
 end
 local function setItem(fn, module, state)
-  print("TRACE -L2- : ", "setItem", fn, module, state );
+  ;
   __WmSw2ForeignInput = module * 100 + fn * 10 + state;
 end
 local function clearAnim(anim)
@@ -189,7 +189,7 @@ end
 local function initAnimationFSM(state)
   resetState(state);
   state[5] = 0; -- active anim [1...4]
-  state[6] = 0; -- selection
+  state[8] = 0; -- selection
   state[7] = 0;
   state[8] = 1;
 end
@@ -198,7 +198,7 @@ local function drawButtons(anims, rects, state)
     if (state[5] == i) then
       lcd.drawFilledRectangle(rect.xmin, rect.ymin, rect.xmax - rect.xmin + 1, rect.ymax - rect.ymin + 1, COLOR_THEME_ACTIVE);
     else
-      if (state[6] == i) then
+      if (state[8] == i) then
         lcd.drawFilledRectangle(rect.xmin, rect.ymin, rect.xmax - rect.xmin + 1, rect.ymax - rect.ymin + 1, COLOR_THEME_FOCUS);
         lcd.drawRectangle(rect.xmin, rect.ymin, rect.xmax - rect.xmin + 1, rect.ymax - rect.ymin + 1, COLOR_THEME_PRIMARY1);
       else
@@ -215,31 +215,52 @@ local function covers(touch, item)
   end
   return false;
 end
-local function processEvents(rects, state, event, touch)
-  if (event == EVT_TOUCH_TAP) then
-    for bi, rect in ipairs(rects) do
-      if (covers(touch, rect)) then
-        state[6] = bi;
-        break;
-      end
-    end
-  elseif (event == EVT_VIRTUAL_ENTER) then
-    print("TRACE -L1- : ", "PE2:", state[5], state[6] );
-    if (state[6] == state[5]) then
+local function processKeyEvents(anims, state, event)
+  if (event == EVT_VIRTUAL_ENTER) then
+    ;
+    if (state[8] == state[5]) then
       state[5] = 0;
       return 0;
     end
-    if (state[6]) and (state[6] <= #rects) then
-      return state[6];
+    if (state[8]) and (state[8] <= #anims) then
+      state[5] = state[8] ;
     end
   end
-  return 0;
+  if (event == EVT_VIRTUAL_INC) then
+    ;
+    if (state[8] >= #anims) then
+      state[8] = 1;
+    else
+      state[8] = state[8] + 1;
+    end
+  end
+  if (event == EVT_VIRTUAL_DEC) then
+    ;
+    if (state[8] <= 1) then
+      state[8] = #anims;
+    else
+      state[8] = state[8] - 1;
+    end
+  end
+end
+local function processEvents(anims, rects, state, event, touch)
+  if (event == EVT_TOUCH_TAP) then
+    for bi, rect in ipairs(rects) do
+      if (touch) and (covers(touch, rect)) then
+        state[8] = bi;
+        break;
+      end
+    end
+  end
+  processKeyEvents(anims, state, event);
 end
 local function chooseAnimationBW(config, anims, state, event)
   ;
   if not(anims) or (#anims == 0) then
     return;
   end
+  processKeyEvents(anims, state, event);
+  --[[
   if (event == EVT_VIRTUAL_INC) then
     if (state[8] >= #anims) then
       state[8] = 1;
@@ -260,9 +281,10 @@ local function chooseAnimationBW(config, anims, state, event)
       return nil;
     else
       state[5] = state[8];
-      return anims[state[8]];
+      return anims[state[8] ];
     end
   end
+  --]]
   for i, anim in ipairs(anims) do
     if (i == state[5]) then
       if (i == state[8]) then
@@ -293,6 +315,7 @@ local function chooseAnimation(config, widget, anims, state, event, touch)
   local border_h = 40;
   local bw = widget[3] - 2 * border_h;;
   local vs = 5;
+  ;
   if not(anims) then
     return;
   end
@@ -334,19 +357,25 @@ local function chooseAnimation(config, widget, anims, state, event, touch)
     rects[4] = rect;
   end
   drawButtons(anims, rects, state);
-  local selection = processEvents(rects, state, event, touch);
+  processEvents(anims, rects, state, event, touch);
+  if (state[5] > 0) then
+    return anims[state[5]];
+  else
+    __WmSw2Warning1 = nil;
+    __WmSw2Warning2 = nil;
+    return nil;
+  end
+  --[[
   if (selection > 0) then
     resetState(state);
     state[5] = selection;
     return anims[selection];
   else
     if (state[5] > 0) and (state[5] <= #anims) then
-      return anims[state[5]];
+      return anims[state[5] ];
     end
   end
-  __WmSw2Warning1 = nil;
-  __WmSw2Warning2 = nil;
-  return nil;
+  --]]
 end
 if (LCD_W <= 128) then
   return {

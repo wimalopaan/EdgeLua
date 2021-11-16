@@ -529,7 +529,7 @@ local function processEventsBWScroll(config, menu, menuState, event, queue, call
     callback(menu, menuState, queue);
   else
     if (event ~= lastEvent) then
-      print("TRACE -L2- : ", "processEventsBWScroll", event );
+      ;
       lastEvent = event;
     end
     if (event > 0) then
@@ -552,7 +552,7 @@ local function processEventsBWKeys(config, menu, menuState, event, queue, callba
     callback(menu, menuState, queue);
   else
     if (event ~= lastEvent) then
-      print("TRACE -L2- : ", "processEventsBWKeys", event );
+      ;
       lastEvent = event;
     end
     if (event > 0) then

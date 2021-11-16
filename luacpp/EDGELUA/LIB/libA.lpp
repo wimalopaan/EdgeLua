@@ -200,7 +200,7 @@ end
 local function initAnimationFSM(state)
   resetState(state);
   state[FSMANIM_ActiveAnim] = 0; -- active anim [1...4]
-  state[FSMANIM_Selection] = 0; -- selection
+  state[FSMANIM_CursorRow] = 0; -- selection
   state[FSMANIM_LastReached] = 0;
   state[FSMANIM_CursorRow] = 1;
 end
@@ -210,7 +210,7 @@ local function drawButtons(anims, rects, state)
     if (state[FSMANIM_ActiveAnim] == i) then
       lcd.drawFilledRectangle(rect.xmin, rect.ymin, rect.xmax - rect.xmin + 1, rect.ymax - rect.ymin + 1, COLOR_THEME_ACTIVE);
     else
-      if (state[FSMANIM_Selection] == i) then
+      if (state[FSMANIM_CursorRow] == i) then
         lcd.drawFilledRectangle(rect.xmin, rect.ymin, rect.xmax - rect.xmin + 1, rect.ymax - rect.ymin + 1, COLOR_THEME_FOCUS);
         lcd.drawRectangle(rect.xmin, rect.ymin, rect.xmax - rect.xmin + 1, rect.ymax - rect.ymin + 1, COLOR_THEME_PRIMARY1);
       else
@@ -229,25 +229,45 @@ local function covers(touch, item)
   return false;
 end
 
-local function processEvents(rects, state, event, touch)
-  if (event == EVT_TOUCH_TAP) then
-    for bi, rect in ipairs(rects) do
-      if (covers(touch, rect)) then
-        state[FSMANIM_Selection] = bi;
-        break;
-      end
-    end
-  elseif (event ==  EVT_VIRTUAL_ENTER) then
-    TRACE1("PE2:", state[FSMANIM_ActiveAnim], state[FSMANIM_Selection]);
-    if (state[FSMANIM_Selection] == state[FSMANIM_ActiveAnim]) then
+local function processKeyEvents(anims, state, event)
+  if (event ==  EVT_VIRTUAL_ENTER) then
+    TRACE1("PE2:", state[FSMANIM_ActiveAnim], state[FSMANIM_CursorRow]);
+    if (state[FSMANIM_CursorRow] == state[FSMANIM_ActiveAnim]) then
       state[FSMANIM_ActiveAnim] = 0;
       return 0;
     end 
-    if (state[FSMANIM_Selection]) and (state[FSMANIM_Selection] <= #rects) then
-      return state[FSMANIM_Selection];
+    if (state[FSMANIM_CursorRow]) and (state[FSMANIM_CursorRow] <= #anims) then
+      state[FSMANIM_ActiveAnim] = state[FSMANIM_CursorRow] ;
     end
   end
-  return 0;
+  if (event == EVT_VIRTUAL_INC) then
+    TRACE1("PE3");
+    if (state[FSMANIM_CursorRow] >= #anims) then 
+      state[FSMANIM_CursorRow] = 1;
+    else
+      state[FSMANIM_CursorRow] = state[FSMANIM_CursorRow] + 1;
+    end 
+  end
+  if (event == EVT_VIRTUAL_DEC) then
+    TRACE1("PE3");
+    if (state[FSMANIM_CursorRow] <= 1) then
+      state[FSMANIM_CursorRow] = #anims;
+    else
+      state[FSMANIM_CursorRow] = state[FSMANIM_CursorRow] - 1;
+    end
+  end
+end
+
+local function processEvents(anims, rects, state, event, touch)
+  if (event == EVT_TOUCH_TAP) then
+    for bi, rect in ipairs(rects) do
+      if (touch) and (covers(touch, rect)) then
+        state[FSMANIM_CursorRow] = bi;
+        break;
+      end
+    end
+  end
+  processKeyEvents(anims, state, event);
 end
 
 local function chooseAnimationBW(config, anims, state, event)
@@ -255,7 +275,8 @@ local function chooseAnimationBW(config, anims, state, event)
   if not(anims) or (#anims == 0) then
     return;
   end 
-
+  processKeyEvents(anims, state, event);
+  --[[
   if (event == EVT_VIRTUAL_INC) then
     if (state[FSMANIM_CursorRow] >= #anims) then 
       state[FSMANIM_CursorRow] = 1;
@@ -276,9 +297,10 @@ local function chooseAnimationBW(config, anims, state, event)
       return nil;
     else
       state[FSMANIM_ActiveAnim] = state[FSMANIM_CursorRow];
-      return anims[state[FSMANIM_CursorRow]];
+      return anims[state[FSMANIM_CursorRow] ];
     end
   end
+  --]]
 
   for i, anim in ipairs(anims) do
     if (i == state[FSMANIM_ActiveAnim]) then
@@ -296,7 +318,6 @@ local function chooseAnimationBW(config, anims, state, event)
       end 
     end
     lcd.drawText(30, i * 10, anim[ANIM_Name], SMLSIZE);
-
   end
   TRACE3("chooseAnimationBW E");
   if (state[FSMANIM_ActiveAnim] > 0) then
@@ -312,6 +333,8 @@ local function chooseAnimation(config, widget, anims, state, event, touch)
   local border_h = 40;
   local bw = widget[W_Width] - 2 * border_h;;
   local vs = 5;
+
+  TRACE3("chooseAnimation", config, widget, anims, state, event, touch);
 
   if not(anims) then
     return;
@@ -355,22 +378,27 @@ local function chooseAnimation(config, widget, anims, state, event, touch)
   end
 
   drawButtons(anims, rects, state);
-  local selection = processEvents(rects, state, event, touch);
+  processEvents(anims, rects, state, event, touch);
 
+  if (state[FSMANIM_ActiveAnim] > 0) then
+    return anims[state[FSMANIM_ActiveAnim]];
+  else
+    __WmSw2Warning1 = nil;
+    __WmSw2Warning2 = nil;
+    return nil;
+  end
+
+  --[[
   if (selection > 0) then
     resetState(state);
     state[FSMANIM_ActiveAnim] = selection;
     return anims[selection];
   else
     if (state[FSMANIM_ActiveAnim] > 0) and (state[FSMANIM_ActiveAnim] <= #anims) then
-      return anims[state[FSMANIM_ActiveAnim]];
+      return anims[state[FSMANIM_ActiveAnim] ];
     end
   end
-
-  __WmSw2Warning1 = nil;
-  __WmSw2Warning2 = nil;
-
-  return nil;
+  --]]
 end
 
 if (LCD_W <= 128) then
