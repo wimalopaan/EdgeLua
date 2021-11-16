@@ -4,9 +4,8 @@ local function init()
 end 
 
 local function run()
-  local value = 42;
-  ASSERT(value == 42);
 
+  --[[
   TRACE("test", 1, 2, 3);
 
   local t5u = getFieldInfo("t5u");
@@ -38,7 +37,14 @@ local function run()
   if (ls) then
     print("LS:", ls.func, ls["and"])
   end
+  --]]
 
+  local in1 = getFieldInfo("input5");
+  TRACE("input5")
+  if (in1) then
+    TRACE("input5:", in1.id, getValue(in1.id));
+  end
+  
   return 1;
 end 
 

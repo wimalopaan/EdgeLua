@@ -5,8 +5,7 @@
 local function init()
 end
 local function run()
-  local value = 42;
-  if not(value == 42) then print("Assertion error:" .. "value == 42") end;
+  --[[
   print("TRACE: ", "test", 1, 2, 3 );
   local t5u = getFieldInfo("t5u");
   if (t5u) then
@@ -31,6 +30,12 @@ local function run()
   local ls = model.getLogicalSwitch(50);
   if (ls) then
     print("LS:", ls.func, ls["and"])
+  end
+  --]]
+  local in1 = getFieldInfo("input5");
+  print("TRACE: ", "input5" )
+  if (in1) then
+    print("TRACE: ", "input5:", in1.id, getValue(in1.id) );
   end
   return 1;
 end

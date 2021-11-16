@@ -347,7 +347,7 @@ local function initConfigColor(config)
       cfg[8] = info.id;
     end
   end
-  local footer = "Vers: " .. "2.1";;
+  local footer = "Vers: " .. "2.01";
   if (cfg[9] == 0) then
     footer = footer .. " Mod: xjt";
   elseif (cfg[9] == 1) then

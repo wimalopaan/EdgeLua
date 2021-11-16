@@ -8,6 +8,10 @@
 -- IMPORTANT
 -- Please note that the above license also covers the transfer protocol used and the encoding scheme and
 -- all further principals of tranferring state and other information.
+       
+       
+       
+       
 local function init()
 end
 local function gather(basedir, names)
@@ -47,7 +51,7 @@ local dirs = {
   "/WIDGETS/ELUAWI",
 };
 local function run()
-  lcd.drawText(0, 0, "Compiling ...", TEXT_COLOR);
+  lcd.drawText(0, 0, "Compiling ..." .. "2.01", TEXT_COLOR);
   local t = getTime();
   local dir = nil;
   if ((t - lastTime) > 50) then

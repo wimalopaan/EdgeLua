@@ -283,6 +283,7 @@ local function displayMenuBW(config, widget, menu, overlays, state, pagetitles)
   local activePageIndex = state[3];
   local page = menu[activePageIndex];
   local overlay = overlays[activePageIndex];
+  ;
   if (pagetitles[activePageIndex]) then
     lcd.drawScreenTitle(pagetitles[activePageIndex], activePageIndex, #menu);
   else
