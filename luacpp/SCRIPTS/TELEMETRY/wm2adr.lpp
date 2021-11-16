@@ -1,0 +1,74 @@
+--
+-- EdgeLUA - EdgeTx / OpenTx Extensions 
+-- Copyright (C) 2021 Wilhelm Meier <wilhelm.wm.meier@googlemail.com>
+--
+-- This work is licensed under the Creative Commons Attribution-NonCommercial-NoDerivatives 4.0 International License. 
+-- To view a copy of this license, visit http://creativecommons.org/licenses/by-nc-nd/4.0/ 
+-- or send a letter to Creative Commons, PO Box 1866, Mountain View, CA 94042, USA.
+
+-- IMPORTANT
+-- Please note that the above license also covers the transfer protocol used and the encoding scheme and 
+-- all further principals of tranferring state and other information.
+
+#include "telemetry.h"
+
+local menuState = {};
+local paramEncoder = nil;
+local paramScaler = nil;
+
+local lastRun = 0;
+
+__stopWmSw2 = false; -- stop sending out
+
+local function init_telemetry()
+    load();
+    collectgarbage();
+
+    if (errorCode > 0) then
+       return;
+    end
+
+    if not(__WmSw2Config) then
+        local config = __libI.loadConfig();
+        if not(config) then
+          errorCode = 4;
+          return;
+        end
+        __WmSw2Config = __libI.initConfig(config);
+      end
+      collectgarbage();
+    
+      local unused;
+      unused, paramScaler, paramEncoder = __libP.getEncoder(__WmSw2Config);
+      unused = nil;
+    
+      __libI = nil; -- free memory
+    
+      collectgarbage();
+end
+
+local function run_telemetry(event) 
+    lcd.clear();
+    if (errorCode == 0) then
+        __stopWmSw2 = true;
+        lastRun = getTime();
+        __libD.displayAddressConfig(__WmSw2Config, paramEncoder, paramScaler, menuState, event, touch);
+        else
+      lcd.drawText(0, 0, "Error: " .. errorCode, DBLSIZE);
+    end
+  end
+
+local function background_telemetry()
+    if (errorCode == 0) then
+      if ((getTime() - lastRun) > 100) then
+        __stopWmSw2 = false;
+        menuState[1] = 0; -- deselected state
+      end
+    end
+end
+
+return {
+    init = init_telemetry,
+    run = run_telemetry,
+    background = background_telemetry
+}

@@ -14,6 +14,7 @@
        
        
        
+errorCode = 0;
 local function load()
   local basedir = "/EDGELUA" .. "/LIB/";
   if not __libI then
@@ -35,9 +36,18 @@ local function load()
     end
   end
 end
+local function loadLibA()
+  local basedir = "/EDGELUA" .. "/LIB/";
+  if not __libA then
+      print("TRACE: ", "LOAD_A", basedir );
+    __libA = loadScript(basedir .. "libA.lua")();
+    if not __libA then
+      errorCode = 3.1;
+    end
+  end
+end
 local name = "EL_Gui";
 local options = {};
---local widget = nil;
 local menuState = {1, 1, 1, 0, 0}; -- row, col, page
 local buttonState = {0, 0, 0, 0, 0, 0};
 local menu = {};
@@ -51,7 +61,6 @@ local switchFSM = nil;
 local encoder = nil;
 local exportValues = {0, -50, 50, 100}; -- percent
 local rssiState = {};
-local errorCode = 0;
 __WmSw2Config = nil;
 __stopWmSw2 = false; -- stop sending out
 __WmSw2ForeignInput = 0;

@@ -14,11 +14,9 @@
 
 local name = "EL_Adr";
 local options = {};
-local widget = nil;
---local config = {};
-local encoder = nil;
+local paramEncoder = nil;
+local paramScaler = nil;
 local menuState = {};
-local errorCode = 0;
 
 local lastRun = 0;
 
@@ -27,10 +25,10 @@ __stopWmSw2 = false; -- stop sending out
 local function create(zone, options)
   load();
   if (errorCode > 0) then
-    return widget;
+    return {};
   end
 
-  widget = __libI.initWidget(zone, options);
+  local widget = __libI.initWidget(zone, options);
   collectgarbage();
 
   if not(__WmSw2Config) then
@@ -50,7 +48,7 @@ local function create(zone, options)
   end
 
   local unused;
-  unused, unused, encoder = __libP.getEncoder(__WmSw2Config);
+  unused, paramScaler, paramEncoder = __libP.getEncoder(__WmSw2Config);
   unused = nil;
 
   __libI = nil; -- free memory
@@ -78,7 +76,7 @@ local function refresh(widget, event, touch)
   if (errorCode == 0) then
     __stopWmSw2 = true;
     lastRun = getTime();
-    __libD.displayAddressConfig(__WmSw2Config, widget, encoder, paramScaler, menuState, event, touch);
+    __libD.displayAddressConfig(__WmSw2Config, widget, paramEncoder, paramScaler, menuState, event, touch);
     background();
   else
     lcd.drawText(widget[W_X], widget[W_Y], "Error: " .. errorCode, DBLSIZE);

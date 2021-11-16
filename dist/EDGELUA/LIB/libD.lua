@@ -529,7 +529,7 @@ local function processEventsBWScroll(config, menu, menuState, event, queue, call
     callback(menu, menuState, queue);
   else
     if (event ~= lastEvent) then
-      print("TRACE: ", "processEventsBWScroll", event );
+      print("TRACE -L2- : ", "processEventsBWScroll", event );
       lastEvent = event;
     end
     if (event > 0) then
@@ -547,12 +547,12 @@ local function processEventsBWScroll(config, menu, menuState, event, queue, call
   end
 end
 local function processEventsBWKeys(config, menu, menuState, event, queue, callback)
+  ;
   if (event == EVT_VIRTUAL_ENTER) then
     callback(menu, menuState, queue);
   else
     if (event ~= lastEvent) then
-      print("TRACE: ", "processEventsBWKeys", event );
--- print("TRACE: ", "processEventsBWKeys", EVT_VIRTUAL_INC, EVT_VIRTUAL_DEC, EVT_VIRTUAL_PREV, EVT_VIRTUAL_NEXT, EVT_VIRTUAL_MENU, EVT_VIRTUAL_NEXT_PAGE );
+      print("TRACE -L2- : ", "processEventsBWKeys", event );
       lastEvent = event;
     end
     if (event > 0) then
@@ -568,6 +568,7 @@ local function processEventsBWKeys(config, menu, menuState, event, queue, callba
       nextCol(menu, menuState);
     end
   end
+  ;
 end
 local function processEventsColor(config, menu, menuState, event, queue, callback)
   if (event == EVT_VIRTUAL_ENTER) then
@@ -801,7 +802,27 @@ local function displayFmRssiWarningColor(config, widget, state)
 -- print("safemode");
   end
 end
-local function displayAddressConfigBW(config, widget, encoder, pScaler, state, event)
+local function displayAddressConfigBW(config, encoder, pScaler, state, event)
+  if (state[1] == 0) then
+    lcd.drawText(0, 0, "Attach only one device to the RX.", SMLSIZE);
+    lcd.drawText(0, 10, "Press [Enter] to start learning", MIDSIZE);
+    if (event == EVT_VIRTUAL_ENTER) then
+      state[1] = 1;
+    end
+  elseif (state[1] == 1) then
+    local adr = pScaler(config) + 1;
+    if (adr > 8) then
+      adr = 8;
+    end
+    lcd.drawText(0, 0, "Address: " .. adr, MIDSIZE + INVERS);
+    lcd.drawText(0, 20, "Watch for the device to respond.", SMLSIZE);
+    lcd.drawText(0, 30, "Switch on RX and device", MIDSIZE);
+    encoder(config[10], 14, adr);
+    if (event == EVT_VIRTUAL_ENTER) then
+      state[1] = 0;
+    end
+  else
+  end
 end
 local function displayAddressConfigColor(config, widget, encoder, pScaler, state, event, touch)
   lcd.clear();
@@ -851,6 +872,7 @@ if (LCD_W <= 128) then
     processOverlays = processOverlays,
     selectItem = selectItem,
     selectParamItem = selectParamItem,
+    processForeignInput = processForeignInput,
     displayAddressConfig = displayAddressConfigBW,
   };
 elseif (LCD_W <= 212) then
@@ -862,6 +884,7 @@ elseif (LCD_W <= 212) then
     processOverlays = processOverlays,
     selectItem = selectItem,
     selectParamItem = selectParamItem,
+    processForeignInput = processForeignInput,
     displayAddressConfig = displayAddressConfigBW,
   };
 else

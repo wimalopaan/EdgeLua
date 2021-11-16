@@ -26,7 +26,7 @@ local encoder = nil;
 local paramEncoder = nil;
 local paramScaler = nil;
 local configFSM = nil;
-local errorCode = 0;
+--local errorCode = 0;
 local help = {};
 
 local lastRun = 0;

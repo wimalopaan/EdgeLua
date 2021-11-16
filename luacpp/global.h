@@ -11,7 +11,7 @@
 
 #define USE_SHM // only for color/edgetx (PR)
 
-//#define USE_LS_STICKY // patch
+#define USE_LS_STICKY // patch
 
 #define LSFUNC_A_EQ_X 1
 #define LSFUNC_A_GT_X 3

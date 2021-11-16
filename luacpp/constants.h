@@ -113,6 +113,7 @@
 #define FSMANIM_ActiveAnim 5
 #define FSMANIM_Selection 6
 #define FSMANIM_LastReached 7
+#define FSMANIM_CursorRow 8
 
 #define FSMANIM_STATE_Init 0
 #define FSMANIM_STATE_Run 1

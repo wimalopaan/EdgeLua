@@ -14,6 +14,7 @@
        
        
        
+errorCode = 0;
 local function load()
   local basedir = "/EDGELUA" .. "/LIB/";
   if not __libI then
@@ -35,6 +36,16 @@ local function load()
     end
   end
 end
+local function loadLibA()
+  local basedir = "/EDGELUA" .. "/LIB/";
+  if not __libA then
+      print("TRACE: ", "LOAD_A", basedir );
+    __libA = loadScript(basedir .. "libA.lua")();
+    if not __libA then
+      errorCode = 3.1;
+    end
+  end
+end
 local name = "EL_Con";
 local options = {};
 --local widget = nil;
@@ -49,7 +60,7 @@ local encoder = nil;
 local paramEncoder = nil;
 local paramScaler = nil;
 local configFSM = nil;
-local errorCode = 0;
+--local errorCode = 0;
 local help = {};
 local lastRun = 0;
 __stopWmSw2 = false; -- stop WMSW2 sending out

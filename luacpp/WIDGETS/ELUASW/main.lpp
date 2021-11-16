@@ -14,7 +14,6 @@
 
 local name = "EL_Gui";
 local options = {};
---local widget = nil;
 local menuState = {1, 1, 1, 0, 0}; -- row, col, page
 local buttonState = {0, 0, 0, 0, 0, 0};
 local menu = {};
@@ -28,7 +27,6 @@ local switchFSM = nil;
 local encoder = nil;
 local exportValues = {0, -50, 50, 100}; -- percent
 local rssiState = {};
-local errorCode = 0;
 
 __WmSw2Config = nil;
 __stopWmSw2 = false; -- stop sending out

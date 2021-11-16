@@ -95,6 +95,7 @@ local function initAnimations(anims)
   return canims;
 end
 local function setItem(fn, module, state)
+  print("TRACE -L2- : ", "setItem", fn, module, state );
   __WmSw2ForeignInput = module * 100 + fn * 10 + state;
 end
 local function clearAnim(anim)
@@ -109,7 +110,7 @@ local function clearAnim(anim)
     end
   end
 end
-local function runAnimation(widget, anim, state)
+local function runAnimation(anim, state)
   if not(anim) then
     return;
   end
@@ -189,6 +190,8 @@ local function initAnimationFSM(state)
   resetState(state);
   state[5] = 0; -- active anim [1...4]
   state[6] = 0; -- selection
+  state[7] = 0;
+  state[8] = 1;
 end
 local function drawButtons(anims, rects, state)
   for i, rect in ipairs(rects) do
@@ -221,7 +224,7 @@ local function processEvents(rects, state, event, touch)
       end
     end
   elseif (event == EVT_VIRTUAL_ENTER) then
-    print("TRACE: ", "PE2:", state[5], state[6] );
+    print("TRACE -L1- : ", "PE2:", state[5], state[6] );
     if (state[6] == state[5]) then
       state[5] = 0;
       return 0;
@@ -231,6 +234,57 @@ local function processEvents(rects, state, event, touch)
     end
   end
   return 0;
+end
+local function chooseAnimationBW(config, anims, state, event)
+  ;
+  if not(anims) or (#anims == 0) then
+    return;
+  end
+  if (event == EVT_VIRTUAL_INC) then
+    if (state[8] >= #anims) then
+      state[8] = 1;
+    else
+      state[8] = state[8] + 1;
+    end
+  end
+  if (event == EVT_VIRTUAL_DEC) then
+    if (state[8] <= 1) then
+      state[8] = #anims;
+    else
+      state[8] = state[8] - 1;
+    end
+  end
+  if (event == EVT_VIRTUAL_ENTER) then
+    if (state[5] == state[8]) then
+      state[5] = 0;
+      return nil;
+    else
+      state[5] = state[8];
+      return anims[state[8]];
+    end
+  end
+  for i, anim in ipairs(anims) do
+    if (i == state[5]) then
+      if (i == state[8]) then
+        lcd.drawText(10, i * 10, "[x]", SMLSIZE + INVERS);
+      else
+        lcd.drawText(10, i * 10, "[x]", SMLSIZE);
+      end
+      lcd.drawText(30, i * 10, anim[1], SMLSIZE);
+    else
+      if (i == state[8]) then
+        lcd.drawText(10, i * 10, "[ ]", SMLSIZE + INVERS);
+      else
+        lcd.drawText(10, i * 10, "[ ]", SMLSIZE);
+      end
+    end
+    lcd.drawText(30, i * 10, anim[1], SMLSIZE);
+  end
+  ;
+  if (state[5] > 0) then
+    return anims[state[5]];
+  end
+  return nil;
 end
 local function chooseAnimation(config, widget, anims, state, event, touch)
   lcd.clear();
@@ -294,10 +348,28 @@ local function chooseAnimation(config, widget, anims, state, event, touch)
   __WmSw2Warning2 = nil;
   return nil;
 end
-return {
-  loadAnimations = loadAnimations,
-  initAnimations = initAnimations,
-  runAnimation = runAnimation,
-  chooseAnimation = chooseAnimation,
-  initAnimationFSM = initAnimationFSM,
-};
+if (LCD_W <= 128) then
+  return {
+    loadAnimations = loadAnimations,
+    initAnimations = initAnimations,
+    runAnimation = runAnimation,
+    chooseAnimation = chooseAnimationBW,
+    initAnimationFSM = initAnimationFSM,
+  };
+  elseif (LCD_W <= 212) then
+    return {
+      loadAnimations = loadAnimations,
+      initAnimations = initAnimations,
+      runAnimation = runAnimation,
+      chooseAnimation = chooseAnimationBW,
+      initAnimationFSM = initAnimationFSM,
+    };
+    else
+  return {
+    loadAnimations = loadAnimations,
+    initAnimations = initAnimations,
+    runAnimation = runAnimation,
+    chooseAnimation = chooseAnimation,
+    initAnimationFSM = initAnimationFSM,
+  };
+  end

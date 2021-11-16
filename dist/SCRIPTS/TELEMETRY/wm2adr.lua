@@ -46,68 +46,52 @@ local function loadLibA()
     end
   end
 end
-local name = "EL_Adr";
-local options = {};
+local menuState = {};
 local paramEncoder = nil;
 local paramScaler = nil;
-local menuState = {};
 local lastRun = 0;
 __stopWmSw2 = false; -- stop sending out
-local function create(zone, options)
-  load();
-  if (errorCode > 0) then
-    return {};
-  end
-  local widget = __libI.initWidget(zone, options);
-  collectgarbage();
-  if not(__WmSw2Config) then
-    local config = __libI.loadConfig();
-    if not(config) then
-      errorCode = 4;
-      return widget;
+local function init_telemetry()
+    load();
+    collectgarbage();
+    if (errorCode > 0) then
+       return;
     end
-    __WmSw2Config = __libI.initConfig(config);
-  end
-  collectgarbage();
-  local menu = __libI.loadMenu();
-  if not(menu) then
-    errorCode = 5;
-    return widget;
-  end
-  local unused;
-  unused, paramScaler, paramEncoder = __libP.getEncoder(__WmSw2Config);
-  unused = nil;
-  __libI = nil; -- free memory
-  collectgarbage();
-  return widget;
+    if not(__WmSw2Config) then
+        local config = __libI.loadConfig();
+        if not(config) then
+          errorCode = 4;
+          return;
+        end
+        __WmSw2Config = __libI.initConfig(config);
+      end
+      collectgarbage();
+      local unused;
+      unused, paramScaler, paramEncoder = __libP.getEncoder(__WmSw2Config);
+      unused = nil;
+      __libI = nil; -- free memory
+      collectgarbage();
 end
-local function update(widget, options)
-  widget[11] = options;
-end
-local function background(widget)
-  if (errorCode == 0) then
-    if ((getTime() - lastRun) > 100) then
-      __stopWmSw2 = false;
-      menuState[1] = 0; -- deselected state
+local function run_telemetry(event)
+    lcd.clear();
+    if (errorCode == 0) then
+        __stopWmSw2 = true;
+        lastRun = getTime();
+        __libD.displayAddressConfig(__WmSw2Config, paramEncoder, paramScaler, menuState, event, touch);
+        else
+      lcd.drawText(0, 0, "Error: " .. errorCode, DBLSIZE);
     end
   end
-end
-local function refresh(widget, event, touch)
-  __libD.updateWidgetDimensions(widget, event);
-  if (errorCode == 0) then
-    __stopWmSw2 = true;
-    lastRun = getTime();
-    __libD.displayAddressConfig(__WmSw2Config, widget, paramEncoder, paramScaler, menuState, event, touch);
-    background();
-  else
-    lcd.drawText(widget[1], widget[2], "Error: " .. errorCode, DBLSIZE);
-  end
+local function background_telemetry()
+    if (errorCode == 0) then
+      if ((getTime() - lastRun) > 100) then
+        __stopWmSw2 = false;
+        menuState[1] = 0; -- deselected state
+      end
+    end
 end
 return {
-  name=name,
-  options=options,
-  create=create,
-  update=update,
-  refresh=refresh,
-  background=background
-};
+    init = init_telemetry,
+    run = run_telemetry,
+    background = background_telemetry
+}

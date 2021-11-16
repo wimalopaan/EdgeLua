@@ -2,6 +2,8 @@
 
 #include "global.h"
 
+errorCode = 0;
+
 local function load()
   local basedir = BASE_DIR .. "/LIB/";
   if not __libI then
@@ -24,3 +26,13 @@ local function load()
   end
 end
 
+local function loadLibA()
+  local basedir = BASE_DIR .. "/LIB/";
+  if not __libA then
+      TRACE("LOAD_A", basedir);
+    __libA = loadScript(basedir .. "libA.lua")();
+    if not __libA then
+      errorCode = 3.1;
+    end
+  end
+end

@@ -14,6 +14,7 @@
        
        
        
+errorCode = 0;
 local function load()
   local basedir = "/EDGELUA" .. "/LIB/";
   if not __libI then
@@ -35,15 +36,6 @@ local function load()
     end
   end
 end
-local name = "EL_Ani";
-local options = {};
-local animations = nil;
-local errorCode = 0;
-local fsmState = {};
-local currentAnimation = nil;
---__stopWmSw2 = false; -- stop sending out
---__WmSw2foreignInput = 0;
---__WmSw2Warning = nil;
 local function loadLibA()
   local basedir = "/EDGELUA" .. "/LIB/";
   if not __libA then
@@ -54,6 +46,14 @@ local function loadLibA()
     end
   end
 end
+local name = "EL_Ani";
+local options = {};
+local animations = nil;
+local fsmState = {};
+local currentAnimation = nil;
+--__stopWmSw2 = false; -- stop sending out
+--__WmSw2foreignInput = 0;
+--__WmSw2Warning = nil;
 local function create(zone, options)
   load();
   loadLibA();
@@ -99,9 +99,8 @@ local function update(widget, options)
 end
 local function background(widget)
   if (errorCode == 0) then
-    -- print("current:", currentAnimation, fsmState[5]);
     if not(__stopWmSw2) then
-      currentAnimation = __libA.runAnimation(widget, currentAnimation, fsmState);
+      currentAnimation = __libA.runAnimation(currentAnimation, fsmState);
     end
   end
 end
