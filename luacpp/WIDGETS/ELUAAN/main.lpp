@@ -18,11 +18,6 @@ local animations = nil;
 local fsmState = {};
 local currentAnimation = nil;
 
---__stopWmSw2 = false; -- stop sending out
---__WmSw2foreignInput = 0;
---__WmSw2Warning = nil;
-
-
 local function create(zone, options)
   load();
   loadLibA();
@@ -87,7 +82,7 @@ end
 
 local function background(widget)
   if (errorCode == 0) then
-    if not(__stopWmSw2) then
+    if (__stopWmSw2 == 0) then
       currentAnimation = __libA.runAnimation(currentAnimation, fsmState);
     end
   end

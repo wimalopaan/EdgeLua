@@ -20,8 +20,6 @@ local menuState = {};
 
 local lastRun = 0;
 
-__stopWmSw2 = false; -- stop sending out
-
 local function create(zone, options)
   load();
   if (errorCode > 0) then
@@ -65,7 +63,7 @@ end
 local function background(widget)
   if (errorCode == 0) then
     if ((getTime() - lastRun) > 100) then
-      __stopWmSw2 = false;
+      __stopWmSw2 = bit32.band(__stopWmSw2, bit32.bnot(STOPMASK_ADRESS));
       menuState[1] = 0; -- deselected state
     end
   end
@@ -74,7 +72,7 @@ end
 local function refresh(widget, event, touch)
   __libD.updateWidgetDimensions(widget, event);
   if (errorCode == 0) then
-    __stopWmSw2 = true;
+    __stopWmSw2 = bit32.bor(__stopWmSw2, STOPMASK_ADRESS);
     lastRun = getTime();
     __libD.displayAddressConfig(__WmSw2Config, widget, paramEncoder, paramScaler, menuState, event, touch);
     background();

@@ -18,8 +18,6 @@ local paramScaler = nil;
 
 local lastRun = 0;
 
-__stopWmSw2 = false; -- stop sending out
-
 local function init_telemetry()
     load();
     collectgarbage();
@@ -38,7 +36,7 @@ local function init_telemetry()
       end
       collectgarbage();
     
-      local unused;
+      local unused = nil;
       unused, paramScaler, paramEncoder = __libP.getEncoder(__WmSw2Config);
       unused = nil;
     
@@ -50,10 +48,10 @@ end
 local function run_telemetry(event) 
     lcd.clear();
     if (errorCode == 0) then
-        __stopWmSw2 = true;
+        __stopWmSw2 = bit32.bor(__stopWmSw2, STOPMASK_ADRESS);
         lastRun = getTime();
         __libD.displayAddressConfig(__WmSw2Config, paramEncoder, paramScaler, menuState, event, touch);
-        else
+    else
       lcd.drawText(0, 0, "Error: " .. errorCode, DBLSIZE);
     end
   end
@@ -61,7 +59,7 @@ local function run_telemetry(event)
 local function background_telemetry()
     if (errorCode == 0) then
       if ((getTime() - lastRun) > 100) then
-        __stopWmSw2 = false;
+        __stopWmSw2 = bit32.band(__stopWmSw2, bit32.bnot(STOPMASK_ADRESS));
         menuState[1] = 0; -- deselected state
       end
     end
@@ -70,5 +68,5 @@ end
 return {
     init = init_telemetry,
     run = run_telemetry,
-    background = background_telemetry
+    background = background_telemetry,
 }

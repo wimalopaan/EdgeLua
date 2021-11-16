@@ -15,6 +15,11 @@
        
        
 errorCode = 0;
+__WmSw2Config = nil;
+__stopWmSw2 = 0;
+__WmSw2ForeignInput = 0;
+__WmSw2Warning1 = nil;
+__WmSw2Warning2 = nil;
 local function load()
   local basedir = "/EDGELUA" .. "/LIB/";
   if not __libI then
@@ -61,11 +66,6 @@ local switchFSM = nil;
 local encoder = nil;
 local exportValues = {0, -50, 50, 100}; -- percent
 local rssiState = {};
-__WmSw2Config = nil;
-__stopWmSw2 = false; -- stop sending out
-__WmSw2ForeignInput = 0;
-__WmSw2Warning1 = nil;
-__WmSw2Warning2 = nil;
 local lastForeignInput = 0;
 local remoteInput = {0, 0, 0, 0};
 local function create(zone, options)
@@ -115,7 +115,7 @@ local function background(widget)
       __libD.processForeignInput(__WmSw2Config, __WmSw2ForeignInput, menu, queue);
       lastForeignInput = __WmSw2ForeignInput;
     end
-    if not(__stopWmSw2) then
+    if (__stopWmSw2 == 0) then
       switchFSM(__WmSw2Config, menu, queue, fsmState, encoder, exportValues);
     end
     __libP.rssiState(__WmSw2Config, rssiState);

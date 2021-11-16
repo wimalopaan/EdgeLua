@@ -15,6 +15,11 @@
        
        
 errorCode = 0;
+__WmSw2Config = nil;
+__stopWmSw2 = 0;
+__WmSw2ForeignInput = 0;
+__WmSw2Warning1 = nil;
+__WmSw2Warning2 = nil;
 local function load()
   local basedir = "/EDGELUA" .. "/LIB/";
   if not __libI then
@@ -50,7 +55,6 @@ local menuState = {};
 local paramEncoder = nil;
 local paramScaler = nil;
 local lastRun = 0;
-__stopWmSw2 = false; -- stop sending out
 local function init_telemetry()
     load();
     collectgarbage();
@@ -66,7 +70,7 @@ local function init_telemetry()
         __WmSw2Config = __libI.initConfig(config);
       end
       collectgarbage();
-      local unused;
+      local unused = nil;
       unused, paramScaler, paramEncoder = __libP.getEncoder(__WmSw2Config);
       unused = nil;
       __libI = nil; -- free memory
@@ -75,17 +79,17 @@ end
 local function run_telemetry(event)
     lcd.clear();
     if (errorCode == 0) then
-        __stopWmSw2 = true;
+        __stopWmSw2 = bit32.bor(__stopWmSw2, 2);
         lastRun = getTime();
         __libD.displayAddressConfig(__WmSw2Config, paramEncoder, paramScaler, menuState, event, touch);
-        else
+    else
       lcd.drawText(0, 0, "Error: " .. errorCode, DBLSIZE);
     end
   end
 local function background_telemetry()
     if (errorCode == 0) then
       if ((getTime() - lastRun) > 100) then
-        __stopWmSw2 = false;
+        __stopWmSw2 = bit32.band(__stopWmSw2, bit32.bnot(2));
         menuState[1] = 0; -- deselected state
       end
     end
@@ -93,5 +97,5 @@ end
 return {
     init = init_telemetry,
     run = run_telemetry,
-    background = background_telemetry
+    background = background_telemetry,
 }

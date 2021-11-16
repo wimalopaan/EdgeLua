@@ -15,6 +15,11 @@
        
        
 errorCode = 0;
+__WmSw2Config = nil;
+__stopWmSw2 = 0;
+__WmSw2ForeignInput = 0;
+__WmSw2Warning1 = nil;
+__WmSw2Warning2 = nil;
 local function load()
   local basedir = "/EDGELUA" .. "/LIB/";
   if not __libI then
@@ -58,13 +63,7 @@ local switchFSM = {};
 local encoder = nil;
 local rssiState = {};
 local exportValues = {0, -50, 50, 100}; -- percent
-local errorCode = 0;
 local lastForeignInput = 0;
-__WmSw2Config = nil;
-__stopWmSw2 = false; -- stop sending out
-__WmSw2ForeignInput = 0;
-__WmSw2Warning1 = nil;
-__WmSw2Warning2 = nil;
 local function run_telemetry(event)
     if (errorCode == 0) then
       __libD.processEvents(__WmSw2Config, menu, menuState, event, queue, __libD.selectItem);
@@ -125,7 +124,8 @@ local function background_telemetry()
       __libD.processForeignInput(__WmSw2Config, __WmSw2ForeignInput, menu, queue);
       lastForeignInput = __WmSw2ForeignInput;
     end
-    if not(__stopWmSw2) then
+    print("TRACE: ", "background_telemetry sw", __stopWmSw2 );
+    if (__stopWmSw2 == 0) then
       switchFSM(__WmSw2Config, menu, queue, fsmState, encoder, exportValues);
     end
     __libP.rssiState(__WmSw2Config, rssiState);

@@ -2,7 +2,15 @@
 
 #define BASE_DIR "/EDGELUA"
 #define SHM_VAR 1
-#define GLOBAL_LUA_MIX_VAR __Sw2MixerValue
+#define GLOBAL_LUA_MIX_VAR   __Sw2MixerValue
+#define GLOABL_LUA_CONFIG    __WmSw2Config
+#define GLOBAL_LUA_STOP_MASK __stopWmSw2
+#define GLOBAL_LUA_FOREIGN   __WmSw2ForeignInput
+#define GLOABL_LUA_WARN1     __WmSw2Warning1
+#define GLOBAL_LUA_WARN2     __WmSw2Warning2
+
+#define STOPMASK_CONFIG 1
+#define STOPMASK_ADRESS 2
 
 #define EVENT_X9E_MENU 96
 #define EVENT_X9E_EXIT 97

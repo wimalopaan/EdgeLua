@@ -13,9 +13,7 @@
 
 #include "telemetry.h"
 
-local widget = {};
 local menuState = {1, 1, 1, 0, 0}; -- row, col, page, selrow, selcol
---local config = {};
 local menu = {};
 local headers = {};
 local queue = nil;
@@ -24,17 +22,13 @@ local configFSM = nil;
 local encoder = nil;
 local paramScaler = nil;
 local paramEncoder = nil;
-local errorCode = 0;
 
 local lastRun = 0;
-
-__stopWmSw2 = false; -- stop sending out
---__WmSw2Config = nil;
 
 local function run_telemetry(event)
   if (errorCode == 0) then
     lcd.clear();
-    __stopWmSw2 = true;
+    __stopWmSw2 = bit32.bor(__stopWmSw2, STOPMASK_CONFIG);
     lastRun = getTime();
     __libD.processEvents(__WmSw2Config, menu, menuState, event, queue, __libD.selectParamItem);
     local pvalue = __libD.displayParamMenu(__WmSw2Config, widget, menu, headers, menuState, paramScaler);
@@ -103,8 +97,9 @@ end
 
 local function background_telemetry()
   if (errorCode == 0) then
+    TRACE3("background_telemetry", lastRun, getTime(), __stopWmSw2);
     if ((getTime() - lastRun) > 100) then
-      __stopWmSw2 = false;
+      __stopWmSw2 = bit32.band(__stopWmSw2, bit32.bnot(STOPMASK_CONFIG));
     end
   end
 end

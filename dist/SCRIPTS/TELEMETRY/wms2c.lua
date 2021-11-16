@@ -15,6 +15,11 @@
        
        
 errorCode = 0;
+__WmSw2Config = nil;
+__stopWmSw2 = 0;
+__WmSw2ForeignInput = 0;
+__WmSw2Warning1 = nil;
+__WmSw2Warning2 = nil;
 local function load()
   local basedir = "/EDGELUA" .. "/LIB/";
   if not __libI then
@@ -46,9 +51,7 @@ local function loadLibA()
     end
   end
 end
-local widget = {};
 local menuState = {1, 1, 1, 0, 0}; -- row, col, page, selrow, selcol
---local config = {};
 local menu = {};
 local headers = {};
 local queue = nil;
@@ -57,14 +60,11 @@ local configFSM = nil;
 local encoder = nil;
 local paramScaler = nil;
 local paramEncoder = nil;
-local errorCode = 0;
 local lastRun = 0;
-__stopWmSw2 = false; -- stop sending out
---__WmSw2Config = nil;
 local function run_telemetry(event)
   if (errorCode == 0) then
     lcd.clear();
-    __stopWmSw2 = true;
+    __stopWmSw2 = bit32.bor(__stopWmSw2, 1);
     lastRun = getTime();
     __libD.processEvents(__WmSw2Config, menu, menuState, event, queue, __libD.selectParamItem);
     local pvalue = __libD.displayParamMenu(__WmSw2Config, widget, menu, headers, menuState, paramScaler);
@@ -118,8 +118,9 @@ local function init_telemetry()
 end
 local function background_telemetry()
   if (errorCode == 0) then
+    ;
     if ((getTime() - lastRun) > 100) then
-      __stopWmSw2 = false;
+      __stopWmSw2 = bit32.band(__stopWmSw2, bit32.bnot(1));
     end
   end
 end

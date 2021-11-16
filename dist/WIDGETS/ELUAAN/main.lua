@@ -15,6 +15,11 @@
        
        
 errorCode = 0;
+__WmSw2Config = nil;
+__stopWmSw2 = 0;
+__WmSw2ForeignInput = 0;
+__WmSw2Warning1 = nil;
+__WmSw2Warning2 = nil;
 local function load()
   local basedir = "/EDGELUA" .. "/LIB/";
   if not __libI then
@@ -51,9 +56,6 @@ local options = {};
 local animations = nil;
 local fsmState = {};
 local currentAnimation = nil;
---__stopWmSw2 = false; -- stop sending out
---__WmSw2foreignInput = 0;
---__WmSw2Warning = nil;
 local function create(zone, options)
   load();
   loadLibA();
@@ -99,7 +101,7 @@ local function update(widget, options)
 end
 local function background(widget)
   if (errorCode == 0) then
-    if not(__stopWmSw2) then
+    if (__stopWmSw2 == 0) then
       currentAnimation = __libA.runAnimation(currentAnimation, fsmState);
     end
   end

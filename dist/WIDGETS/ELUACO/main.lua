@@ -15,6 +15,11 @@
        
        
 errorCode = 0;
+__WmSw2Config = nil;
+__stopWmSw2 = 0;
+__WmSw2ForeignInput = 0;
+__WmSw2Warning1 = nil;
+__WmSw2Warning2 = nil;
 local function load()
   local basedir = "/EDGELUA" .. "/LIB/";
   if not __libI then
@@ -63,7 +68,6 @@ local configFSM = nil;
 --local errorCode = 0;
 local help = {};
 local lastRun = 0;
-__stopWmSw2 = false; -- stop WMSW2 sending out
 local function create(zone, options)
   load();
   collectgarbage();
@@ -106,13 +110,15 @@ local function update(widget, options)
 end
 local function background(widget)
   if (errorCode == 0) then
-    if ((getTime() - lastRun) > 100) then __stopWmSw2 = false; end
+    if ((getTime() - lastRun) > 100) then
+      __stopWmSw2 = bit32.band(__stopWmSw2, bit32.bnot(1));
+    end
   end
 end
 local function refresh(widget, event, touch)
   __libD.updateWidgetDimensions(widget, event);
   if (errorCode == 0) then
-    __stopWmSw2 = true;
+    __stopWmSw2 = bit32.bor(__stopWmSw2, 1);
     lastRun = getTime();
     __libD.processEvents(__WmSw2Config, menu, menuState, event, queue, __libD.selectParamItem);
     __libD.processTouch(menu, menuState, event, touch);
