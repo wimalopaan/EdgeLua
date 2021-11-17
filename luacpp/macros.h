@@ -3,6 +3,10 @@
 #define __hash #
 #define __identity(x) x
 #define ADD(table, v) table[__identity(__hash)table + 1] = v
+#define INC(value) value = value + 1
+#define DEC(value) value = value - 1
+#define INCMOD(value, table) if (value == __identity(__hash)table) then value = 1; else INC(value); end
+#define DECMOD(value, table) if (value == 1) then value = __identity(__hash)table; else DEC(value); end
 
 #ifdef DEBUG
 # define TRACELEVEL 0 // 0, 1, 2, 3
