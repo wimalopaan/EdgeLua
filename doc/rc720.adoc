@@ -1,0 +1,388 @@
+= RC-720-D
+Wilhelm Meier <wilhelm.wm.meier@googlemail.com>
+:revnumber: 1.2
+:revremark: HW_1.1
+:revdate: 01.01.1970
+:lang: de
+:toc:
+:toc-title: Inhalt
+:toclevels: 4
+:numbered:
+:pagenums:
+:src_numbered: 
+:icons: font
+:icontype: svg
+:figure-caption: Abbildung
+:description: RC-720-D
+:title: RC-720-D: Zweifach Schottelsteuerung
+:title-page:
+:sectanchors:
+:sectlinks:
+:experimental:
+:copyright: Wilhelm Meier
+:duration: 90
+:source-highlighter: pygments
+:pygments-css: class
+:showtitle:
+:docinfo1:
+:stem:
+// for attributes in link:[] macro like link:xxx[window="_blank"]
+:linkattrs:
+
+:imagesdir: ../../doc/images
+:idir: ../../doc
+
+:mName: RC-720
+:model: rc720
+:bus: auto 
+  
+include::{idir}/defs.adoc[]
+
+<<<
+
+.QR-Code zu Informationen und Downloads
+qrcode::https://github.com/wimalopaan/Electronics[xdim=10, align="center"]
+
+<<<
+
+include::{idir}/preface.adoc[]
+ 
+<<<
+
+include::{idir}/symbols.adoc[]
+
+include::{idir}/law.adoc[]
+
+include::{idir}/security.adoc[]
+
+<<< 
+
+[[intro]]
+== Einführung
+
+Das `RC-720-D` ist eine _Doppel-Schottelsteuerung_ für die Ansteuerung von _zwei_ `360°`-Feedbackservos mit analogem Positionsausgang sowie von _zwei_ Motorstellern mit oder ohne BEC.
+Dies ermöglicht die Drehung der Schottelantriebe beliebig oft um `360°` durch entsprechende Bewegungen am Kreuzknüppel. Durch die Kombination mit dem Kanal für den Schub kann eine 
+sichere Steuerung erreicht werden. Um den Anschluß der Motorsteller zu vereinfachen, besitzt das Modul eine _BEC-Weiche_, was den Betrieb mit beiden BECs der beiden Motorsteller 
+ohne einen Spannungsabfall ermöglicht.
+
+[[basics]]
+== Grundsätzliches
+
+Schottelantriebe werden grundsätzlich durch einen _Schubvektor_ gesteuert. Dies bedeutet, das der Schub sowohl in seiner _Richtung_ wie auch in seiner _Stärke_ die 
+steuernde Größe ist. Demzufolge erwartet das `RC-720-D` als Eingang _zwei_ Schubvektoren, einmal für den linken (vorderen) und einmal für den rechten (hinteren) 
+Schottelantrieb.
+
+Jeder Schubvektor besteht aus den _beiden_ Komponenten _Richtung_ und _Stärke_. Dazu erwartet das `RC-720-D` zwei hierfür verwendete Übertragungskanäle. Da es sich um eine 
+_Doppel_-Steuerung handelt, die demnach _zwei_ Schubvektoren benötigt, erwartet das `RC-720-D` insgesamt also _vier_ Übertragungskanäle.
+
+Um die Verkabelung möglichst einfach zu gestalten, hat das `RC-720-D` nur einen digitalen Bus-Eingang. Das Modul erkennt automatisch, ob es sich hierbei um ein `SBus` 
+(nicht-invertiert / invertiert), ein `IBus` 
+oder ein `SumD`-Signal handelt. Es bleibt lediglich noch festzulegen, welche der `16` Kanäle des Bus-Systems für das `RC-720-D` verwendet werden sollen. Diese Zuordnung geschieht 
+in einer notwendigen Konfigurationsphase des Moduls. Dies ermöglicht einen behinderungsfreien Betrieb auch mit anderen Modulen zusammen am Bus-System.
+
+Erfolgt die Bedienung der Schottels über je einen _Kreuzknüppel_, so muss die links-rechts bzw. hoch-runter Information des Kreuzknüppels (kartesiches Koordinatensystem) zunächst 
+in einen _Schubvektor_ (Polarkoordinatensystem) umgeformt werden. Für Sender mit dem Betriebssystem EdgeTx/OpenTx stehen hier entsprechende Erweiterungen (Mischer-Skripte) 
+zur Verfügung.
+
+Eine weitere Besonderheit ist die Verwendung von Telemetrie für die aktuelle Ausrichtung der Schottelantriebe. Weil jeder Schottelantrieb nicht beliebig schnell
+den Steuerbewegungen am Sender folgen kann, wird die aktuelle Position über Telemetrie an den Sender gesendet. Im Sender kann dann beispielsweise eine Darstellung der 
+Soll- und Ist-Position bzw. des Schubvektors stattfinden. Dazu stehen für EdgeTx/OpenTx entsprechende _Widgets_ bereit.
+
+Der `RC-720-D` besitzt eine BEC-Weiche. Daher können die BEC der _beiden_ Motorsteller _aktiv_ bleiben (ein Herausziehen des Plus-Kabels eines der Steller ist _nicht_ notwendig 
+und _nicht_ sinnvoll). Die Weiche hat eine Belastbarkeit von `10A` je Strang (natürlich können damit die `JR`-Verbinder _nicht_ belastet werden). Die Weiche ermöglicht eine 
+_gleichzeitige_ Nutzung beider BECs. Damit verdoppelt sich die Gesamtbelastbarkeit der BEC-Versorgung. Die BEC-Weiche hat keinen Spannungsverlust und ist damit wesentlich 
+empfehlenswerter als eine Dioden-Lösung.
+
+Der Empfänger wird dann über die beiden Leitungen (Bus-Verbinder und Telemetrie-Verbinder) vom `RC-720-D` versorgt.
+
+Die beiden Servos werden direkt über das Summen-BEC der BEC-Weiche auf dem `RC-720-D` versorgt. Dies ist sehr sinnvoll, da die Feedbackservos teilweise eine sehr hohe
+Stromaufnahme haben. Dies verhindert zuverlässig Störungen an den Empfänger weiterzuleiten.
+
+[[view]]
+== Einsatz und Einbau
+
+In <<image1>> sieht man die Einbausituation eines typischen Schottelantriebes. Sowohl die Richtungsdrehung wie auch der Propellerantrieb wird hier über Zahnriemen realisiert.
+Hierbei ist zu beachten, dass das Übersetzungsverhältnis für die Richtungsdrehung `1:1` beträgt.
+
+[[image1]]
+.Ansicht eines gesamten Schottelantriebes: das Übersetzungsverhältnis von Servo zum Schottel muss 1:1 betragen
+image::system01.jpg[align="center",width=75%,pdfwidth=75%]
+
+[[connect]]
+== Anschlüsse
+
+Um die Vielzahl der Anschlüsse zu veranschaulichen, dienen die folgenden Bilder.
+
+.Gesamtansicht: im Bild oben auf der Platine sind die Anschlüsse S2-O2-P2-P1-O1-S1 (von links nach rechts). Im Bild unten die die beiden Anschlusspeitschen, links für das Aktor-Bus-System, rechts für den Telemetrie-Bus, in der Mitte der Daisy-Chain-Ausgang für `IBus`-Telemetrie
+image::rc720_01.jpg[align="center",width=75%,pdfwidth=75%]
+
+.Anschlüsse für die Bus-Systeme im Detail
+image::rc720_02.jpg[align="center",width=75%,pdfwidth=75%]
+
+.Anschlüsse für die Servos und Motorsteller bzw. Kalibrierungskanäle
+image::rc720_03.jpg[align="center",width=75%,pdfwidth=75%]
+
+
+[[first]]
+== Erste Inbetriebnahme
+
+Bevor eine Nutzung des `RC-720-D` erfolgreich möglich ist, müssen erst die _vier_ Übertragungskanäle für die beiden _Schubvektoren_ festgelegt werden. 
+
+.Festlung der Übertragungskanäle für die Schubvektoren
+[TIP]
+In dieser Anleitung verwenden wir die Kanäle `10-15` für das `RC-720-D`-Modul. Zwar benötigt man für die beiden Schubvektoren insgesamt nur vier Übertragungskanäle, 
+jedoch erwartet das `RC-720-D` in der Konfiguration während der ersten Inbetriebnahme insgesamt _sechs_ Übertragungskanäle. Die beiden _zusätzlichen_ Kanäle
+stehen dann für die _Kalibrierung_ der angeschlossenen Motorsteller zur Verfügung. Diese werden nach der Konfiguration aber nicht mehr benötigt und können als weitere 
+PWM-Outputs benutzt werden.
+
+[[channels]]
+=== Schema der Übertragungskanäle
+
+Das `RC-720-D` verwendet sechs _direkt aufeinander folgende_ Übertragungskanäle. In dieser Anleitung sind das die Kanäle `10-15` als _Beispiel_. Sie können jedoch auch 
+eine andere Festlegung treffen. Daher ist es nur wichtig festzulegen, welcher Kanal der _erste_ Kanal dieser Gruppe sein soll, die anderen Kanäle ergeben sich dann 
+als die direkt folgenden.
+
+Der _erste_ Kanal der Gruppe sei mit stem:[S_0] bezeichnet. Dann haben wir folgende Zuordnungen:
+
+.Übertragungskanalschema
+[horizontal]
+Kanal stem:[(S_0)]::     Schub für Schottel 1 
+Kanal stem:[(S_0 + 1)]:: Richtung für Schottel 1 
+Kanal stem:[(S_0 + 2)]:: Schub für Schottel 2 
+Kanal stem:[(S_0 + 3)]:: Richtung für Schottel 2 
+Kanal stem:[(S_0 + 4)]:: Kalibrierungskanal 1 (oder Hilfskanal 1) bzw. mechanische Null-Position 1 (nur im _Anlernmodus_ ab Version `V48`)
+Kanal stem:[(S_0 + 5)]:: Kalibrierungskanal 2 (oder Hilfskanal 2) bzw. mechanische Null-Position 1 (nur im _Anlernmodus_ ab Version `V48`)
+
+.Motorsteller
+[NOTE]
+Im Schiffsmodellbau ist es üblich, dass man Vorwärts/Rückwärts-Motorsteller einsetzt. Dies wird auch im `RC-720-D` so beibehalten, obgleich bei einem Schottelantrieb die 
+Drehrichtung des Propellers niemals umgekehrt wird. Der am `RC-720-D` eingesetzte Steller muss jedoch trotzdem ein V/R-Steller sein. Dieser wird allerdings nur in _Vorwärtsrichtung_ 
+betrieben. So bleiben alle Ihre Steller universell einsetzbar.
+
+Entsprechend dem obigen Schema stellen Sie an Ihrem Sender ein, dass am Kanal stem:[S_0] (in diesem Dokument beispielsweise Kanal `10`) der Schub für Schottel 1 ausgegeben wird. 
+Die anderen Kanaäle folgen entsprechend.
+
+.Nicht benötigte Hilfskanäle
+[TIP]
+--
+Wenn die Hilfskanäle nicht benötigt werden, so brauchen Sie keine weiteren Maßnahmen zu ergreifen. Das Weiterleiten der Übertragungskanäle aus dem Bus-Signal 
+zu den Ausgängen des `RC-720-D` stört den Ablauf nicht.
+
+Es ist jedoch auch möglich, das Kanalschema so zu legen, dass die Hilfskanäle _außerhalb_ des übertragenen Bereiches liegen. Dies kann erreicht werden, indem 
+für den Kanal stem:[S_0] die Nummer `13` gewählt wird. Damit liegen Kanäle stem:[S_4] und stem:[S_5] außerhalb der gültigen Kanalnummern `[1...15]` und 
+erscheinen nicht an den Ausgängen `O1` und `O2`.
+--
+
+.Mechanische Null-Position der Servos (ab *V48* der Firmware)
+[IMPORTANT]
+--
+Beim Einbau der Schottels ist es nicht immer möglich durch Verschieben der Anlenkung (Zahnriemen), die Null-Position des Servos mit der Geradeaus-Position des Schottelantriebes
+zur Deckung zu bringen. Aus diesem Grunde kann mit den Kanälen stem:[(S_0 + 4)] und stem:[(S_0 + 5)] _im Anlernvorgang_ die Geradeaus-Position über eine Verschiebung der Null-Position
+der Servos erreicht werden.
+--
+
+[[mix]]
+=== Einrichtungen am EdgeTx/OpenTx-Sender
+
+Um die Möglichkeit der `360°`-Steuerung in vollem Umfang nutzen zu können, bietet es sich an, im Sender die Umrechnung von kartesichen in Polar-Koordinaten vorzunehmen.
+Dies geschieht durch ein entsprechendes Mischer-Skript (https://github.com/wimalopaan/OpenTxLua/blob/main/SCRIPTS/MIXES/schotl.lua[Download]).
+
+.Kopiern des Schottelsteuerungsskriptes auf die `SD-Karte` des Senders
+[NOTE]
+Natürlich müssen Sie das Schottelsteuerungsskript zunächst auf die `SD-Karte` Ihres Senders kopieren (Ordner: `SCRIPTS/MIXES`). Dies wird als bekannt 
+vorausgesetzt und hier nicht weiter beschrieben.
+
+.Neuere Versionen des Mischer-Skriptes
+[TIP]
+--
+Bitte achten Sie auf regelmäßige Updates des Mischer-Skriptes. Ggf. können einige _ScreenShots_ in dieser Anleitung davon abweichen.
+--
+
+Als ersten Schritt erzeugen Sie eine neue Zeile in der Übersicht der Mischer-Skripte und wählen hier das 
+Skript `schotl.lua` von der `SD-Karte` aus.
+
+.Übersicht über die Lua-Skripte
+image::screen01.png[align="center",width=75%,pdfwidth=75%]
+
+Wesentlich für den Betrieb ist die Zuordnung der entsprechenden _Inputs_ für die Schottels. In diesem Beispiel wird davon ausgegangen, dass der _linke_ Antrieb
+(Schottel 1) mit den Gebern und den korrespondiernden _Inputs_ `Höh` und `Sei` (linker Kreuzknüppel)
+und der _rechte_ Antrieb (Schottel 2) mit den _Inputs_ `Gas` und `Que` (rechter Kreuzknüppel)
+gesteuert werden soll.
+
+.Einrichtung des Schottelsteuerungsskriptes: man achte auf die Kanalzuordnung für Schottel 1 (Eingang A1 und B1) und Schottel 2 (Eingang A2 und B2)
+image::screen02.png[align="center",width=75%,pdfwidth=75%]
+
+_Nachdem_ das Mischer-Skript `schotl.lua` eingerichtet wurde, tauchen in der Liste der möglichen Eingänge eines Mischers nun auch 
+die _Schubvektorkomponenten_ `SchottDir1`, `SchottPow1`, `SchottDir2` und `SchottPow2` auf. 
+
+.Einrichtung des Mischers für den Übertragungskanal für Schub des Schottels 1 (hier: Kanal 10)
+image::screen03.png[align="center",width=75%,pdfwidth=75%]
+
+Damit werden dann nun auch die Übertragungskanäle `10` und `11` für den Schubvektor 1 und die Übertragungskanäle `13` und `14` für den 
+Schubvektor 2 definiert. Zusätzlich wird der _Input_ `Gas` auch noch für die beiden Kalibrierungskanäle `14` und `15` eingesetzt.
+
+.Übersicht über die eingerichteten Übertragungskanäle für das `RC-720-D`
+image::screen04a.png[align="center",width=75%,pdfwidth=75%]
+
+.Weitere Übertragungskanäle
+[IMPORTANT]
+Stellen Sie sicher, dass _keine weiteren_ Übertragungskanäle im Sender definiert sind. Dies könnte die Anlernprozedur behindern.
+
+=== Konfiguration des `RC-720-D`
+
+Die Konfiguration des `RC-720-D` erfolgt durch das _Anlernen_ der Übertragungskanals stem:[S_0] (in diesem Dokument: Kanal `10`). 
+
+==== Die Anlernprozedur
+
+Um in den _Konfigurationsmodus_ zu gelangen, stecken Sie auf den Anschluß `O1` am `RC-720-D`-Modul eine Brücke zwischen den Pins `1` und `3` der
+3-poligen Stiftleiste (die kann durch ein Dupont-Jumper-Kabel geschehen oder auch durch den _FlySky_-Bindestecker).
+
+Gehen Sie nun folgendermaßen vor:
+
+. Stecken Sie die Brücke auf die Pins `1` und `3` des Verbinders `O1` am `RC-720-D`
+. Verbinden Sie vom `RC-720-D` den Bus-Eingang mit dem Bus-Ausgang des Empfängers. Der Empfänger sollte schon an den Sender gebunden sein.
+. Verbinden Sie einen (oder beide) Motorsteller mit den Eingängen `P1` und `P2` des `RC-720-D`. 
+.. Die Steller sollten ein BEC besitzen, damit wird dann der Empfänger versorgt.
+.. Die Steller müssen _nicht_ mit einem Motor verbunden sein.
+. Schließen Sie beide Feedbackservos an. Achten Sie auf den korrekten Anschluß der _Feedback_-Leitung (das ist die _vierte_ Ader des Servokabels, die meist 
+ein gesonderten Steckverbinder besitzt).
+. Schalten Sie den Sender ein.
+.. Bringen Sie alle benutzten Geber in _Neutralstellung_.
+.. Achten Sie vor allem auch darauf, dass die Richtungsübertragungskanäle ebenfalls den Neutralwert liefern.
+.. Dies können Sie am bestem am _Kanalmonitor_ kontrollieren.
+. Schalten Sie nun die Versorgung der Modellelektronik über das `RC-720-D` ein: dazu versorgen Sie beide Steller mit der notwendigen Quelle.
+. Warten Sie, bis der Empfänger den Sender auch erkannt hat.
+. Das `RC-720-D` führt zunächst eine Bus-Erkennung durch:
+.. Die LED leuchtet bis zu `3s` dauerhaft.
+.. Anschließend wird durch einmaliges (`IBus`) oder Doppelblinken (`SBus`) angezeigt, welches Bus-System erkannt wurde. 
+.. Danach geht das Modul in den Konfigurationsmodus.
+. Das `RC-720-D` zeigt nun den Konfigurationsmodus durch ein _Dreifach-Blinken_ der LED 1 an.
+. Lenken Sie nun den _Schub_ des _ersten_ Schottels auf Maximalausschlag aus, _ohne_ dabei die Richtung nach links oder rechts wesentlich auszulenken.
+.. Wurde der Ausschag vom `RC-720-D` erfolgreich erkannt, so erlischt die LED 1 und die LED 2 erleuchtet.
+. Neutralisieren Sie nun wieder den Schub des Schottels 1.
+.. Wurde die Neutralposition erfolgreich erkannt, so leuchtet zusätzlich zu LED 2 nun auch wieder die LED 1 für ca. 1 Sekunde auf.
+. Der Anlernvorgang ist damit abgeschlossen.
+.. Das `RC-720-D` geht nun - wie bei _jedem_ Einschalten - in die notwendige _Kalibrierungsphase_.
+. In der Kalibrierungsphase (bei jedem Einschalten) durchlaufen die Servos eine Umdrehung bzw. einen Suchlauf. 
+. Anschließend (_nur_ in diesem _Anlernvorgang_) kann die Null-Postion über Kanal stem:[(S_0 + 4)] und stem:[(S_0 + 5)] eingestellt werden. Die LEDs blinken dreifach.
+. Soll das Einstellen der Null-Positionen beendet werden, so betätigen Sie wieder einmal stem:[S_0] in Richtung Vollausschlag (dies braucht nur kurz zu sein, denn anschließend ist das Modul 
+betriebsbereit).
+. Danach geht das `RC-720-D` in den _Betriebsmodus_ über. Anhand der Servos sollten Sie nun 
+einen ersten Test durchführen können.
+
+[[operate]]
+== Betrieb
+
+Stellen Sie sicher, dass die Brücke am Eingang/Ausgang `O1` _nicht_ gesteckt ist, damit das Modul in den _Normalbetrieb_ geben kann.
+
+=== Kalibrierungsphase der Servos
+
+Bei _jedem_ Neustart werden beide Servos _neu_ kalibriert. Hierbei drehen sich die Servos und damit auch die Schottelantriebe _mindestens_ einmal komplett um 
+die eigene Achse. 
+
+.Bewegungsfreiheit der Schottelantriebe
+[CAUTION]
+Damit die Kalibrierungsphase störungsfrei ablaufen kannm, stellen Sie sicher, dass sich die Schottelantriebe blockadefrei komplett um die eigene Achse drehen können.
+
+[[widget]]
+=== Telemetrie
+
+==== Sensordarstellung für `S.Port`
+
+Das `RC-720-D` benutzt die _physische_ Sensor-ID `1` und stellt die folgenden Sensoren zur Verfügung (s.a. <<sens1>>):
+
+[horizontal]
+`Tmp2`:: _interne_ Temperatur des Moduls
+`5101`:: Position des Schottel 1
+`5102`:: Position des Schottel 2
+`5103`:: Software-Version des Moduls
+
+[[sens1]]
+.Darstellung der Sensoren für `S.Port`
+image::telem01.png[align="center",width=75%,pdfwidth=75%]
+
+Die Positionssensoren können zur graphischen Darstellung der Schottel-Lage verwendet werden.
+
+.Umbenennung der Sensoren
+[TIP]
+Weil es für die _Winkelposition_ der Schottels im `S.Port`-Protokoll keine eigene Kennung gibt, wird hier die generische Kennung `5101` und `5102` verwendet. 
+Natürlich können diese Sensoren aus umbenannt werden (s.a. <<rename>>).
+
+==== Sensordarstellung für `IBus`
+
+Das `RC-720-D` verwendet für `IBus` die folgenden Sensoren (s.a. <<sens2>>):
+
+[horizontal]
+`Tmp2`:: _interne_ Temperatur des Moduls
+`0085`:: Position des Schottel 1 (s.a. <<rename>> zur Umbenennugn von Sensoren)
+`0085`:: Position des Schottel 2
+`Arm`:: Software-Version des Moduls
+
+[[sens2]]
+.Übersicht der Sensoren am `IBus`: man erkennt `Tmp1` als interne Temperatur, `Arm` für die Software-Version des `RC-720-D` sowie die beiden Sensoren mit der ID `0085` für die beiden Positionen.
+image::telem02.png[align="center",width=75%,pdfwidth=75%]
+
+[[rename]]
+.Gerade für die Positionssensoren empfiehlt es sich, eine _Umbenennung_ in etwa `Pos1` und `Pos2` vorzunehmen.
+image::telem04.png[align="center",width=75%,pdfwidth=75%]
+
+==== Anzeige-Widget für EdgeTx / OpenTx Color-LCD-Sender
+
+Für die Anzeige des Soll-Schibvektors und der Ist-Lage des Schottel-Antriebs existiert ein 
+https://github.com/wimalopaan/OpenTxLua/tree/main/WIDGETS/Schottel[Schottel-Widget] für EdgeTx / OpenTx Color-LCD-Sender.
+
+.Das Telemetrie-Widget: es sind hier _zwei_ Instanzen des Schottel-Telemetrie-Widgets konfiguriert. In der Info-Leiste am oberen Bildschirmrand sind zwei weitere Widgets mit dem Temperatursensor und der Anzeige der Version konfiguriert.
+image::telem03.png[align="center",width=75%,pdfwidth=75%]
+//image::widget01.png[align="center",width=75%,pdfwidth=75%]
+
+Um beide Schottelzustände gleichzeitig auf einer Telemetrie-Seite anzeigen zu können, bietet sich ein 
+Layout `1x2` an. Für beide Widgets wird dann jeweils das https://github.com/wimalopaan/OpenTxLua/tree/main/WIDGETS/Schottel[Schottel-Widget] eingerichtet 
+mit dem Namen `WM Schottel`.
+
+.Beim Anlegen einer Telemetrie-Seite wählt man sinnvollerweise das Layout `1x2`
+image::widget02.png[align="center",width=75%,pdfwidth=75%]
+
+.Das Schottel-Telemetrie-Widget trägt den Namen `WM Schottel`
+image::widget03.png[align="center",width=75%,pdfwidth=75%]
+
+Für beide Widgets müssen dann abschließend noch die Zuordnung der anzuzeigende Werte erfolgen.
+Man wählt hier die zugehörigen Sensorwerte für den jeweiligen Schottelantrieb.
+
+Jedes Widget kann eine unterschiedliche Nummer bekommen, wobei gerade Nummern links-bündig und ungerade Nummern rechts-bündig angezeigt werden.
+
+.Konfiguration des linken Widgets für Schottel 1
+image::conf01.png[align="center",width=75%,pdfwidth=75%]
+
+.Konfiguration des linken Widgets für Schottel 2
+image::conf02.png[align="center",width=75%,pdfwidth=75%]
+
+== Optionen
+
+=== Servos
+
+Als Feedback-Servos eignen sich alle Servos mit
+
+* Winkelposition im Intervall `[0°, 360°]` wird abgebildet auf ein Spannungsintervall `[0,4V(max)]`
+* Drehbewegung über stem:[N * 360°]
+* Ansteuerung über PWM-Signal als Geschwindigkeit-/Richtungssignal
+
+Beispiele:
+
+* https://www.feetechrc.com/multi-mode-operation-and-protection.html[Feetech FB5317M-360 und FB5311M-360]
+
+=== Weitere BEC-Module
+
+Unter Umständen kann es sinnvoll oder gewünscht sein, an den Empfänger einen weiteren Motorsteller mit BEC anzuschließen. 
+Dies ist problemlos möglich, sofern die Spannung des weiteren BEC _höher_ als die Spannung der BECs der Schottel-Motorsteller ist.
+
+== Ressourcen
+
+* https://github.com/wimalopaan/OpenTxLua/blob/main/SCRIPTS/MIXES/schotl.lua[Download Mischer-Skript]
+* https://github.com/wimalopaan/OpenTxLua/tree/main/WIDGETS/Schottel[Download Schottel-Widget]
+* https://www.feetechrc.com/multi-mode-operation-and-protection.html[Feetech FB5317M-360 und FB5311M-360]
+
+<<<
+
+include::{idir}/operate.adoc[]
+
+<<<

@@ -1,0 +1,61 @@
+= RC-GUI
+Wilhelm Meier <wilhelm.wm.meier@googlemail.com>
+:revnumber: 2.01
+:revremark: HW_1.x
+:revdate: 01.01.1970
+:lang: de
+:toc:
+:toc-title: Inhalt
+:toclevels: 4
+:numbered:
+:pagenums:
+:src_numbered: 
+:icons: font
+:icontype: svg
+:figure-caption: Abbildung
+:description: RC-Menusystem
+:title: RC-GUI: Menusystem Grundbaustein
+:title-page:
+:sectanchors:
+:sectlinks:
+:experimental:
+:copyright: Wilhelm Meier
+:duration: 90
+:source-highlighter: pygments
+:pygments-css: class
+:showtitle:
+:docinfo1:
+:stem:
+// for attributes in link:[] macro like link:xxx[window="_blank"]
+:linkattrs:
+
+:imagesdir: .images
+:idir: include
+
+:mName: RC-720
+:model: rc720
+:bus: auto 
+  
+include::{idir}/defs.adoc[]
+
+<<<
+
+.QR-Code zu Informationen und Downloads
+qrcode::https://github.com/wimalopaan/Electronics[xdim=10, align="center"]
+
+<<<
+
+include::{idir}/preface.adoc[]
+ 
+<<<
+
+include::{idir}/symbols.adoc[]
+
+include::{idir}/law.adoc[]
+
+include::{idir}/security.adoc[]
+
+<<< 
+
+[[intro]]
+== Einführung
