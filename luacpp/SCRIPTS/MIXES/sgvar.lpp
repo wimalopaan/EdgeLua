@@ -12,7 +12,10 @@
 
 #include "../../global.h"
 
-local output = { "sw_var" };
+local output = { 
+   "sw_var",
+   "transp"
+};
 
 #ifndef USE_SHM
 
@@ -39,22 +42,22 @@ local function initGV()
    end
  end
 
- #else
+ #endif
 
-GLOBAL_LUA_MIX_VAR = 0;
-
-#endif
+if (LCD_W <= 212) then
+   GLOBAL_LUA_MIX_VAR = 0;
+end
 
 local function transportGlobalLua()
-   return GLOBAL_LUA_MIX_VAR;
+   return GLOBAL_LUA_MIX_VAR, 0;
 end
 
 local function transportGV()
-   return model.getGlobalVariable(gvar, 0);
+   return model.getGlobalVariable(gvar, 0), 1;
 end
 
 local function transportShm()
-   return getShmVar(SHM_VAR);
+   return getShmVar(SHM_VAR), 2;
 end
 
 if (LCD_W <= 212) then
@@ -64,20 +67,27 @@ if (LCD_W <= 212) then
       run = transportGlobalLua
    };
 else
+   #ifdef USE_SHM
    if (getShmVar) then
       TRACE("sgvar: use transportShm");
       return {
          output = output,
          run = transportShm
       };
-      else
-         return {
-            TRACE("sgvar: use transportGV");
-            #ifndef USE_SHM
-            init = initGV,
-            #endif
-            output = output,
-            run = transportGV
-         };
-      end
+   else
+      TRACE("sgvar: use transportGV");
+      return {
+         init = initGV,
+         output = output,
+         run = transportGV
+      };
+   end
+   #else
+   TRACE("sgvar: use transportGV");
+   return {
+      init = initGV,
+      output = output,
+      run = transportGV
+   };
+   #endif
 end

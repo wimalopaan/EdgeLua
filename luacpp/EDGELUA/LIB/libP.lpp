@@ -225,44 +225,62 @@ end
 
 local function transportGV(gv, value)
   model.setGlobalVariable(gv, 0, value);
+  TRACE3("transportGV", value);
 end
 
 local function transportShm(gv, value)
   setShmVar(SHM_VAR, value)
+  TRACE3("transportShm", value);
 end
 
 local function transportGlobalLua(gv, value)
-  GLOBAL_LUA_MIX_VAR = math.floor(value);
---  TRACE("transportGlobalLua", GLOBAL_LUA_MIX_VAR);
+  GLOBAL_LUA_MIX_VAR = value;
+  TRACE3("transportGlobal", value);
+end
+
+local function scaleXJT(sbusValue)
+  local b = bit32.extract(sbusValue, 4);
+  if (sbusValue >= 0) then
+    return ((sbusValue * 1024) / 1638 + 0.5);
+  else
+    if (b == 0) then
+      return ((sbusValue * 1024) / 1638 - 0.5);
+    else
+      return ((sbusValue * 1024) / 1638 + 0.5);
+    end
+  end
+end
+
+local function scaleIBus(ibusValue)
+  if (ibusValue >= 0) then
+    return (ibusValue + 1);
+  else
+    return ibusValue;
+  end
+end
+
+local function scaleSBus(sbusValue)
+  if (sbusValue >= 0) then
+    return ((sbusValue * 1024) / 1638 + 1.5);
+  else
+    return ((sbusValue * 1024) / 1638 + 0.5);
+  end 
 end
 
 local function setXJT(gv, sbusValue)
-  local b = bit32.extract(sbusValue, 4);
-  if (sbusValue >= 0) then
-    transportToMixer(gv, (sbusValue * 1024) / 1638 + 0.5);
-  else
-    if (b == 0) then
-      transportToMixer(gv, (sbusValue * 1024) / 1638 - 0.5);
-    else
-      transportToMixer(gv, (sbusValue * 1024) / 1638 + 0.5);
-    end
-  end
+  local v = math.modf(scaleXJT(sbusValue));
+   transportToMixer(gv, sbusValue);
+--  transportToMixer(gv + 1, v);
 end 
 
 local function setIBus(gv, ibusValue)
-  if (ibusValue >= 0) then
-    transportToMixer(gv, ibusValue + 1);
-  else
-    transportToMixer(gv, ibusValue);
-  end
+  local v = math.modf(scaleIBus(ibusValue));
+  transportToMixer(gv, v);
 end 
 
 local function setSBus(gv, sbusValue)
-  if (sbusValue >= 0) then
-    transportToMixer(gv, (sbusValue * 1024) / 1638 + 1.5);
-  else
-    transportToMixer(gv, (sbusValue * 1024) / 1638 + 0.5);
-  end   
+  local v = math.modf(scaleSBus(sbusValue));
+  transportToMixer(gv, v);
 end 
 
 local function parameterToValueSBus(paramNumber, paramValue)
@@ -418,6 +436,7 @@ if (LCD_W <= 212) then -- BW radio
     rssiState = rssiState,
   };
 else -- color radio
+  #ifdef USE_SHM
   if (getShmVar) then
     TRACE("libP: use transportShm");
     transportToMixer = transportShm;
@@ -425,6 +444,10 @@ else -- color radio
     TRACE("libP: use transportGV");
     transportToMixer = transportGV;
   end
+  #else
+    TRACE("libP: use transportGV");
+    transportToMixer = transportGV;
+  #endif
   return {
     Class = Class,
     getSwitchFSM = getSwitchFSM,

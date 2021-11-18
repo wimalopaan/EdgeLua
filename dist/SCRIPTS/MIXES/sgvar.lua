@@ -12,16 +12,21 @@
        
        
        
-local output = { "sw_var" };
-__Sw2MixerValue = 0;
+local output = {
+   "sw_var",
+   "transp"
+};
+if (LCD_W <= 212) then
+   __Sw2MixerValue = 0;
+end
 local function transportGlobalLua()
-   return __Sw2MixerValue;
+   return __Sw2MixerValue, 0;
 end
 local function transportGV()
-   return model.getGlobalVariable(gvar, 0);
+   return model.getGlobalVariable(gvar, 0), 1;
 end
 local function transportShm()
-   return getShmVar(1);
+   return getShmVar(1), 2;
 end
 if (LCD_W <= 212) then
    print("TRACE: ", "sgvar: use transportGlobalLua" );
@@ -36,11 +41,12 @@ else
          output = output,
          run = transportShm
       };
-      else
-         return {
-            print("TRACE: ", "sgvar: use transportGV" );
-            output = output,
-            run = transportGV
-         };
-      end
+   else
+      print("TRACE: ", "sgvar: use transportGV" );
+      return {
+         init = initGV,
+         output = output,
+         run = transportGV
+      };
+   end
 end

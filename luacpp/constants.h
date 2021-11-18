@@ -57,6 +57,9 @@
 #define MENUSTATE_Page 3
 #define MENUSTATE_SelRow 4
 #define MENUSTATE_SelCol 5
+#ifdef USE_VALUE_STORAGE
+# define MENUSTATE_Dirty 6
+#endif
 
 #define ITEM_Name 1
 #define ITEM_States 2

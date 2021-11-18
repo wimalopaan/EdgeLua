@@ -53,10 +53,8 @@ local function loadLibA()
 end
 local name = "EL_Con";
 local options = {};
---local widget = nil;
 local menuState = {1, 1, 1, 0, 0}; -- row, col, page
 local buttonState = {0, 0, 0, 0, 0, 0};
---local config = {};
 local menu = {};
 local headers = {};
 local queue = nil;
@@ -65,7 +63,6 @@ local encoder = nil;
 local paramEncoder = nil;
 local paramScaler = nil;
 local configFSM = nil;
---local errorCode = 0;
 local help = {};
 local lastRun = 0;
 local function create(zone, options)
@@ -102,7 +99,6 @@ local function create(zone, options)
   __libI = nil; -- free memory
   queue = __libP.Class.Queue.new();
   collectgarbage();
--- print("gc6: ", collectgarbage("count"));
   return widget;
 end
 local function update(widget, options)

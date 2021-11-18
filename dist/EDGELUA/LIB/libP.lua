@@ -209,39 +209,54 @@ local function sbusSwitchFSM(config, menu, queue, state, encoder, exportValues)
 end
 local function transportGV(gv, value)
   model.setGlobalVariable(gv, 0, value);
+  ;
 end
 local function transportShm(gv, value)
   setShmVar(1, value)
+  ;
 end
 local function transportGlobalLua(gv, value)
-  __Sw2MixerValue = math.floor(value);
--- print("TRACE: ", "transportGlobalLua", __Sw2MixerValue );
+  __Sw2MixerValue = value;
+  ;
 end
-local function setXJT(gv, sbusValue)
+local function scaleXJT(sbusValue)
   local b = bit32.extract(sbusValue, 4);
   if (sbusValue >= 0) then
-    transportToMixer(gv, (sbusValue * 1024) / 1638 + 0.5);
+    return ((sbusValue * 1024) / 1638 + 0.5);
   else
     if (b == 0) then
-      transportToMixer(gv, (sbusValue * 1024) / 1638 - 0.5);
+      return ((sbusValue * 1024) / 1638 - 0.5);
     else
-      transportToMixer(gv, (sbusValue * 1024) / 1638 + 0.5);
+      return ((sbusValue * 1024) / 1638 + 0.5);
     end
   end
 end
-local function setIBus(gv, ibusValue)
+local function scaleIBus(ibusValue)
   if (ibusValue >= 0) then
-    transportToMixer(gv, ibusValue + 1);
+    return (ibusValue + 1);
   else
-    transportToMixer(gv, ibusValue);
+    return ibusValue;
   end
 end
-local function setSBus(gv, sbusValue)
+local function scaleSBus(sbusValue)
   if (sbusValue >= 0) then
-    transportToMixer(gv, (sbusValue * 1024) / 1638 + 1.5);
+    return ((sbusValue * 1024) / 1638 + 1.5);
   else
-    transportToMixer(gv, (sbusValue * 1024) / 1638 + 0.5);
+    return ((sbusValue * 1024) / 1638 + 0.5);
   end
+end
+local function setXJT(gv, sbusValue)
+  local v = math.modf(scaleXJT(sbusValue));
+   transportToMixer(gv, sbusValue);
+-- transportToMixer(gv + 1, v);
+end
+local function setIBus(gv, ibusValue)
+  local v = math.modf(scaleIBus(ibusValue));
+  transportToMixer(gv, v);
+end
+local function setSBus(gv, sbusValue)
+  local v = math.modf(scaleSBus(sbusValue));
+  transportToMixer(gv, v);
 end
 local function parameterToValueSBus(paramNumber, paramValue)
   if (paramNumber >= 0) and (paramNumber <= 15) then
