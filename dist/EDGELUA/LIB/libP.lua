@@ -209,15 +209,15 @@ local function sbusSwitchFSM(config, menu, queue, state, encoder, exportValues)
 end
 local function transportGV(gv, value)
   model.setGlobalVariable(gv, 0, value);
-  ;
+  print("TRACE -L3- : ", "transportGV", value );
 end
 local function transportShm(gv, value)
   setShmVar(1, value)
-  ;
+  print("TRACE -L3- : ", "transportShm", value );
 end
 local function transportGlobalLua(gv, value)
   __Sw2MixerValue = value;
-  ;
+  print("TRACE -L3- : ", "transportGlobal", value );
 end
 local function scaleXJT(sbusValue)
   local b = bit32.extract(sbusValue, 4);

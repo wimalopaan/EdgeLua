@@ -94,7 +94,7 @@ local function run_telemetry(event)
   end
 local function run_background()
   if (errorCode == 0) then
-   
+    print("TRACE -L3- : ", "run_background ani", __stopWmSw2 )
     if (__stopWmSw2 == 0) then
       currentAnimation = __libA.runAnimation(currentAnimation, fsmState);
     end

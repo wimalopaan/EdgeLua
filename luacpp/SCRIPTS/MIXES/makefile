@@ -1,6 +1,10 @@
-targets += sgvar.lua e2ibus.lua e2sbus.lua e2xjt.lua 
+targets += sgvar.lua e2ibus.lua e2sbus.lua e2xjt.lua vsp.lua schotl.lua
 
 sgvar.lua: sgvar.lpp ../../global.h ../../version.h ../../constants.h ../../functions.lh
+
+schotl.lua: schotl.lpp ../../global.h ../../version.h ../../constants.h ../../functions.lh
+
+vsp.lua: vsp.lpp ../../global.h ../../version.h ../../constants.h ../../functions.lh
 
 e2ibus.lua: e2ibus.lpp ../../global.h ../../version.h ../../constants.h ../../functions.lh
 

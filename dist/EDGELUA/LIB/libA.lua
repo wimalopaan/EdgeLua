@@ -95,7 +95,7 @@ local function initAnimations(anims)
   return canims;
 end
 local function setItem(fn, module, state)
-  ;
+  print("TRACE -L2- : ", "setItem", fn, module, state );
   __WmSw2ForeignInput = module * 100 + fn * 10 + state;
 end
 local function clearAnim(anim)
@@ -217,7 +217,7 @@ local function covers(touch, item)
 end
 local function processKeyEvents(anims, state, event)
   if (event == EVT_VIRTUAL_ENTER) then
-    ;
+    print("TRACE -L1- : ", "PE2:", state[5], state[8] );
     if (state[8] == state[5]) then
       state[5] = 0;
       return 0;
@@ -227,7 +227,7 @@ local function processKeyEvents(anims, state, event)
     end
   end
   if (event == EVT_VIRTUAL_INC) then
-    ;
+    print("TRACE -L1- : ", "PE3" );
     if (state[8] >= #anims) then
       state[8] = 1;
     else
@@ -235,7 +235,7 @@ local function processKeyEvents(anims, state, event)
     end
   end
   if (event == EVT_VIRTUAL_DEC) then
-    ;
+    print("TRACE -L1- : ", "PE3" );
     if (state[8] <= 1) then
       state[8] = #anims;
     else
@@ -255,7 +255,7 @@ local function processEvents(anims, rects, state, event, touch)
   processKeyEvents(anims, state, event);
 end
 local function chooseAnimationBW(config, anims, state, event)
-  ;
+  print("TRACE -L3- : ", "chooseAnimationBW A" );
   if not(anims) or (#anims == 0) then
     return;
   end
@@ -302,7 +302,7 @@ local function chooseAnimationBW(config, anims, state, event)
     end
     lcd.drawText(30, i * 10, anim[1], SMLSIZE);
   end
-  ;
+  print("TRACE -L3- : ", "chooseAnimationBW E" );
   if (state[5] > 0) then
     return anims[state[5]];
   end
@@ -315,7 +315,7 @@ local function chooseAnimation(config, widget, anims, state, event, touch)
   local border_h = 40;
   local bw = widget[3] - 2 * border_h;;
   local vs = 5;
-  ;
+  print("TRACE -L3- : ", "chooseAnimation", config, widget, anims, state, event, touch );
   if not(anims) then
     return;
   end

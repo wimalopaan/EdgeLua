@@ -286,7 +286,7 @@ local function displayMenuBW(config, widget, menu, overlays, state, pagetitles)
   local activePageIndex = state[3];
   local page = menu[activePageIndex];
   local overlay = overlays[activePageIndex];
-  ;
+  print("TRACE -L3- : ", "displayMenuBW", pagetitles, pagetitles[activePageIndex] );
   if (pagetitles[activePageIndex]) then
     lcd.drawScreenTitle(pagetitles[activePageIndex], activePageIndex, #menu);
   else
@@ -533,7 +533,7 @@ local function processEventsBWScroll(config, menu, menuState, event, queue, call
     callback(menu, menuState, queue);
   else
     if (event ~= lastEvent) then
-      ;
+      print("TRACE -L2- : ", "processEventsBWScroll", event );
       lastEvent = event;
     end
     if (event > 0) then
@@ -551,12 +551,12 @@ local function processEventsBWScroll(config, menu, menuState, event, queue, call
   end
 end
 local function processEventsBWKeys(config, menu, menuState, event, queue, callback)
-  ;
+  print("TRACE -L3- : ", "processEventsBWKeys A" );
   if (event == EVT_VIRTUAL_ENTER) then
     callback(menu, menuState, queue);
   else
     if (event ~= lastEvent) then
-      ;
+      print("TRACE -L2- : ", "processEventsBWKeys", event );
       lastEvent = event;
     end
     if (event > 0) then
@@ -572,7 +572,7 @@ local function processEventsBWKeys(config, menu, menuState, event, queue, callba
       nextCol(menu, menuState);
     end
   end
-  ;
+  print("TRACE -L3- : ", "processEventsBWKeys E" );
 end
 local function processEventsColor(config, menu, menuState, event, queue, callback)
   if (event == EVT_VIRTUAL_ENTER) then
