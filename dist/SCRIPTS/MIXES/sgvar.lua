@@ -21,13 +21,13 @@ if (LCD_W <= 212) then
    __Sw2MixerValue = 0;
 end
 local function transportGlobalLua()
-   return __Sw2MixerValue, 0;
+   return __Sw2MixerValue, 0, 0;
 end
 local function transportGV()
    return model.getGlobalVariable(gvar, 0), 1, model.getGlobalVariable((gvar + 1), 0);
 end
 local function transportShm()
-   return getShmVar(1), 2;
+   return getShmVar(1), 2, 0;
 end
 if (LCD_W <= 212) then
    print("TRACE: ", "sgvar: use transportGlobalLua" );

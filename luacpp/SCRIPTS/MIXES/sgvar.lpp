@@ -50,7 +50,7 @@ if (LCD_W <= 212) then
 end
 
 local function transportGlobalLua()
-   return GLOBAL_LUA_MIX_VAR, 0;
+   return GLOBAL_LUA_MIX_VAR, 0, 0;
 end
 
 local function transportGV()
@@ -58,7 +58,7 @@ local function transportGV()
 end
 
 local function transportShm()
-   return getShmVar(SHM_VAR), 2;
+   return getShmVar(SHM_VAR), 2, 0;
 end
 
 if (LCD_W <= 212) then
