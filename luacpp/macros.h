@@ -33,9 +33,10 @@
 # define TRACE2(...)
 # define TRACE3(...)
 #endif 
-
-
 #else
 # define ASSERT(X)
-# define TRACE(x)
+# define TRACE(...)
+# define TRACE1(...)
+# define TRACE2(...)
+# define TRACE3(...)
 #endif

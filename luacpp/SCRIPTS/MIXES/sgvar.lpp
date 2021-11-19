@@ -14,8 +14,10 @@
 
 local output = { 
    "sw_var",
+   #ifdef DEBUG
    "transp",
    "raw"
+   #endif 
 };
 
 #ifndef USE_SHM
@@ -50,15 +52,27 @@ if (LCD_W <= 212) then
 end
 
 local function transportGlobalLua()
-   return GLOBAL_LUA_MIX_VAR, 0, 0;
+   return GLOBAL_LUA_MIX_VAR
+   #ifdef DEBUG
+   , 0, 0
+   #endif 
+   ;
 end
 
 local function transportGV()
-   return model.getGlobalVariable(gvar, 0), 1, model.getGlobalVariable((gvar + 1), 0);
+   return model.getGlobalVariable(gvar, 0)
+   #ifdef DEBUG
+   , 1, model.getGlobalVariable((gvar + 1), 0)
+   #endif 
+   ;
 end
 
 local function transportShm()
-   return getShmVar(SHM_VAR), 2, 0;
+   return getShmVar(SHM_VAR)
+   #ifdef DEBUG
+   , 2, 0
+   #endif
+   ;
 end
 
 if (LCD_W <= 212) then
