@@ -48,7 +48,7 @@ local function run(a1, b1, a2, b2, deadband, to)
    local max1 = math.sqrt(min1 * min1 + 1024 * 1024) / 1024;
    local min2 = math.min(math.abs(a2), math.abs(b2));
    local max2 = math.sqrt(min2 * min2 + 1024 * 1024) / 1024;
-   print("TRACE -L3- : ", "min1:", min1, "max1", max1 );
+   ;
    if (SchottelPow1 > deadband) then
       SchottelDir1 = math.atan2(b1, a1) * 1024 / math.pi;
       saveLastDir(1, SchottelDir1, timeout);

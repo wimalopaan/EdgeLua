@@ -9,7 +9,7 @@
 #define DECMOD(value, table) if (value == 1) then value = __identity(__hash)table; else DEC(value); end
 
 #ifdef DEBUG
-# define TRACELEVEL 3 // 0, 1, 2, 3
+# define TRACELEVEL 0 // 0, 1, 2, 3
 # define ASSERT(x) if not(x) then print("Assertion error:" .. #x) end
 # define TRACE(...) print("TRACE: "__VA_OPT__(,) __VA_ARGS__ )
 #if (TRACELEVEL == 0)

@@ -124,7 +124,7 @@ local function background_telemetry()
       __libD.processForeignInput(__WmSw2Config, __WmSw2ForeignInput, menu, queue);
       lastForeignInput = __WmSw2ForeignInput;
     end
-    print("TRACE -L3- : ", "background_telemetry sw", __stopWmSw2 );
+    ;
     if (__stopWmSw2 == 0) then
       switchFSM(__WmSw2Config, menu, queue, fsmState, encoder, exportValues);
     end

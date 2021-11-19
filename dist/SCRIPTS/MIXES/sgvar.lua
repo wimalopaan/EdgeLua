@@ -14,7 +14,8 @@
        
 local output = {
    "sw_var",
-   "transp"
+   "transp",
+   "raw"
 };
 if (LCD_W <= 212) then
    __Sw2MixerValue = 0;
@@ -23,7 +24,7 @@ local function transportGlobalLua()
    return __Sw2MixerValue, 0;
 end
 local function transportGV()
-   return model.getGlobalVariable(gvar, 0), 1;
+   return model.getGlobalVariable(gvar, 0), 1, model.getGlobalVariable((gvar + 1), 0);
 end
 local function transportShm()
    return getShmVar(1), 2;

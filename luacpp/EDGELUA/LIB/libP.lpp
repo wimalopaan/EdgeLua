@@ -269,18 +269,26 @@ end
 
 local function setXJT(gv, sbusValue)
   local v = math.modf(scaleXJT(sbusValue));
-   transportToMixer(gv, sbusValue);
---  transportToMixer(gv + 1, v);
+  transportToMixer(gv, v);
+  #ifdef DEBUG
+  transportToMixer(gv + 1, scaleXJT(sbusValue));
+  #endif
 end 
 
 local function setIBus(gv, ibusValue)
   local v = math.modf(scaleIBus(ibusValue));
   transportToMixer(gv, v);
+  #ifdef DEBUG
+  transportToMixer(gv + 1, scaleIBus(ibusValue));
+  #endif
 end 
 
 local function setSBus(gv, sbusValue)
   local v = math.modf(scaleSBus(sbusValue));
   transportToMixer(gv, v);
+  #ifdef DEBUG
+  transportToMixer(gv + 1, scaleSBus(sbusValue));
+  #endif
 end 
 
 local function parameterToValueSBus(paramNumber, paramValue)

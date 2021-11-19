@@ -118,7 +118,7 @@ local function init_telemetry()
 end
 local function background_telemetry()
   if (errorCode == 0) then
-    print("TRACE -L3- : ", "background_telemetry", lastRun, getTime(), __stopWmSw2 );
+    ;
     if ((getTime() - lastRun) > 100) then
       __stopWmSw2 = bit32.band(__stopWmSw2, bit32.bnot(1));
     end

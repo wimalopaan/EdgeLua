@@ -14,7 +14,8 @@
 
 local output = { 
    "sw_var",
-   "transp"
+   "transp",
+   "raw"
 };
 
 #ifndef USE_SHM
@@ -35,12 +36,12 @@ local function initGV()
             return;
          end
          __WmSw2Config = __libI.initConfig(config);
-         gvar = __WmSw2Config[CFG_MixerGlobalVariable];
          collectgarbage();
         end
       end
    end
- end
+   gvar = __WmSw2Config[CFG_MixerGlobalVariable];
+end
 
  #endif
 
@@ -53,7 +54,7 @@ local function transportGlobalLua()
 end
 
 local function transportGV()
-   return model.getGlobalVariable(gvar, 0), 1;
+   return model.getGlobalVariable(gvar, 0), 1, model.getGlobalVariable((gvar + 1), 0);
 end
 
 local function transportShm()

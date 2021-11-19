@@ -209,15 +209,15 @@ local function sbusSwitchFSM(config, menu, queue, state, encoder, exportValues)
 end
 local function transportGV(gv, value)
   model.setGlobalVariable(gv, 0, value);
-  print("TRACE -L3- : ", "transportGV", value );
+  ;
 end
 local function transportShm(gv, value)
   setShmVar(1, value)
-  print("TRACE -L3- : ", "transportShm", value );
+  ;
 end
 local function transportGlobalLua(gv, value)
   __Sw2MixerValue = value;
-  print("TRACE -L3- : ", "transportGlobal", value );
+  ;
 end
 local function scaleXJT(sbusValue)
   local b = bit32.extract(sbusValue, 4);
@@ -247,16 +247,18 @@ local function scaleSBus(sbusValue)
 end
 local function setXJT(gv, sbusValue)
   local v = math.modf(scaleXJT(sbusValue));
-   transportToMixer(gv, sbusValue);
--- transportToMixer(gv + 1, v);
+  transportToMixer(gv, v);
+  transportToMixer(gv + 1, scaleXJT(sbusValue));
 end
 local function setIBus(gv, ibusValue)
   local v = math.modf(scaleIBus(ibusValue));
   transportToMixer(gv, v);
+  transportToMixer(gv + 1, scaleIBus(ibusValue));
 end
 local function setSBus(gv, sbusValue)
   local v = math.modf(scaleSBus(sbusValue));
   transportToMixer(gv, v);
+  transportToMixer(gv + 1, scaleSBus(sbusValue));
 end
 local function parameterToValueSBus(paramNumber, paramValue)
   if (paramNumber >= 0) and (paramNumber <= 15) then
