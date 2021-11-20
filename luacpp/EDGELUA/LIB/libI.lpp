@@ -452,9 +452,11 @@ local function findModuleInfo(module, map, modInfos)
           if (entry.description) then
             modInfo.help = entry.description;
           end
+          --[[
           if (entry.saveparams) then
             modInfo.save = true;
           end
+          --]]
           return modInfo;
         end
       end
@@ -494,7 +496,8 @@ local function initParamMenu(cfg, menu, map, modInfos, mode)
   local cmenu = {};
   local headers = {};
   local help = {};
-  local modulesToSave = {};
+
+--  local modulesToSave = {};
 
   local miTable = moduleItems(menu);
 
@@ -503,10 +506,12 @@ local function initParamMenu(cfg, menu, map, modInfos, mode)
     if (#items > 0) then
       local modInfo = findModuleInfo(imodule, map, modInfos); -- full module info table 
       if (modInfo) then
+        --[[
         if (modInfo.save) then
           TRACE("initParamMenu save module", imodule);
           modulesToSave[imodule] = true;
         end
+        --]]
         local header = {nil, nil, nil}; -- header[1] = title, header[2] =  moduleNumber
         header[PHEADER_Title] = modInfo.description;
         header[PHEADER_Module] = imodule;
@@ -578,9 +583,9 @@ local function initParamMenu(cfg, menu, map, modInfos, mode)
               for itemLineNumber = 1, #modInfo.functionParams do
                 local line = {nil, nil, nil}; -- {citem, {v0, v1, v2, ...}, itemLine}
                 local values = {};
-                if (modulesToSave[imodule]) then
+--                if (modulesToSave[imodule]) then
                   TRACE("initParamMenu: load Values", imodule, itemNumber, #modInfo.functionParams[itemLineNumber]);
-                end
+--                end
                 for valueNumber = 1, #modInfo.functionParams[itemLineNumber] do
                   values[valueNumber] = 0;
                 end
@@ -603,7 +608,8 @@ local function initParamMenu(cfg, menu, map, modInfos, mode)
       end
     end
   end
-  return headers, cmenu, help, modulesToSave;
+--  return headers, cmenu, help, modulesToSave;
+  return headers, cmenu, help;
 end
 
 local function initParamMenuBW(cfg, menu, map, modInfos)
@@ -614,7 +620,8 @@ local function initParamMenuColor(cfg, menu, map, modInfos, filename)
   if not(menu) or not(map) or not(modInfos) then
     return;
   end
-  local headers, cmenu, help, modulesToSave = initParamMenu(cfg, menu, map, modInfos, true);
+--  local headers, cmenu, help, modulesToSave = initParamMenu(cfg, menu, map, modInfos, true);
+  local headers, cmenu, help = initParamMenu(cfg, menu, map, modInfos, true);
 
   if (cfg[CFG_Footer]) then
     cmenu.footer = cfg[CFG_Footer];
@@ -622,7 +629,8 @@ local function initParamMenuColor(cfg, menu, map, modInfos, filename)
       cmenu.footer = cmenu.footer .. " File:" .. filename;
     end
   end
-  return headers, cmenu, help, modulesToSave;
+--  return headers, cmenu, help, modulesToSave;
+  return headers, cmenu, help;
 end
 
 local function initMenuBW(menu)

@@ -10,7 +10,6 @@
 -- Please note that the above license also covers the transfer protocol used and the encoding scheme and 
 -- all further principals of tranferring state and other information.
 
-
 -- Default menu for large radios w/ color lcd
 
 local gstates1 = {"aus", "ein", "blink 1", "blink 2"};
@@ -18,7 +17,8 @@ local gstates2 = {"stop", "ab", "auf", "Not aus"};
 local gstates3 = {"Pos 1", "Pos 2", "Pos 3", "Pos 4"};
 
 local menu = {
-  title = "Large";
+  title = "Model3",
+  saveValues = true,
   { -- template for digital multiswitch RC-MultiSwitch-D @ Address(1)
     title = "Deck 1",
     {"M1A", states = gstates1, state = 1, switch = "sa", fn = 1, module = 1},
@@ -54,9 +54,9 @@ local menu = {
 local exportValues = {0, -50, 50, 100}; -- values for states
 
 local map = {
-  {module = 1, type = 1, description = "Das Modul mit dem roten Aufkleber", saveparams = true},
+  {module = 1, type = 1, description = "Das Modul mit dem roten Aufkleber"},
   {module = 2, type = 2, description = "Im Ruderhaus"},
-  {module = 8, type = 3, saveparams = true},
+  {module = 8, type = 3},
 };
 
 return menu, map, exportValues;
