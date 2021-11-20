@@ -36,6 +36,9 @@ Wilhelm Meier <wilhelm.wm.meier@googlemail.com>
 :model: rc720
 :bus: auto 
   
+:extractordir: .extractor
+:basedir: ../luacpp/EDGELUA
+
 include::{idir}/defs.adoc[]
 
 <<<
@@ -56,6 +59,9 @@ include::{idir}/law.adoc[]
 include::{idir}/security.adoc[]
 
 <<< 
+
+include::{basedir}/MODELS/{extractordir}/tiny.lua.all[]
+
 
 [[intro]]
 == Einführung

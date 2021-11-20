@@ -1,4 +1,11 @@
 
+EXTRACTOR = $(HOME)/Projekte/github/extractor/extract/extractor
+EXTRACTDIR = .extractor
+EXTRACTDIRNC = .extractornc
+EXLN = -n
+
+SRCHI = source-highlight
+
 .PHONY: all clean subdirs ${subdirs} 
 
 subdirs: ${subdirs}
@@ -9,6 +16,13 @@ all: subdirs  $(targets)
 
 %.lua: %.lpp
 	cpp $(CPPFLAGS) -E -P $< > $@
+
+
+%.lpp.extract: %.lpp
+	$(EXTRACTOR) $(EXLN) -l none -a A2 -a N -o $@ -d $(EXTRACTDIR) $<
+
+%.lua.extract: %.lua
+	$(EXTRACTOR) $(EXLN) -l none -a A2 -a N -o $@ -d $(EXTRACTDIR) $<
 
 lppsources = $(wildcard *.lpp)
 luatargets = $(patsubst %.lpp, %.lua, $(lppsources))
