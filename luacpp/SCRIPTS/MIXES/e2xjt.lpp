@@ -1,0 +1,70 @@
+--
+-- WM OTXE - OpenTX Extensions 
+-- Copyright (C) 2020 Wilhelm Meier <wilhelm.wm.meier@googlemail.com>
+--
+-- This work is licensed under the Creative Commons Attribution-NonCommercial-NoDerivatives 4.0 International License. 
+-- To view a copy of this license, visit http://creativecommons.org/licenses/by-nc-nd/4.0/ 
+-- or send a letter to Creative Commons, PO Box 1866, Mountain View, CA 94042, USA.
+
+-- IMPORTANT
+-- Please note that the above license also covers the transfer protocol used and the encoding scheme and 
+-- all further principals of tranferring state and other information.
+
+#include "../../global.h"
+
+local output = { 
+   "e2xjt",
+   "GV",
+   "x-y"
+}
+
+local errorCode = 0;
+local gvar = 5;
+
+local function init()
+   if not(__WmSw2Config) then
+      local basedir = BASE_DIR .. "/LIB/";
+      if not __libI then
+        __libI = loadScript(basedir .. "libI.lua")();
+        if not __libI then
+          errorCode = 1;
+        else   
+         local config = __libI.loadConfig();
+         if not(config) then
+            errorCode = 4;
+            return;
+         end
+         __WmSw2Config = __libI.initConfig(config);
+         gvar = __WmSw2Config[CFG_MixerGlobalVariable];
+         collectgarbage();
+        end
+      end
+   end
+ end
+
+local offset1  =  0.5;
+local offset2E = -0.5;
+local offset2O =  0.5;
+
+local function run()
+   local o = 0;
+   local x = model.getGlobalVariable(gvar, 0);
+   local b = bit32.extract(x, 4);
+   if (x >= 0) then
+      o =  (x * 1024) / 1638 + offset1;
+   else
+      if (b == 0) then
+	     o = (x * 1024) / 1638 + offset2E;
+      else
+	     o =  (x * 1024) / 1638 + offset2O;
+      end
+   end
+
+   return o;
+end
+
+return {
+   output = output, 
+   run = run, 
+   init = init
+}
