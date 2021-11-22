@@ -1,0 +1,137 @@
+--
+-- EdgeLUA - EdgeTx / OpenTx Extensions 
+-- Copyright (C) 2021 Wilhelm Meier <wilhelm.wm.meier@googlemail.com>
+--
+-- This work is licensed under the Creative Commons Attribution-NonCommercial-NoDerivatives 4.0 International License. 
+-- To view a copy of this license, visit http://creativecommons.org/licenses/by-nc-nd/4.0/ 
+-- or send a letter to Creative Commons, PO Box 1866, Mountain View, CA 94042, USA.
+
+-- IMPORTANT
+-- Please note that the above license also covers the transfer protocol used and the encoding scheme and 
+-- all further principals of tranferring state and other information.
+
+#include "../../widget.h"
+
+local name = "EL_Test";
+local options = {};
+
+local function create(zone, options)
+  load();
+  collectgarbage();
+  
+  if (errorCode > 0) then
+    return {};
+  end
+
+  local widget = __libI.initWidget(zone, options);
+  collectgarbage();
+
+  if not(__WmSw2Config) then
+    local config = __libI.loadConfig();
+    if not(config) then
+      errorCode = 4;
+      return widget;
+    end
+    __WmSw2Config = __libI.initConfig(config);
+  end 
+  collectgarbage();
+
+  __libI = nil; -- free memory
+
+  collectgarbage();
+
+  return widget;
+end
+
+local function update(widget, options)
+  widget[W_Options] = options;
+end
+
+local function background(widget)
+  if (errorCode == 0) then
+  end
+end
+
+local function refresh(widget, event, touch)
+  __libD.updateWidgetDimensions(widget, event);
+  if (errorCode == 0) then
+    local y = widget[W_Y];
+    local x1 = widget[W_X];
+    local x2 = x1 + widget[W_Width] / 4;
+    lcd.clear();
+    #ifdef DEBUG
+        lcd.drawText(x1, y, "Ver: " .. VERSION .. " (debug)", SMLSIZE);
+    #else
+        lcd.drawText(x1, y, "Ver: " .. VERSION, SMLSIZE);
+    #endif
+    y = y + widget[W_FontHSmall]; 
+    lcd.drawText(x1, y, "Radio: " , SMLSIZE);    
+    local ver, radio, maj, minor, rev, osname = getVersion();
+    if (osname) then
+        lcd.drawText(x2, y, "EdgeTx " .. radio .. " " .. maj .. "." .. minor .. "." .. rev, SMLSIZE);
+    else
+        lcd.drawText(x2, y, "OpenTx " .. radio .. " " .. maj .. "." .. minor .. "." .. rev, SMLSIZE);
+    end
+    y = y + widget[W_FontHSmall]; 
+    lcd.drawText(x1, y, "value storage:", SMLSIZE);
+    #ifdef USE_VALUE_STORAGE
+        lcd.drawText(x2, y, "yes", SMLSIZE);
+    #else 
+        lcd.drawText(x2, y, "no", SMLSIZE);
+    #endif
+    y = y + widget[W_FontHSmall]; 
+    lcd.drawText(x1, y, "trim names:", SMLSIZE);
+    #ifdef USE_TRIM_NAMES
+        local id = getFieldInfo("t5u");
+        if (id) then
+            lcd.drawText(x2, y, "yes", SMLSIZE);
+        else
+            lcd.drawText(x2, y, "no", SMLSIZE);
+        end
+    #else 
+        lcd.drawText(x2, y, "---", SMLSIZE);
+    #endif 
+    y = y + widget[W_FontHSmall]; 
+    lcd.drawText(x1, y, "sl:", SMLSIZE);
+    local id = getFieldInfo("sl1");
+    if (id) then
+        lcd.drawText(x2, y, "yes", SMLSIZE);
+    else
+        lcd.drawText(x2, y, "no", SMLSIZE);
+    end
+    y = y + widget[W_FontHSmall];     
+    lcd.drawText(x1, y, "shm:", SMLSIZE);
+    #ifdef USE_SHM
+    if (getShmVar) then
+        lcd.drawText(x2, y, "yes", SMLSIZE);
+    else
+        lcd.drawText(x2, y, "no", SMLSIZE);
+    end
+    #else 
+        lcd.drawText(x2, y, "---", SMLSIZE);
+    #endif
+    y = y + widget[W_FontHSmall]; 
+    lcd.drawText(x1, y, "sticky switch:", SMLSIZE);
+    #ifdef USE_LS_STICKY
+    if (setStickySwitch) then
+        lcd.drawText(x2, y, "yes", SMLSIZE);
+    else
+        lcd.drawText(x2, y, "no", SMLSIZE);
+    end
+    #else
+        lcd.drawText(x2, y, "---", SMLSIZE);
+    #endif 
+  else
+    lcd.drawText(widget[W_X], widget[W_Y], "Error: " .. errorCode, DBLSIZE);
+  end
+end
+
+return { 
+    name=name,
+    options=options,
+    create=create,
+    update=update,
+    refresh=refresh,
+    background=background
+};
+
