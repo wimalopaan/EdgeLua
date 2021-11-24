@@ -17,6 +17,7 @@ local options = {};
 
 local function create(zone, options)
   load();
+  loadLibU();
   collectgarbage();
   
   if (errorCode > 0) then
@@ -55,72 +56,7 @@ end
 local function refresh(widget, event, touch)
   __libD.updateWidgetDimensions(widget, event);
   if (errorCode == 0) then
-    local y = widget[W_Y];
-    local x1 = widget[W_X];
-    local x2 = x1 + widget[W_Width] / 4;
-    lcd.clear();
-    #ifdef DEBUG
-        lcd.drawText(x1, y, "Ver: " .. VERSION .. " (debug)", SMLSIZE);
-    #else
-        lcd.drawText(x1, y, "Ver: " .. VERSION, SMLSIZE);
-    #endif
-    y = y + widget[W_FontHSmall]; 
-    lcd.drawText(x1, y, "Radio: " , SMLSIZE);    
-    local ver, radio, maj, minor, rev, osname = getVersion();
-    if (osname) then
-        lcd.drawText(x2, y, "EdgeTx " .. radio .. " " .. maj .. "." .. minor .. "." .. rev, SMLSIZE);
-    else
-        lcd.drawText(x2, y, "OpenTx " .. radio .. " " .. maj .. "." .. minor .. "." .. rev, SMLSIZE);
-    end
-    y = y + widget[W_FontHSmall]; 
-    lcd.drawText(x1, y, "value storage:", SMLSIZE);
-    #ifdef USE_VALUE_STORAGE
-        lcd.drawText(x2, y, "yes", SMLSIZE);
-    #else 
-        lcd.drawText(x2, y, "no", SMLSIZE);
-    #endif
-    y = y + widget[W_FontHSmall]; 
-    lcd.drawText(x1, y, "trim names:", SMLSIZE);
-    #ifdef USE_TRIM_NAMES
-        local id = getFieldInfo("t5u");
-        if (id) then
-            lcd.drawText(x2, y, "yes", SMLSIZE);
-        else
-            lcd.drawText(x2, y, "no", SMLSIZE);
-        end
-    #else 
-        lcd.drawText(x2, y, "---", SMLSIZE);
-    #endif 
-    y = y + widget[W_FontHSmall]; 
-    lcd.drawText(x1, y, "sl:", SMLSIZE);
-    local id = getFieldInfo("sl1");
-    if (id) then
-        lcd.drawText(x2, y, "yes", SMLSIZE);
-    else
-        lcd.drawText(x2, y, "no", SMLSIZE);
-    end
-    y = y + widget[W_FontHSmall];     
-    lcd.drawText(x1, y, "shm:", SMLSIZE);
-    #ifdef USE_SHM
-    if (getShmVar) then
-        lcd.drawText(x2, y, "yes", SMLSIZE);
-    else
-        lcd.drawText(x2, y, "no", SMLSIZE);
-    end
-    #else 
-        lcd.drawText(x2, y, "---", SMLSIZE);
-    #endif
-    y = y + widget[W_FontHSmall]; 
-    lcd.drawText(x1, y, "sticky switch:", SMLSIZE);
-    #ifdef USE_LS_STICKY
-    if (setStickySwitch) then
-        lcd.drawText(x2, y, "yes", SMLSIZE);
-    else
-        lcd.drawText(x2, y, "no", SMLSIZE);
-    end
-    #else
-        lcd.drawText(x2, y, "---", SMLSIZE);
-    #endif 
+    __libU.displayDebug(widget);
   else
     lcd.drawText(widget[W_X], widget[W_Y], "Error: " .. errorCode, DBLSIZE);
   end

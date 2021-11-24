@@ -26,6 +26,146 @@ local function serialize(table, filename)
       end
 end
 
-return {
-    serialize = serialize,
-}
+local function saveValues(menu, filename, state)
+end
+
+local function initValues(menu, filename)
+end
+
+local debugText = {};
+
+local function initDebugTextBW() 
+  debugText[DEBUG_TEXT_Version] = "Vers:";
+  debugText[DEBUG_TEXT_GetFieldSL] = "GFLS:";
+  debugText[DEBUG_TEXT_GetSwitchId] = "SwId:";
+  debugText[DEBUG_TEXT_Radio] = "Rad:";
+  debugText[DEBUG_TEXT_Shm] = "Shm:";
+  debugText[DEBUG_TEXT_StickySwitch] = "SSw:";
+  debugText[DEBUG_TEXT_TrimSwitchId] = "TrSw:";
+  debugText[DEBUG_TEXT_ValueStorage] = "VSto:";
+end
+
+local function initDebugTextColor() 
+  debugText[DEBUG_TEXT_Version] = "Version:";
+  debugText[DEBUG_TEXT_GetFieldSL] = "SwitchID LS:";
+  debugText[DEBUG_TEXT_GetSwitchId] = "GetSwitchId:";
+  debugText[DEBUG_TEXT_Radio] = "Radio:";
+  debugText[DEBUG_TEXT_Shm] = "SharedMem:";
+  debugText[DEBUG_TEXT_StickySwitch] = "SetStickySw:";
+  debugText[DEBUG_TEXT_TrimSwitchId] = "TrimSwitch:";
+  debugText[DEBUG_TEXT_ValueStorage] = "ValueStorage:";
+end
+
+local function displayDebugBW(widget) 
+  local y = widget[W_Y];
+  local x1 = widget[W_X];
+  local x2 = x1 + widget[W_Width] / 4;
+  local x3 = x1 + widget[W_Width] / 2;
+  local x4 = x1 + 3 * widget[W_Width] / 4;
+  #ifdef DEBUG
+      lcd.drawText(x1, y, debugText[DEBUG_TEXT_Version] .. VERSION .. " (dbg)", SMLSIZE);
+  #else
+      lcd.drawText(x1, y, debugText[DEBUG_TEXT_Version] .. VERSION, SMLSIZE);
+  #endif
+  y = y + widget[W_FontHSmall]; 
+  lcd.drawText(x1, y, debugText[DEBUG_TEXT_Radio] , SMLSIZE);    
+  local ver, radio, maj, minor, rev, osname = getVersion();
+  if (osname) then
+      lcd.drawText(x2, y, "ETx " .. radio .. " " .. maj .. "." .. minor .. "." .. rev, SMLSIZE);
+  else
+      lcd.drawText(x2, y, "OTx " .. radio .. " " .. maj .. "." .. minor .. "." .. rev, SMLSIZE);
+  end
+  y = y + widget[W_FontHSmall]; 
+  lcd.drawText(x1, y, debugText[DEBUG_TEXT_ValueStorage], SMLSIZE);
+  #ifdef USE_VALUE_STORAGE
+      lcd.drawText(x2, y, "y", SMLSIZE);
+  #else 
+      lcd.drawText(x2, y, "n", SMLSIZE);
+  #endif
+  y = y + widget[W_FontHSmall]; 
+  lcd.drawText(x1, y, debugText[DEBUG_TEXT_TrimSwitchId], SMLSIZE);
+  #ifdef USE_TRIM_NAMES
+      local id = getFieldInfo("t5u");
+      if (id) then
+          lcd.drawText(x2, y, "y", SMLSIZE);
+      else
+          lcd.drawText(x2, y, "n", SMLSIZE);
+      end
+  #else 
+      lcd.drawText(x2, y, "-", SMLSIZE);
+  #endif 
+  y = y + widget[W_FontHSmall]; 
+  lcd.drawText(x1, y, debugText[DEBUG_TEXT_GetSwitchId], SMLSIZE);
+  #ifdef USE_GETSWITCHID
+      if (getSwitchId) then
+          lcd.drawText(x2, y, "y", SMLSIZE);
+      else
+          lcd.drawText(x2, y, "n", SMLSIZE);
+      end
+  #else 
+      lcd.drawText(x2, y, "-", SMLSIZE);
+  #endif 
+
+  y = y + widget[W_FontHSmall]; 
+  lcd.drawText(x1, y, debugText[DEBUG_TEXT_GetFieldSL], SMLSIZE);
+  local id = getFieldInfo("sl1");
+  if (id) then
+      lcd.drawText(x2, y, "y", SMLSIZE);
+  else
+      lcd.drawText(x2, y, "n", SMLSIZE);
+  end
+
+  y = widget[W_Y];
+  y = y + widget[W_FontHSmall];     
+  y = y + widget[W_FontHSmall];     
+
+  lcd.drawText(x3, y, debugText[DEBUG_TEXT_Shm], SMLSIZE);
+  #ifdef USE_SHM
+  if (getShmVar) then
+      lcd.drawText(x4, y, "y", SMLSIZE);
+  else
+      lcd.drawText(x4, y, "n", SMLSIZE);
+  end
+  #else 
+      lcd.drawText(x4, y, "-", SMLSIZE);
+  #endif
+  y = y + widget[W_FontHSmall]; 
+  lcd.drawText(x3, y, debugText[DEBUG_TEXT_StickySwitch], SMLSIZE);
+  #ifdef USE_LS_STICKY
+  if (setStickySwitch) then
+      lcd.drawText(x4, y, "y", SMLSIZE);
+  else
+      lcd.drawText(x4, y, "n", SMLSIZE);
+  end
+  #else
+      lcd.drawText(x4, y, "-", SMLSIZE);
+  #endif 
+  
+end
+
+local function displayDebugColor(widget) 
+  displayDebugBW(widget);
+end
+
+if (LCD_W <= 128) then
+  initDebugTextBW();
+  return {
+    saveValues = saveValues,
+    initValues = initValues,
+    displayDebug = displayDebugBW,
+  };
+elseif (LCD_W <= 212) then
+  initDebugTextBW();
+  return {
+    saveValues = saveValues,
+    initValues = initValues,
+    displayDebug = displayDebugBW,
+  };
+else
+  initDebugTextColor();
+  return {
+    saveValues = saveValues,
+    initValues = initValues,
+    displayDebug = displayDebugColor,
+  };
+end

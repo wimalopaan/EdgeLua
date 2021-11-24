@@ -167,3 +167,12 @@
 #define FSMRSSI_STATE_WaitUp 1
 #define FSMRSSI_STATE_Normal 2
 #define FSMRSSI_STATE_WaitDown 3
+
+#define DEBUG_TEXT_Radio 1
+#define DEBUG_TEXT_TrimSwitchId 2
+#define DEBUG_TEXT_GetSwitchId 3
+#define DEBUG_TEXT_GetFieldSL 4
+#define DEBUG_TEXT_Shm 5
+#define DEBUG_TEXT_StickySwitch 6
+#define DEBUG_TEXT_Version 7
+#define DEBUG_TEXT_ValueStorage 8
