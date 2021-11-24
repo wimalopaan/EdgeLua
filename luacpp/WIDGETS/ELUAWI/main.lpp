@@ -16,57 +16,39 @@ local name = "EL_Wch";
 
 local options = {
   { "Name", STRING}, -- display name
-  { "GVar", VALUE, 7, 0, 8}, -- gvar (counting from 0)
   { "Adresse", VALUE, 1, 1, 8},
   { "Funktion", VALUE, 1, 1, 8},
   { "Zustand", SOURCE, 8}, -- telemetry state variable
 };
 
-local gvalue = 1; -- state 1 := off
-
-local function isDigit(v)
-  return (v >= string.byte("0")) and (v <= string.byte("9"));
-end
-
-local function isLetter(v)
-  return (v >= string.byte("A") and (v <= string.byte("Z"))) or (v >= string.byte("a") and (v <= string.byte("z")));
-end
-
-local function nthChar(n, v)
-  local c = bit32.extract(v, n * 8, 8);
-  if (isDigit(c) or isLetter(c)) then
-    return string.char(c);
-  end
-  return nil;
-end
-
-local function optionString(option)
-  local s = "";
-  for i = 0,3 do
-    local c = nthChar(i, option);
-    if (c) then
-      s = s .. c;
-    else
-      return s;
-    end;
-  end
-  return s
-end
-
+local buttonState = 1; -- state 1 := off
 
 local function create(zone, options)
-  zone.cx = zone.x + zone.w / 2;
-  zone.cy = zone.y + zone.h / 2;
-  return {
-    zone = zone,
-    options = options,
-    events = 0,
-    canvas = {}
-  };
+  load();
+  loadLibU();
+
+  if (errorCode > 0) then
+    return {};
+  end
+
+  local widget = __libI.initWidget(zone, options);
+  collectgarbage();
+
+  if not(__WmSw2Config) then
+    local config = __libI.loadConfig();
+    if not(config) then
+      errorCode = 4;
+      return widget;
+    end
+    __WmSw2Config = __libI.initConfig(config);
+  end 
+  collectgarbage();
+
+  return widget;
 end
 
 local function update(widget, options)
-  widget.options = options;
+  widget[W_Options] = options;
 end
 
 local function background(widget)
@@ -96,121 +78,112 @@ local function buttonBorderState(button)
 end
 
 local function refresh(widget, event, touch)
-  if (event) then -- fullscreen
-    widget.canvas.x = 0;
-    widget.canvas.y = 0;
-    widget.canvas.cx = LCD_W / 2;
-    widget.canvas.cy = LCD_H / 2;
-    widget.canvas.w = LCD_W;
-    widget.canvas.h = LCD_H;
-  else
-    widget.canvas.x = widget.zone.x;
-    widget.canvas.y = widget.zone.y;
-    widget.canvas.cx = widget.zone.cx;
-    widget.canvas.cy = widget.zone.cy;
-    widget.canvas.w = widget.zone.w;
-    widget.canvas.h = widget.zone.h;
-  end
+  __libD.updateWidgetDimensions(widget, event);
+  if (errorCode == 0) then
 
-  local border = 2;
-  local iw = (widget.canvas.w / 6);
-  local ih = widget.canvas.h;
-  if (ih > iw) then
-    ih = iw;
-  end
-
-  local f1 = {x = widget.canvas.x, y = widget.canvas.y, w = iw / 2, h = ih};
-  if (event) then
-    f1.y = widget.canvas.cy - ih / 2;
-  end
-  local f2 = {x = f1.x + f1.w, y = f1.y, w = iw, h = ih};
-  local f3 = {x = f2.x + f2.w, y = f1.y, w = iw, h = ih};
-  local f4 = {x = f3.x + f3.w, y = f1.y, w = iw, h = ih};
-  local f5 = {x = f4.x + f4.w, y = f1.y, w = iw / 2, h = ih};
-  local f6 = {x = f5.x + f5.w, y = f1.y, w = iw, h = ih};
-  local f7 = {x = f6.x + f6.w, y = f1.y, w = iw, h = ih};
-
-  local holdBtn = makeButton(f3, border);
-  local leftBtn = makeButton(f2, border);
-  local rightBtn = makeButton(f4, border);
-  local stopBtn = makeButton(f7, border);
-
-  lcd.drawFilledRectangle(holdBtn.x, holdBtn.y, holdBtn.w, holdBtn.h, GREEN);
-  lcd.drawFilledCircle(stopBtn.x + stopBtn.w/2, stopBtn.y + stopBtn.h/2, stopBtn.h/2 - border, RED);
-  lcd.drawFilledTriangle(leftBtn.x + border, leftBtn.y + leftBtn.h/2,
-    leftBtn.x + leftBtn.w - border, leftBtn.y + border,
-    leftBtn.x + leftBtn.w - border, leftBtn.y + leftBtn.h - border, ORANGE);
-  lcd.drawFilledTriangle(rightBtn.x + rightBtn.w - border, rightBtn.y + rightBtn.h/2,
-    rightBtn.x + border, rightBtn.y + border,
-    rightBtn.x + border, rightBtn.y + rightBtn.h - border, ORANGE);
-
-  lcd.drawFilledRectangle(f1.x + border, f1.y + border, f1.w - (2 * border), f1.h - (2 * border), YELLOW);
-  lcd.drawFilledRectangle(f5.x + border, f5.y + border, f5.w - (2 * border), f5.h - (2 * border), YELLOW);
-  lcd.drawText(f6.x + border, f6.y + f6.h / 2 - 16, optionString(widget.options.Name));
-
-  buttonText(holdBtn, "Halt");
-  buttonText(leftBtn, "Links");
-  buttonText(rightBtn, "Rechts");
-  buttonText(stopBtn, "Frei");
-
-  buttonBorder(holdBtn);
-  buttonBorder(leftBtn);
-  buttonBorder(rightBtn);
-
-  local state = getValue(widget.options.Zustand);
-
-  if (state == 40) then
-    lcd.drawText(f6.x + border, f6.y + f6.h - 16, "Halt");
-    buttonBorderState(holdBtn);
-  elseif (state == 41) then
-    lcd.drawText(f6.x + border, f6.y + f6.h - 16, "Rechts");
-    buttonBorderState(rightBtn);
-  elseif (state == 42) then
-    lcd.drawText(f6.x + border, f6.y + f6.h - 16, "Links");
-    buttonBorderState(leftBtn);
-  elseif (state == 43) then
-    lcd.drawText(f6.x + border, f6.y + f6.h - 16, "Blockiert");
-    lcd.drawFilledRectangle(f5.x + border, f5.y + border, f5.w - (2 * border), f5.h - (2 * border), BLINK + RED);
-    lcd.drawFilledRectangle(f1.x + border, f1.y + border, f1.w - (2 * border), f1.h - (2 * border), BLINK + RED);
-  elseif (state == 44) then
-    lcd.drawText(f6.x + border, f6.y + f6.h - 16, "Ende rechts");
-    lcd.drawFilledRectangle(f5.x + border, f5.y + border, f5.w - (2 * border), f5.h - (2 * border), RED);
-  elseif (state == 45) then
-    lcd.drawText(f6.x + border, f6.y + f6.h - 16, "Ende links");
-    lcd.drawFilledRectangle(f1.x + border, f1.y + border, f1.w - (2 * border), f1.h - (2 * border), RED);
-  elseif (state == 46) then
-    lcd.drawText(f6.x + border, f6.y + f6.h - 16, "Frei");
-    lcd.drawRectangle(f7.x + border, f7.y + border, f7.w - (2 * border), f7.h - (2 * border), ORANGE, 4);
-  elseif (state == 50) then
-    lcd.drawText(f6.x + border, f6.y + f6.h - 16, "Fehler");
-  elseif (state >= 10) and (state < 20) then
-    lcd.drawText(f6.x + border, f6.y + f6.h - 16, "Start");
-  elseif (state >= 20) and (state < 40) then
-    lcd.drawText(f6.x + border, f6.y + f6.h - 16, "Kalibrierung");
-  else 
-    lcd.drawText(f6.x + border, f6.y + f6.h - 16, "Ungueltig");
-  end
-
-  if (event == EVT_TOUCH_TAP) then
-    if (covers(touch, holdBtn)) then
-      gvalue = 1;
-      gvalue = gvalue + 10 * widget.options.Funktion + 100 * widget.options.Adresse;
-      --print(gvalue);
-    elseif (covers(touch, leftBtn)) then
-      gvalue = 2;
-      gvalue = gvalue + 10 * widget.options.Funktion + 100 * widget.options.Adresse;
-      --print(gvalue);
-    elseif (covers(touch, rightBtn)) then
-      gvalue = 3;
-      gvalue = gvalue + 10 * widget.options.Funktion + 100 * widget.options.Adresse;
-      --print(gvalue);
-    elseif (covers(touch, stopBtn)) then
-      gvalue = 4;
-      gvalue = gvalue + 10 * widget.options.Funktion + 100 * widget.options.Adresse;
-      --print(gvalue);
+    local border = 2;
+    local iw = (widget[W_Width] / 6);
+    local ih = widget[W_Height];
+    if (ih > iw) then
+      ih = iw;
     end
-  end   
-  model.setGlobalVariable(widget.options.GVar, getFlightMode(), gvalue);
+  
+    local f1 = {x = widget[W_X], y = widget[W_Y], w = iw / 2, h = ih};
+    if (event) then
+      f1.y = (widget[W_Y] + widget[W_Height]) / 2 - ih / 2;
+    end
+    local f2 = {x = f1.x + f1.w, y = f1.y, w = iw, h = ih};
+    local f3 = {x = f2.x + f2.w, y = f1.y, w = iw, h = ih};
+    local f4 = {x = f3.x + f3.w, y = f1.y, w = iw, h = ih};
+    local f5 = {x = f4.x + f4.w, y = f1.y, w = iw / 2, h = ih};
+    local f6 = {x = f5.x + f5.w, y = f1.y, w = iw, h = ih};
+    local f7 = {x = f6.x + f6.w, y = f1.y, w = iw, h = ih};
+  
+    local holdBtn = makeButton(f3, border);
+    local leftBtn = makeButton(f2, border);
+    local rightBtn = makeButton(f4, border);
+    local stopBtn = makeButton(f7, border);
+  
+    lcd.drawFilledRectangle(holdBtn.x, holdBtn.y, holdBtn.w, holdBtn.h, GREEN);
+    lcd.drawFilledCircle(stopBtn.x + stopBtn.w/2, stopBtn.y + stopBtn.h/2, stopBtn.h/2 - border, RED);
+    lcd.drawFilledTriangle(leftBtn.x + border, leftBtn.y + leftBtn.h/2,
+      leftBtn.x + leftBtn.w - border, leftBtn.y + border,
+      leftBtn.x + leftBtn.w - border, leftBtn.y + leftBtn.h - border, ORANGE);
+    lcd.drawFilledTriangle(rightBtn.x + rightBtn.w - border, rightBtn.y + rightBtn.h/2,
+      rightBtn.x + border, rightBtn.y + border,
+      rightBtn.x + border, rightBtn.y + rightBtn.h - border, ORANGE);
+  
+    lcd.drawFilledRectangle(f1.x + border, f1.y + border, f1.w - (2 * border), f1.h - (2 * border), YELLOW);
+    lcd.drawFilledRectangle(f5.x + border, f5.y + border, f5.w - (2 * border), f5.h - (2 * border), YELLOW);
+    lcd.drawText(f6.x + border, f6.y + f6.h / 2 - 16, __libU.optionString(widget[W_Options].Name));
+  
+    buttonText(holdBtn, "Halt");
+    buttonText(leftBtn, "Links");
+    buttonText(rightBtn, "Rechts");
+    buttonText(stopBtn, "Frei");
+  
+    buttonBorder(holdBtn);
+    buttonBorder(leftBtn);
+    buttonBorder(rightBtn);
+  
+    local state = getValue(widget[W_Options].Zustand);
+  
+    if (state == 40) then
+      lcd.drawText(f6.x + border, f6.y + f6.h - 16, "Halt");
+      buttonBorderState(holdBtn);
+    elseif (state == 41) then
+      lcd.drawText(f6.x + border, f6.y + f6.h - 16, "Rechts");
+      buttonBorderState(rightBtn);
+    elseif (state == 42) then
+      lcd.drawText(f6.x + border, f6.y + f6.h - 16, "Links");
+      buttonBorderState(leftBtn);
+    elseif (state == 43) then
+      lcd.drawText(f6.x + border, f6.y + f6.h - 16, "Blockiert");
+      lcd.drawFilledRectangle(f5.x + border, f5.y + border, f5.w - (2 * border), f5.h - (2 * border), BLINK + RED);
+      lcd.drawFilledRectangle(f1.x + border, f1.y + border, f1.w - (2 * border), f1.h - (2 * border), BLINK + RED);
+    elseif (state == 44) then
+      lcd.drawText(f6.x + border, f6.y + f6.h - 16, "Ende rechts");
+      lcd.drawFilledRectangle(f5.x + border, f5.y + border, f5.w - (2 * border), f5.h - (2 * border), RED);
+    elseif (state == 45) then
+      lcd.drawText(f6.x + border, f6.y + f6.h - 16, "Ende links");
+      lcd.drawFilledRectangle(f1.x + border, f1.y + border, f1.w - (2 * border), f1.h - (2 * border), RED);
+    elseif (state == 46) then
+      lcd.drawText(f6.x + border, f6.y + f6.h - 16, "Frei");
+      lcd.drawRectangle(f7.x + border, f7.y + border, f7.w - (2 * border), f7.h - (2 * border), ORANGE, 4);
+    elseif (state == 50) then
+      lcd.drawText(f6.x + border, f6.y + f6.h - 16, "Fehler");
+    elseif (state >= 10) and (state < 20) then
+      lcd.drawText(f6.x + border, f6.y + f6.h - 16, "Start");
+    elseif (state >= 20) and (state < 40) then
+      lcd.drawText(f6.x + border, f6.y + f6.h - 16, "Kalibrierung");
+    else 
+      lcd.drawText(f6.x + border, f6.y + f6.h - 16, "Ungueltig");
+    end
+  
+    if (event == EVT_TOUCH_TAP) then
+      local fn = widget[W_Options].Funktion;
+      local module = widget[W_Options].Adresse;
+      if (covers(touch, holdBtn)) then
+        buttonState = 1;
+        TRACE("buttonState", buttonState);
+      elseif (covers(touch, leftBtn)) then
+        buttonState = 2;
+        TRACE("buttonState", buttonState);
+      elseif (covers(touch, rightBtn)) then
+        buttonState = 3;
+        TRACE("buttonState", buttonState);
+      elseif (covers(touch, stopBtn)) then
+        buttonState = 4;
+        TRACE("buttonState", buttonState);
+      end
+      __WmSw2ForeignInput = buttonState + 10 * fn + 100 * module;
+      TRACE("buttonState FI", __WmSw2ForeignInput);
+    end   
+
+  else
+    lcd.drawText(widget[W_X], widget[W_Y], "Error: " .. errorCode, DBLSIZE);
+  end
+
 end
 
 return { 

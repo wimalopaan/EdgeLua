@@ -88,6 +88,7 @@ local function background(widget)
     __libD.processShortCuts(shortCuts, queue);
     __libD.processRemoteInput(__WmSw2Config, menu, queue, remoteInput);
     if (lastForeignInput ~= __WmSw2ForeignInput) then
+      TRACE("foreignInput", __WmSw2ForeignInput);
       __libD.processForeignInput(__WmSw2Config, __WmSw2ForeignInput, menu, queue);
       lastForeignInput = __WmSw2ForeignInput;
     end
