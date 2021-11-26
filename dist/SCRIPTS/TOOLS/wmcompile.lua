@@ -51,7 +51,7 @@ local dirs = {
   "/WIDGETS/ELUAWI",
 };
 local function run()
-  lcd.drawText(0, 0, "Compiling ..." .. "2.01", TEXT_COLOR);
+  lcd.drawText(0, 0, "Compiling ..." .. "2.02", TEXT_COLOR);
   local t = getTime();
   local dir = nil;
   if ((t - lastTime) > 50) then
