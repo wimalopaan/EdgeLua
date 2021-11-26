@@ -38,6 +38,7 @@ local function init_telemetry()
     __libI = nil; -- free memory
     
     collectgarbage();
+
 end
 
 local function run_telemetry(event) 

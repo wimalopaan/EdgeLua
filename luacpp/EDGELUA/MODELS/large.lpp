@@ -23,7 +23,7 @@ local menu = {
     title = "Deck 1",
     {"M1A", states = gstates1, state = 1, switch = "sa", fn = 1, module = 1},
     {"M1B", states = gstates1, state = 1, switch = "sb", fn = 2, module = 1},
-    {"M1C", states = gstates1, state = 1, switch = nil,  fn = 3, module = 1},
+    {"M1C", states = gstates1, state = 1, switch = "input1",  fn = 3, module = 1},
     {"M1D", states = gstates1, state = 1, switch = "se", virtual = { {fn = 7, module = 1} } },
     {"M1E", states = gstates1, state = 1, switch = nil,  fn = 5, module = 1},
     {"M1F", states = gstates1, state = 1, switch = "ls1", fn = 6, module = 1, lsmode = 1},

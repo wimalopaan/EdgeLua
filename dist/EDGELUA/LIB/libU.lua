@@ -12,6 +12,31 @@
        
        
        
+local function isDigit(v)
+  return (v >= string.byte("0")) and (v <= string.byte("9"));
+end
+local function isLetter(v)
+  return (v >= string.byte("A") and (v <= string.byte("Z"))) or (v >= string.byte("a") and (v <= string.byte("z")));
+end
+local function nthChar(n, v)
+  local c = bit32.extract(v, n * 8, 8);
+  if (isDigit(c) or isLetter(c)) then
+    return string.char(c);
+  end
+  return nil;
+end
+local function optionString(option)
+  local s = "";
+  for i = 0,3 do
+    local c = nthChar(i, option);
+    if (c) then
+      s = s .. c;
+    else
+      return s;
+    end;
+  end
+  return s
+end
 local function serialize(table, filename)
     if type(table) == "table" then
         io.write("{\n")
@@ -25,6 +50,128 @@ local function serialize(table, filename)
         error("cannot serialize a " .. type(o))
       end
 end
-return {
-    serialize = serialize,
-}
+local function saveValues(menu, filename, state)
+  if (state[6]) then
+    print("TRACE: ", "saveValues dirty" );
+    state[6] = false;
+  end
+end
+local function initValues(menu, filename)
+  print("TRACE: ", "initValues" );
+end
+local debugText = {};
+local function initDebugTextBW()
+  debugText[7] = "Vers:";
+  debugText[4] = "GFLS:";
+  debugText[3] = "SwId:";
+  debugText[1] = "Rad:";
+  debugText[5] = "Shm:";
+  debugText[6] = "SSw:";
+  debugText[2] = "TrSw:";
+  debugText[8] = "VSto:";
+  debugText[9] = "FNam:";
+end
+local function initDebugTextColor()
+  debugText[7] = "Version:";
+  debugText[4] = "SwitchID LS:";
+  debugText[3] = "GetSwitchId:";
+  debugText[1] = "Radio:";
+  debugText[5] = "SharedMem:";
+  debugText[6] = "SetStickySw:";
+  debugText[2] = "TrimSwitch:";
+  debugText[8] = "ValueStorage:";
+  debugText[9] = "ModelFName:";
+end
+local function displayDebugBW(widget)
+  local y = widget[2];
+  local x1 = widget[1];
+  local x2 = x1 + widget[3] / 4;
+  local x3 = x1 + widget[3] / 2;
+  local x4 = x1 + 3 * widget[3] / 4;
+      lcd.drawText(x1, y, debugText[7] .. "2.01" .. " (dbg)", SMLSIZE);
+  y = y + widget[8];
+  lcd.drawText(x1, y, debugText[1] , SMLSIZE);
+  local ver, radio, maj, minor, rev, osname = getVersion();
+  if (osname) then
+      lcd.drawText(x2, y, "ETx " .. radio .. " " .. maj .. "." .. minor .. "." .. rev, SMLSIZE);
+  else
+      lcd.drawText(x2, y, "OTx " .. radio .. " " .. maj .. "." .. minor .. "." .. rev, SMLSIZE);
+  end
+  y = y + widget[8];
+  lcd.drawText(x1, y, debugText[8], SMLSIZE);
+      lcd.drawText(x2, y, "y", SMLSIZE);
+  y = y + widget[8];
+  lcd.drawText(x1, y, debugText[2], SMLSIZE);
+      local id = getFieldInfo("t5u");
+      if (id) then
+          lcd.drawText(x2, y, "y", SMLSIZE);
+      else
+          lcd.drawText(x2, y, "n", SMLSIZE);
+      end
+  y = y + widget[8];
+  lcd.drawText(x1, y, debugText[3], SMLSIZE);
+      if (getSwitchIndex) then -- getSwitchName(), getSwitchValue(), getPhysicalSwitches(), SWITCH_COUNT
+          lcd.drawText(x2, y, "y", SMLSIZE);
+      else
+          lcd.drawText(x2, y, "n", SMLSIZE);
+      end
+  y = y + widget[8];
+  lcd.drawText(x1, y, debugText[4], SMLSIZE);
+  local id = getFieldInfo("sl1");
+  if (id) then
+      lcd.drawText(x2, y, "y", SMLSIZE);
+  else
+      lcd.drawText(x2, y, "n", SMLSIZE);
+  end
+  y = widget[2];
+  y = y + widget[8];
+  y = y + widget[8];
+  lcd.drawText(x3, y, debugText[5], SMLSIZE);
+  if (getShmVar) and (setShmVar) then
+      lcd.drawText(x4, y, "y", SMLSIZE);
+  else
+      lcd.drawText(x4, y, "n", SMLSIZE);
+  end
+  y = y + widget[8];
+  lcd.drawText(x3, y, debugText[6], SMLSIZE);
+  if (setStickySwitch) then -- getLogicalSwitchValue()
+      lcd.drawText(x4, y, "y", SMLSIZE);
+  else
+      lcd.drawText(x4, y, "n", SMLSIZE);
+  end
+  y = y + widget[8];
+  lcd.drawText(x3, y, debugText[9], SMLSIZE);
+  if (model.getInfo().filename) then
+      lcd.drawText(x4, y, "y", SMLSIZE);
+  else
+      lcd.drawText(x4, y, "n", SMLSIZE);
+  end
+end
+local function displayDebugColor(widget)
+  displayDebugBW(widget);
+end
+if (LCD_W <= 128) then
+  initDebugTextBW();
+  return {
+    saveValues = saveValues,
+    initValues = initValues,
+    displayDebug = displayDebugBW,
+    optionString = optionString,
+  };
+elseif (LCD_W <= 212) then
+  initDebugTextBW();
+  return {
+    saveValues = saveValues,
+    initValues = initValues,
+    displayDebug = displayDebugBW,
+    optionString = optionString,
+  };
+else
+  initDebugTextColor();
+  return {
+    saveValues = saveValues,
+    initValues = initValues,
+    displayDebug = displayDebugColor,
+    optionString = optionString,
+  };
+end

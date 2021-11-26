@@ -13,12 +13,13 @@ local gstates1 = {"aus", "ein", "blink 1", "blink 2"};
 local gstates2 = {"stop", "ab", "auf", "Not aus"};
 local gstates3 = {"Pos 1", "Pos 2", "Pos 3", "Pos 4"};
 local menu = {
-  title = "Large";
+  title = "Model3",
+  saveValues = true,
   { -- template for digital multiswitch RC-MultiSwitch-D @ Address(1)
     title = "Deck 1",
     {"M1A", states = gstates1, state = 1, switch = "sa", fn = 1, module = 1},
     {"M1B", states = gstates1, state = 1, switch = "sb", fn = 2, module = 1},
-    {"M1C", states = gstates1, state = 1, switch = nil, fn = 3, module = 1},
+    {"M1C", states = gstates1, state = 1, switch = "input1", fn = 3, module = 1},
     {"M1D", states = gstates1, state = 1, switch = "se", virtual = { {fn = 7, module = 1} } },
     {"M1E", states = gstates1, state = 1, switch = nil, fn = 5, module = 1},
     {"M1F", states = gstates1, state = 1, switch = "ls1", fn = 6, module = 1, lsmode = 1},
@@ -47,8 +48,8 @@ local menu = {
 }
 local exportValues = {0, -50, 50, 100}; -- values for states
 local map = {
-  {module = 1, type = 1, description = "Das Modul mit dem roten Aufkleber", saveparams = true},
+  {module = 1, type = 1, description = "Das Modul mit dem roten Aufkleber"},
   {module = 2, type = 2, description = "Im Ruderhaus"},
-  {module = 8, type = 3, saveparams = true},
+  {module = 8, type = 3},
 };
 return menu, map, exportValues;

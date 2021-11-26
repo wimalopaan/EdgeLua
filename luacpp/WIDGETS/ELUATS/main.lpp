@@ -41,6 +41,12 @@ local function create(zone, options)
 
   collectgarbage();
 
+  if (getPhysicalSwitches) then
+    for i, sw in ipairs(getPhysicalSwitches()) do
+      TRACE("getPhysicalSwitches", i, sw[1], sw[2]);
+    end   
+  end
+
   return widget;
 end
 

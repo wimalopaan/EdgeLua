@@ -16,7 +16,10 @@ return {
     { mode = 1, trims = {5, 6} }, -- safeMode
   },
   navigation = {
-    next = "t5d",
+    --[[
+      see test widget
+    ]]
+    next = "t5d", -- maybe jsx, jsy on x12s with curve
     previous = "t5u",
     select = "t6u",
     scrollUpDn = "ls", -- direct navigating
@@ -24,9 +27,9 @@ return {
     pageSwitch = "6pos",
     -- pageSwitch = "ext1",
     fallbackIds = { -- switch IDs, if determining via above strings does not work
-      next = 69, -- "5d"
-      previous = 70, -- "5u"
-      select = 72, -- "6u"
+      next = 69, -- "t5d"
+      previous = 70, -- "t5u"
+      select = 72, -- "t6u"
     }
    },
   parameterDial = "s1",

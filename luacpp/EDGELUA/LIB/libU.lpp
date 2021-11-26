@@ -57,9 +57,14 @@ local function serialize(table, filename)
 end
 
 local function saveValues(menu, filename, state)
+  if (state[MENUSTATE_Dirty]) then
+    TRACE("saveValues dirty");
+    state[MENUSTATE_Dirty] = false;
+  end
 end
 
 local function initValues(menu, filename)
+  TRACE("initValues");
 end
 
 local debugText = {};
@@ -73,6 +78,7 @@ local function initDebugTextBW()
   debugText[DEBUG_TEXT_StickySwitch] = "SSw:";
   debugText[DEBUG_TEXT_TrimSwitchId] = "TrSw:";
   debugText[DEBUG_TEXT_ValueStorage] = "VSto:";
+  debugText[DEBUG_TEXT_Filename] = "FNam:";
 end
 
 local function initDebugTextColor() 
@@ -84,6 +90,7 @@ local function initDebugTextColor()
   debugText[DEBUG_TEXT_StickySwitch] = "SetStickySw:";
   debugText[DEBUG_TEXT_TrimSwitchId] = "TrimSwitch:";
   debugText[DEBUG_TEXT_ValueStorage] = "ValueStorage:";
+  debugText[DEBUG_TEXT_Filename] = "ModelFName:";
 end
 
 local function displayDebugBW(widget) 
@@ -127,7 +134,7 @@ local function displayDebugBW(widget)
   y = y + widget[W_FontHSmall]; 
   lcd.drawText(x1, y, debugText[DEBUG_TEXT_GetSwitchId], SMLSIZE);
   #ifdef USE_GETSWITCHID
-      if (getSwitchId) then
+      if (getSwitchIndex) then -- getSwitchName(), getSwitchValue(), getPhysicalSwitches(), SWITCH_COUNT
           lcd.drawText(x2, y, "y", SMLSIZE);
       else
           lcd.drawText(x2, y, "n", SMLSIZE);
@@ -151,7 +158,7 @@ local function displayDebugBW(widget)
 
   lcd.drawText(x3, y, debugText[DEBUG_TEXT_Shm], SMLSIZE);
   #ifdef USE_SHM
-  if (getShmVar) then
+  if (getShmVar) and (setShmVar) then
       lcd.drawText(x4, y, "y", SMLSIZE);
   else
       lcd.drawText(x4, y, "n", SMLSIZE);
@@ -162,7 +169,7 @@ local function displayDebugBW(widget)
   y = y + widget[W_FontHSmall]; 
   lcd.drawText(x3, y, debugText[DEBUG_TEXT_StickySwitch], SMLSIZE);
   #ifdef USE_LS_STICKY
-  if (setStickySwitch) then
+  if (setStickySwitch) then -- getLogicalSwitchValue()
       lcd.drawText(x4, y, "y", SMLSIZE);
   else
       lcd.drawText(x4, y, "n", SMLSIZE);
@@ -170,7 +177,19 @@ local function displayDebugBW(widget)
   #else
       lcd.drawText(x4, y, "-", SMLSIZE);
   #endif 
-  
+
+  y = y + widget[W_FontHSmall]; 
+  lcd.drawText(x3, y, debugText[DEBUG_TEXT_Filename], SMLSIZE);
+  #ifdef USE_MODEL_FILENAME
+  if (model.getInfo().filename) then 
+      lcd.drawText(x4, y, "y", SMLSIZE);
+  else
+      lcd.drawText(x4, y, "n", SMLSIZE);
+  end
+  #else
+      lcd.drawText(x4, y, "-", SMLSIZE);
+  #endif 
+
 end
 
 local function displayDebugColor(widget) 

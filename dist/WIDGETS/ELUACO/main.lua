@@ -14,7 +14,7 @@
        
        
        
-errorCode = 0;
+local errorCode = 0;
 __WmSw2Config = nil;
 __stopWmSw2 = 0;
 __WmSw2ForeignInput = 0;
@@ -51,11 +51,22 @@ local function loadLibA()
     end
   end
 end
+local function loadLibU()
+  local basedir = "/EDGELUA" .. "/LIB/";
+  if not __libU then
+      print("TRACE: ", "LOAD_U", basedir );
+    __libU = loadScript(basedir .. "libU.lua")();
+    if not __libU then
+      errorCode = 3.2;
+    end
+  end
+end
 local name = "EL_Con";
 local options = {};
 local menuState = {1, 1, 1, 0, 0}; -- row, col, page
 local buttonState = {0, 0, 0, 0, 0, 0};
 local menu = {};
+local valuesFileName = nil;
 local headers = {};
 local queue = nil;
 local fsmState = {};
@@ -67,6 +78,7 @@ local help = {};
 local lastRun = 0;
 local function create(zone, options)
   load();
+  loadLibU();
   collectgarbage();
   if (errorCode > 0) then
     return {};
@@ -94,7 +106,12 @@ local function create(zone, options)
   end
   encoder, paramScaler, paramEncoder = __libP.getEncoder(__WmSw2Config);
   configFSM = __libP.getConfigFSM(__WmSw2Config);
-  headers, menu, help = __libI.initParamMenu(__WmSw2Config, menu, map, modInfos, filename)
+  headers, menu, help, valuesFileName = __libI.initParamMenu(__WmSw2Config, menu, map, modInfos, filename)
+print("TRACE: ", "valuesFilename:", valuesFileName )
+   if (valuesFileName) then
+    print("TRACE: ", "valuesFilename:", valuesFileName )
+    __libU.initValues(menu, valuesFileName);
+  end
   __libI.initConfigFSM(fsmState);
   __libI = nil; -- free memory
   queue = __libP.Class.Queue.new();
@@ -121,6 +138,9 @@ local function refresh(widget, event, touch)
     __libD.processButtons(__WmSw2Config, menu, menuState, buttonState, queue, __libD.selectParamItem);
     local pvalue = __libD.displayParamMenu(__WmSw2Config, widget, menu, headers, menuState, paramScaler, event, help);
     configFSM(__WmSw2Config, menu, headers, menuState, queue, fsmState, encoder, paramEncoder, pvalue);
+    if (valuesFileName) then
+      __libU.saveValues(menu, valuesFileName, menuState);
+    end
   else
     lcd.drawText(widget[1], widget[2], "Error: " .. errorCode, DBLSIZE);
   end

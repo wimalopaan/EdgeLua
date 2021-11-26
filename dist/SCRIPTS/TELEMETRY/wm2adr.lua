@@ -14,7 +14,7 @@
        
        
        
-errorCode = 0;
+local errorCode = 0;
 __WmSw2Config = nil;
 __stopWmSw2 = 0;
 __WmSw2ForeignInput = 0;
@@ -48,6 +48,16 @@ local function loadLibA()
     __libA = loadScript(basedir .. "libA.lua")();
     if not __libA then
       errorCode = 3.1;
+    end
+  end
+end
+local function loadLibU()
+  local basedir = "/EDGELUA" .. "/LIB/";
+  if not __libU then
+      print("TRACE: ", "LOAD_U", basedir );
+    __libU = loadScript(basedir .. "libU.lua")();
+    if not __libU then
+      errorCode = 3.2;
     end
   end
 end

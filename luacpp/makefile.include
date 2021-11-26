@@ -17,6 +17,8 @@ all: subdirs  $(targets)
 %.lua: %.lpp
 	cpp $(CPPFLAGS) -E -P $< > $@
 
+%.bmp: %.png
+	convert $< $@
 
 %.lpp.extract: %.lpp
 	$(EXTRACTOR) $(EXLN) -l none -a A2 -a N -o $@ -d $(EXTRACTDIR) $<

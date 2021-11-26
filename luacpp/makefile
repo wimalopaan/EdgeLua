@@ -5,6 +5,7 @@ dist: all filelist.txt copy clean
 
 filelist.txt:
 	find . -name "*.lua" > $@
+	find . -name "*.png" >> $@
 
 copy: filelist.txt
 	tar cf - -T filelist.txt | (cd ../dist; tar xvf -)

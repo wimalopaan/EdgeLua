@@ -24,6 +24,8 @@ local function initWidgetBW()
   widget[W_Width] = LCD_W;
   widget[W_Height] = LCD_H;
   widget[W_FontHeight] = 8;
+  widget[W_FontHSmall] = 8;
+  widget[W_FontHLarge] = 8;
   widget[W_YOffset] = 8;
   widget[W_YPOffset] = 16;
   return widget;
@@ -283,28 +285,37 @@ local function initConfigBW(config)
           end
           local fm = model.getFlightMode(config.safeMode.flightMode);
           if (fm) then
+            local ls = nil;
+            #ifdef USE_GETSWITCHID
+              if (getSwitchIndex) then
+                ls = {};
+                ls.id = getSwitchIndex("ls" ..(fmLsNumber + 1));
+                TRACE("safemode getSwitchIndex", ls);
+              end 
+            #endif
             #ifdef USE_TRIM_NAMES
-              local ls = getFieldInfo("sl" .. (fmLsNumber + 1)); -- patch: ls switch id from name          
-              if (ls) then
-                if (config.safeMode.name) then
-                  fm.name = config.safeMode.name;
-                else
-                  fm.name = "SafeMode";
-                end
-                TRACE("safeMode ls.id", ls.id);
-                fm.switch = -ls.id; -- inverted
-                model.setFlightMode(config.safeMode.flightMode, fm);
-              end
-            #else
+              ls = getFieldInfo("sl" .. (fmLsNumber + 1)); -- patch: ls switch id from name          
+              TRACE("safemode getFieldInfo", ls);
+            #endif
+            if (ls) then
+              TRACE("safeMode ls.id", ls.id);
               if (config.safeMode.name) then
                 fm.name = config.safeMode.name;
               else
                 fm.name = "SafeMode";
               end
-              TRACE("safeMode !LS63";
+              fm.switch = -ls.id; -- inverted
+              model.setFlightMode(config.safeMode.flightMode, fm);
+            else
+              TRACE("safeMode !LS63");
+              if (config.safeMode.name) then
+                fm.name = config.safeMode.name;
+              else
+                fm.name = "SafeMode";
+              end
               fm.switch = -136; -- inverted LS63
               model.setFlightMode(config.safeMode.flightMode, fm);
-              #endif
+            end
           end 
           cfg[CFG_SafeMode_FlightMode] = config.safeMode.flightMode;
           cfg[CFG_SafeMode_Timeout] = config.safeMode.timeOut * 100;
@@ -497,8 +508,25 @@ local function initParamMenu(cfg, menu, map, modInfos, mode)
   local headers = {};
   local help = {};
 
---  local modulesToSave = {};
+  local valuesFileName = nil;
 
+  if (menu.saveValues) then
+    if (model.getInfo().filename) then
+      local fullname = model.getInfo().filename;
+      local basename = string.sub(fullname, 1, #fullname - 4);
+      valuesFileName = BASE_DIR .. "/DATA/" .. basename .. ".lua"; 
+    else   
+      if (#model.getInfo().name > 0) then
+        valuesFileName = BASE_DIR .. "/DATA/" .. model.getInfo().name .. ".lua";
+      else
+        if (menu.title) then
+          valuesFileName = BASE_DIR .. "/DATA/" .. menu.title .. ".lua";        
+        end
+      end 
+    end
+    TRACE("initParamMenu: saveValues:", valuesFileName);
+  end
+  
   local miTable = moduleItems(menu);
 
   for _, imodule in ipairs(getModules(map)) do
@@ -506,12 +534,6 @@ local function initParamMenu(cfg, menu, map, modInfos, mode)
     if (#items > 0) then
       local modInfo = findModuleInfo(imodule, map, modInfos); -- full module info table 
       if (modInfo) then
-        --[[
-        if (modInfo.save) then
-          TRACE("initParamMenu save module", imodule);
-          modulesToSave[imodule] = true;
-        end
-        --]]
         local header = {nil, nil, nil}; -- header[1] = title, header[2] =  moduleNumber
         header[PHEADER_Title] = modInfo.description;
         header[PHEADER_Module] = imodule;
@@ -583,9 +605,7 @@ local function initParamMenu(cfg, menu, map, modInfos, mode)
               for itemLineNumber = 1, #modInfo.functionParams do
                 local line = {nil, nil, nil}; -- {citem, {v0, v1, v2, ...}, itemLine}
                 local values = {};
---                if (modulesToSave[imodule]) then
-                  TRACE("initParamMenu: load Values", imodule, itemNumber, #modInfo.functionParams[itemLineNumber]);
---                end
+                
                 for valueNumber = 1, #modInfo.functionParams[itemLineNumber] do
                   values[valueNumber] = 0;
                 end
@@ -608,8 +628,8 @@ local function initParamMenu(cfg, menu, map, modInfos, mode)
       end
     end
   end
---  return headers, cmenu, help, modulesToSave;
-  return headers, cmenu, help;
+  TRACE("initParamMenu: saveValues:", valuesFileName);
+  return headers, cmenu, help, valuesFileName;
 end
 
 local function initParamMenuBW(cfg, menu, map, modInfos)
@@ -620,8 +640,7 @@ local function initParamMenuColor(cfg, menu, map, modInfos, filename)
   if not(menu) or not(map) or not(modInfos) then
     return;
   end
---  local headers, cmenu, help, modulesToSave = initParamMenu(cfg, menu, map, modInfos, true);
-  local headers, cmenu, help = initParamMenu(cfg, menu, map, modInfos, true);
+  local headers, cmenu, help, valuesFileName = initParamMenu(cfg, menu, map, modInfos, true);
 
   if (cfg[CFG_Footer]) then
     cmenu.footer = cfg[CFG_Footer];
@@ -629,8 +648,7 @@ local function initParamMenuColor(cfg, menu, map, modInfos, filename)
       cmenu.footer = cmenu.footer .. " File:" .. filename;
     end
   end
---  return headers, cmenu, help, modulesToSave;
-  return headers, cmenu, help;
+  return headers, cmenu, help, valuesFileName;
 end
 
 local function initMenuBW(menu)

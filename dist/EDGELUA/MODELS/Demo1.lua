@@ -13,6 +13,8 @@ local gstates1 = {"aus", "ein", "blink 1", "blink 2"};
 local gstates2 = {"stop", "ab", "auf", "Not aus"};
 local gstates3 = {"Pos 1", "Pos 2", "Pos 3", "Pos 4"};
 local menu = {
+  title = "Demo1",
+  saveValues = true,
   { -- template for digital multiswitch RC-MultiSwitch-D @ Address(1)
     title = "Deck 1",
     {"M1A", states = gstates1, state = 1, switch = "sa", fn = 1, module = 1},

@@ -176,3 +176,4 @@
 #define DEBUG_TEXT_StickySwitch 6
 #define DEBUG_TEXT_Version 7
 #define DEBUG_TEXT_ValueStorage 8
+#define DEBUG_TEXT_Filename 9

@@ -91,7 +91,6 @@ local function displayParamMenuBW(config, widget, pmenu, pheaders, state, paramS
     lcd.drawText(x, y, pvalue .. "[" .. percent .. "%]", SMLSIZE + INVERS);
     local line = page[state[4]];
     line[2][state[5]] = pvalue;
-    state[6] = true;
   else
     lcd.drawText(x, y, pvalue .. "[" .. percent .. "%]", SMLSIZE);
   end
@@ -161,7 +160,6 @@ local function displayParamMenuColorNoTheme(config, widget, pmenu, pheaders, sta
     lcd.drawText(x, y, pvalue .. "[" .. percent .. "%]", SMLSIZE + INVERS);
     local line = page[state[4]];
     line[2][state[5]] = pvalue;
-    state[6] = true;
   else
     lcd.drawText(x, y, pvalue .. "[" .. percent .. "%]", SMLSIZE);
   end
@@ -237,7 +235,6 @@ local function displayParamMenuColor(config, widget, pmenu, pheaders, state, par
     lcd.drawText(x, y, pvalue .. "[" .. percent .. "%]", SMLSIZE + COLOR_THEME_WARNING);
     local line = page[state[4]];
     line[2][state[5]] = pvalue;
-    state[6] = true;
   else
     lcd.drawText(x, y, pvalue .. "[" .. percent .. "%]", SMLSIZE + COLOR_THEME_PRIMARY3);
   end
@@ -519,6 +516,7 @@ local function selectParamItem(menu, menuState, queue)
   local pitem = page[menuState[1]];
   local item = pitem;
   queue:push(item);
+    menuState[6] = true;
 end
 local function selectItem(menu, menuState, queue)
   makeSelection(menuState);

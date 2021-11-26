@@ -13,14 +13,16 @@ local gstates1 = {"aus", "ein", "blk1", "blk2"};
 local gstates2 = {"aus", "e1", "e2"};
 local gstates3 = {"Pos1", "Pos2", "Pos3", "Pos4", "Pos5"};
 local menu = {
-   { -- template for digital multiswitch RC-MultiSwitch-D @ Address(1)
+    title = "Model1",
+    saveValues = true,
+    { -- template for digital multiswitch RC-MultiSwitch-D @ Address(1)
         title = "Deck 1",
         {"M1A", states = gstates1, state = 1, switch = "sa", fn = 1, module = 1},
         {"M1B", states = gstates1, state = 1, switch = "sb", fn = 2, module = 1},
         {"M1C", states = gstates1, state = 1, switch = nil, fn = 3, module = 1},
         {"M1D", states = gstates1, state = 1, switch = "se", virtual = { {fn = 7, module = 1} } },
-        {"M1E", states = gstates1, state = 1, switch = nil, fn = 5, module = 1},
-        {"M1F", states = gstates1, state = 1, switch = nil, fn = 6, module = 1},
+        {"M1E", states = gstates1, state = 1, switch = "input1", fn = 5, module = 1},
+        {"M1F", states = gstates1, state = 1, switch = "input2", fn = 6, module = 1},
         {"M1G", states = gstates1, state = 1, switch = nil, fn = 7, module = 1},
         {"M1H", states = gstates1, state = 1, switch = nil, fn = 8, module = 1},
     },

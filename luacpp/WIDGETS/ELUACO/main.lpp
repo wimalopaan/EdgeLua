@@ -17,6 +17,7 @@ local options = {};
 local menuState = {1, 1, 1, 0, 0}; -- row, col, page
 local buttonState = {0, 0, 0, 0, 0, 0};
 local menu = {};
+local valuesFileName = nil;
 local headers = {};
 local queue = nil;
 local fsmState = {};
@@ -30,6 +31,7 @@ local lastRun = 0;
 
 local function create(zone, options)
   load();
+  loadLibU();
   collectgarbage();
   
   if (errorCode > 0) then 
@@ -64,7 +66,15 @@ local function create(zone, options)
   encoder, paramScaler, paramEncoder = __libP.getEncoder(__WmSw2Config);
   configFSM = __libP.getConfigFSM(__WmSw2Config);
 
-  headers, menu, help = __libI.initParamMenu(__WmSw2Config, menu, map, modInfos, filename)
+  headers, menu, help, valuesFileName = __libI.initParamMenu(__WmSw2Config, menu, map, modInfos, filename)
+
+#ifdef USE_VALUE_STORAGE
+TRACE("valuesFilename:", valuesFileName)
+   if (valuesFileName) then
+    TRACE("valuesFilename:", valuesFileName)
+    __libU.initValues(menu, valuesFileName);
+  end
+#endif
 
   __libI.initConfigFSM(fsmState);
 
@@ -99,6 +109,11 @@ local function refresh(widget, event, touch)
     __libD.processButtons(__WmSw2Config, menu, menuState, buttonState, queue, __libD.selectParamItem);
     local pvalue = __libD.displayParamMenu(__WmSw2Config, widget, menu, headers, menuState, paramScaler, event, help);
     configFSM(__WmSw2Config, menu, headers, menuState, queue, fsmState, encoder, paramEncoder, pvalue);
+    #ifdef USE_VALUE_STORAGE
+    if (valuesFileName) then
+      __libU.saveValues(menu, valuesFileName, menuState);      
+    end
+    #endif
   else
     lcd.drawText(widget[W_X], widget[W_Y], "Error: " .. errorCode, DBLSIZE);
   end
