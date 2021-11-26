@@ -587,6 +587,9 @@ end
 local function menuDeselect(menuState)
   menuState[MENUSTATE_SelRow] = 0;
   menuState[MENUSTATE_SelCol] = 0;
+  #ifdef USE_VALUE_STORAGE
+    menuState[MENUSTATE_Dirty] = true;
+  #endif
 end
 
 local function makeSelection(menuState)

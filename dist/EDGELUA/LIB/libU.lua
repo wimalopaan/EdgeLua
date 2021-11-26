@@ -50,14 +50,58 @@ local function serialize(table, filename)
         error("cannot serialize a " .. type(o))
       end
 end
+local function appendToFile(file, values)
+  print("TRACE: ", "appendToFile", file );
+  io.write(file, "\t{");
+  for i, v in ipairs(values) do
+    io.write(file, v .. ",");
+  end
+  io.write(file, "},\n");
+end
 local function saveValues(menu, filename, state)
   if (state[6]) then
     print("TRACE: ", "saveValues dirty" );
     state[6] = false;
+    local file = io.open(filename, "w");
+    if (file) then
+      io.write(file, "return {\n");
+      for ip, page in ipairs(menu) do
+        for il, pline in ipairs(page) do
+          local pitem = pline[1];
+          print("TRACE: ", "saveValues", pitem[1] );
+          appendToFile(file, pline[2]);
+        end
+      end
+      io.write(file, "};\n");
+      io.close(file);
+    else
+      print("TRACE: ", "saveValue open failed:", filename );
+    end
   end
 end
 local function initValues(menu, filename)
-  print("TRACE: ", "initValues" );
+  print("TRACE: ", "initValues", filename );
+  local data = loadfile(filename);
+  print("TRACE: ", "initValues", data );
+  if (data) then
+    local table = data();
+    if (table) then
+      print("TRACE: ", "initValues", #table );
+      local lineNumber = 1;
+      for ip, page in ipairs(menu) do
+        for il, pline in ipairs(page) do
+          local pitem = pline[1];
+          if (#table[lineNumber] == #pline[2]) then
+            print("TRACE: ", "initValues assign", pitem[1] );
+            pline[2] = table[lineNumber];
+          else
+            print("TRACE: ", "initValues no match", pitem[1] );
+          end
+          lineNumber = lineNumber + 1;
+        end
+      end
+    end
+  end
 end
 local debugText = {};
 local function initDebugTextBW()

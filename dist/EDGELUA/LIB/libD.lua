@@ -505,6 +505,7 @@ end
 local function menuDeselect(menuState)
   menuState[4] = 0;
   menuState[5] = 0;
+    menuState[6] = true;
 end
 local function makeSelection(menuState)
   menuState[4] = menuState[1]; -- selection

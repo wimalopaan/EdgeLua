@@ -56,15 +56,61 @@ local function serialize(table, filename)
       end
 end
 
+local function appendToFile(file, values) 
+  TRACE("appendToFile", file);
+  io.write(file, "\t{");
+  for i, v in ipairs(values) do
+    io.write(file, v .. ",");
+  end
+  io.write(file, "},\n");
+end
+
 local function saveValues(menu, filename, state)
   if (state[MENUSTATE_Dirty]) then
     TRACE("saveValues dirty");
     state[MENUSTATE_Dirty] = false;
+  
+    local file = io.open(filename, "w");
+    if (file) then
+      io.write(file, "return {\n");
+      for ip, page in ipairs(menu) do
+        for il, pline in ipairs(page) do
+          local pitem = pline[PLINE_Item];
+          TRACE("saveValues", pitem[PITEM_Name]);
+          appendToFile(file, pline[PLINE_Values]);
+        end
+      end
+      io.write(file, "};\n");
+      io.close(file);
+    else
+      TRACE("saveValue open failed:", filename);
+    end
   end
 end
 
 local function initValues(menu, filename)
-  TRACE("initValues");
+  TRACE("initValues", filename);
+  local data = loadfile(filename);
+  TRACE("initValues", data);
+  if (data) then
+    local table = data();
+    if (table) then
+      TRACE("initValues", #table);
+      local lineNumber = 1;
+      for ip, page in ipairs(menu) do
+        for il, pline in ipairs(page) do
+          local pitem = pline[PLINE_Item];
+          if (#table[lineNumber] == #pline[PLINE_Values]) then
+            TRACE("initValues assign", pitem[PITEM_Name]);
+            pline[PLINE_Values] = table[lineNumber];
+          else
+            TRACE("initValues no match", pitem[PITEM_Name]);
+          end
+          lineNumber = lineNumber + 1;
+        end
+      end        
+    end
+  end
 end
 
 local debugText = {};
