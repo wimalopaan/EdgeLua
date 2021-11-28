@@ -87,6 +87,20 @@ end
 local function insertLogicalSwitchFor(id)
   TRACE("insertLogicalSwitchFor", id);
 
+  #ifdef USE_GETSWITCHID
+  if (getSwitchIndex) then
+    if (type(id) == "string") then
+      local swid = getSwitchIndex(id);
+      if (swid) then
+        TRACE("insertLogicalSwitchFor getSwitchIndex", id, swid);
+        id = swid;
+      else
+        return -1;
+      end
+    end
+  end
+  #endif
+
   #ifdef USE_TRIM_NAMES
   if (type(id) == "string") then
     local swinfo = getFieldInfo(id);
@@ -274,7 +288,7 @@ local function initConfigBW(config)
             for line = 0, lines do
               local m = model.getMix(ch, line);
               if (m) then
-                if not(string.find(m.name, "sw")) then
+                if not(string.find(m.name, config.safeMode.excludeMixesBeginnWith)) then
                   local mask = bit32.lshift(1, config.safeMode.flightMode);
                   m.flightModes = bit32.bor(m.flightModes, mask);
                   model.deleteMix(ch, line);
@@ -294,8 +308,10 @@ local function initConfigBW(config)
               end 
             #endif
             #ifdef USE_TRIM_NAMES
-              ls = getFieldInfo("sl" .. (fmLsNumber + 1)); -- patch: ls switch id from name          
-              TRACE("safemode getFieldInfo", ls);
+              if not(ls) then
+                ls = getFieldInfo("sl" .. (fmLsNumber + 1)); -- patch: ls switch id from name          
+                TRACE("safemode getFieldInfo", ls);
+              end
             #endif
             if (ls) then
               TRACE("safeMode ls.id", ls.id);

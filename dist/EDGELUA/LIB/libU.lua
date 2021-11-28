@@ -132,7 +132,7 @@ local function displayDebugBW(widget)
   local x2 = x1 + widget[3] / 4;
   local x3 = x1 + widget[3] / 2;
   local x4 = x1 + 3 * widget[3] / 4;
-      lcd.drawText(x1, y, debugText[7] .. "2.02" .. " (dbg)", SMLSIZE);
+      lcd.drawText(x1, y, debugText[7] .. "2.03" .. " (dbg)", SMLSIZE);
   y = y + widget[8];
   lcd.drawText(x1, y, debugText[1] , SMLSIZE);
   local ver, radio, maj, minor, rev, osname = getVersion();

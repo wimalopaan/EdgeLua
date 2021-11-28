@@ -79,6 +79,17 @@ local function getFirstFreeLogicalSwitch()
 end
 local function insertLogicalSwitchFor(id)
   print("TRACE: ", "insertLogicalSwitchFor", id );
+  if (getSwitchIndex) then
+    if (type(id) == "string") then
+      local swid = getSwitchIndex(id);
+      if (swid) then
+        print("TRACE: ", "insertLogicalSwitchFor getSwitchIndex", id, swid );
+        id = swid;
+      else
+        return -1;
+      end
+    end
+  end
   if (type(id) == "string") then
     local swinfo = getFieldInfo(id);
     if (swinfo) then
@@ -248,7 +259,7 @@ local function initConfigBW(config)
             for line = 0, lines do
               local m = model.getMix(ch, line);
               if (m) then
-                if not(string.find(m.name, "sw")) then
+                if not(string.find(m.name, config.safeMode.excludeMixesBeginnWith)) then
                   local mask = bit32.lshift(1, config.safeMode.flightMode);
                   m.flightModes = bit32.bor(m.flightModes, mask);
                   model.deleteMix(ch, line);
@@ -265,8 +276,10 @@ local function initConfigBW(config)
                 ls.id = getSwitchIndex("ls" ..(fmLsNumber + 1));
                 print("TRACE: ", "safemode getSwitchIndex", ls );
               end
-              ls = getFieldInfo("sl" .. (fmLsNumber + 1)); -- patch: ls switch id from name
-              print("TRACE: ", "safemode getFieldInfo", ls );
+              if not(ls) then
+                ls = getFieldInfo("sl" .. (fmLsNumber + 1)); -- patch: ls switch id from name
+                print("TRACE: ", "safemode getFieldInfo", ls );
+              end
             if (ls) then
               print("TRACE: ", "safeMode ls.id", ls.id );
               if (config.safeMode.name) then
@@ -365,7 +378,7 @@ local function initConfigColor(config)
       cfg[8] = info.id;
     end
   end
-  local footer = "Vers: " .. "2.02";
+  local footer = "Vers: " .. "2.03";
   if (cfg[9] == 0) then
     footer = footer .. " Mod: xjt";
   elseif (cfg[9] == 1) then
