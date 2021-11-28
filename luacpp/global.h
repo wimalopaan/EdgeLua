@@ -9,6 +9,7 @@
 // can query "t5u", ..., "sl1".."sl62" as switch-source
 #define USE_TRIM_NAMES // only for color/edgetx (own patch)
 #define USE_GETSWITCHID // (PR 1154) getSwitchIndex, ... 
+#define USE_CHAR_CONSTANTS // (PR 1169)
 #define USE_SHM // only for color/edgetx (PR 1018)
 #define USE_LS_STICKY // (PR 1056)
 #define USE_MODEL_FILENAME // (PR 1132)

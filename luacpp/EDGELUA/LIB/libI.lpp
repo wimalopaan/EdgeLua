@@ -783,13 +783,6 @@ local function initMenuColor(cfg, menu, filename)
     if (filename) then
       menudata[MENUDATA_Footer] = menudata[MENUDATA_Footer] .. " File:" .. filename;
     end
-#ifdef DEBUG
-#ifdef USE_SHM
-    if (setShmVar) then
-      menudata[MENUDATA_Footer] = menudata[MENUDATA_Footer] .. " : shm";
-    end
-#endif
-#endif
   end
   return cmenu, shortCuts, overlays, pagetitles, menudata;
 end

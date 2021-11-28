@@ -41,8 +41,17 @@ local function create(zone, options)
 
   collectgarbage();
 
+  if (CHAR_TRIM) then
+    local t5u = getSwitchIndex(CHAR_TRIM .. "5u");
+    TRACE("5u", t5u);
+  else
+    TRACE("5u", "no char constants");      
+  end
+
   if (getPhysicalSwitches) then
-    for i, sw in ipairs(getPhysicalSwitches()) do
+    local sws = getPhysicalSwitches();
+    TRACE("getPhysicalSwitches N", #sws);
+    for i, sw in ipairs(sws) do
       TRACE("getPhysicalSwitches", i, sw[1], sw[2]);
     end   
   end
@@ -63,6 +72,8 @@ local function refresh(widget, event, touch)
   __libD.updateWidgetDimensions(widget, event);
   if (errorCode == 0) then
     __libU.displayDebug(widget);
+
+
   else
     lcd.drawText(widget[W_X], widget[W_Y], "Error: " .. errorCode, DBLSIZE);
   end
