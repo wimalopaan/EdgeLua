@@ -87,16 +87,18 @@ end
 local function insertLogicalSwitchFor(id)
   TRACE("insertLogicalSwitchFor", id);
 
-  #ifdef USE_GETSWITCHID
-  if (getSwitchIndex) then
-    if (type(id) == "string") then
-      local swid = getSwitchIndex(id);
+  #if defined(USE_GETSWITCHID) && defined(USE_CHAR_CONSTANTS)
+  if (type(id) == "string") then
+    if (getSwitchIndex) then
+      local swid = getSwitchIndex(CHAR_TRIM .. id);
       if (swid) then
         TRACE("insertLogicalSwitchFor getSwitchIndex", id, swid);
         id = swid;
       else
         return -1;
       end
+    else
+      return -1;
     end
   end
   #endif
@@ -211,9 +213,85 @@ local function loadConfig()
   return nil;
 end
 
-local function initConfigBW(config)
+#ifdef USE_BACKEND_BUS
+local function initBackendBus(config)
+  TRACE("initBackendBus");
+  local data = {};
+  if (config.backends.bus.stateTimeout) then
+    data[BEND_BUS_StateTimeout] = config.backends.bus.stateTimeout;
+  else
+    data[BEND_BUS_StateTimeout] = BEND_BUS_DEFAULT_StateTimeout;
+  end
+  if (config.backends.bus.mixerGlobalVariable >= 1) then
+    data[BEND_BUS_MixerGlobalVariable] = config.backends.bus.mixerGlobalVariable;
+  else
+    data[BEND_BUS_MixerGlobalVariable] = BEND_BUS_DEFAULT_MixerGlobalVariable;
+  end
+  return data;
+end
+#endif
+
+#ifdef USE_BACKEND_SPORT
+local function initBackendSPort(config)
+  local data = {};
+  return data;
+end
+#endif
+
+#ifdef USE_BACKEND_TIPTIP
+local function initBackendTipTip(config)
+  TRACE("initBackendTipTip");
+  local data = {};
+  if (config.backends.tiptip.shortTimeout) then
+    data[BEND_TIPTIP_ShortTimeout] = config.backends.tiptip.shortTimeout;
+  else
+    data[BEND_TIPTIP_ShortTimeout] = BEND_TIPTIP_DEFAULT_ShortTimeout;
+  end
+  if (config.backends.tiptip.longTimeout) then
+    data[BEND_TIPTIP_LongTimeout] = config.backends.tiptip.longTimeout;
+  else
+    data[BEND_TIPTIP_LongTimeout] = BEND_TIPTIP_DEFAULT_LongTimeout;
+  end
+  if (config.backends.tiptip.mixerGlobalVariable) then
+    data[BEND_TIPTIP_MixerGlobalVariable] = config.backends.tiptip.mixerGlobalVariable;
+  else
+    data[BEND_TIPTIP_MixerGlobalVariable] = BEND_TIPTIP_DEFAULT_MixerGlobalVariable;
+  end
+  if (config.backends.tiptip.values) then
+    TRACE("initBackendTipTip values:", config.backends.tiptip.values, #config.backends.tiptip.values);
+    data[BEND_TIPTIP_Values] = config.backends.tiptip.values;
+  else
+    data[BEND_TIPTIP_Values] = {0, 100, -100};
+  end
+  return data;
+end
+#endif
+
+#ifdef USE_BACKEND_SOLEXPERT
+local function initBackendSolExpert(config)
+  local data = {};
+  return data;
+end
+#endif
+
+local function initConfigBW(config, modifyModel)
   TRACE("initConfigBW");
   local cfg = {};
+  cfg[CFG_Backend_Data] = {};
+
+  #ifdef USE_BACKEND_BUS
+  cfg[CFG_Backend_Data][CFG_BEND_Bus] = initBackendBus(config);
+  #endif
+  #ifdef USE_BACKEND_SPORT
+  cfg[CFG_Backend_Data][CFG_BEND_SPort] = initBackendSPort(config);
+  #endif
+  #ifdef USE_BACKEND_TIPTIP
+  cfg[CFG_Backend_Data][CFG_BEND_TipTip] = initBackendTipTip(config);
+  #endif
+  #ifdef USE_BACKEND_SOLEXPERT
+  cfg[CFG_Backend_Data][CFG_BEND_SolExpert] = initBackendSolExpert(config);
+  #endif
+
   if (config.title) then
     cfg[CFG_Title] = config.title;
   else
@@ -224,12 +302,7 @@ local function initConfigBW(config)
   else
     cfg[CFG_FirstColWidth] = 40;
   end
-  if (config.stateTimeout) then
-    cfg[CFG_StateTimeout] = config.stateTimeout;
-  else
-    cfg[CFG_StateTimeout] = 20;
-  end
-
+  
   if (config.parameterDial) then
     local info = getFieldInfo(config.parameterDial);
     if (info) then
@@ -247,7 +320,6 @@ local function initConfigBW(config)
     local type = module.Type;
     local proto = module.protocol;
     local subproto = module.subProtocol;
-    --print("gc m: ", type, proto, subproto);
     if (type == 2) then -- xjt
       cfg[CFG_Encoding] = 0; -- xjt
     elseif (type == 6) then -- mpm
@@ -263,13 +335,7 @@ local function initConfigBW(config)
     cfg[CFG_Encoding] = 2; --sbus
   end
 
-  if (config.mixerGlobalVariable >= 1) then
-    cfg[CFG_MixerGlobalVariable] = config.mixerGlobalVariable - 1;
-  else
-    cfg[CFG_MixerGlobalVariable] = 5; -- GV6
-  end
-
-  if (config.backend >= 1) and (config.backend <= 3) then
+  if (config.backend >= 1) and (config.backend <= 4) then
     cfg[CFG_Backend] = config.backend;
   else  
     cfg[CFG_Backend] = 1;
@@ -277,7 +343,7 @@ local function initConfigBW(config)
 
 --  model.deleteMixes();
 
-  if (config.safeMode) then
+  if (modifyModel) and (config.safeMode) then
     if (config.safeMode.flightMode > 0) then
       if (config.safeMode.timeOut > 0) and (config.safeMode.linkDropoutMax > 0) then
         local fmLsNumber = insertSettableSwitch(1);
@@ -303,8 +369,8 @@ local function initConfigBW(config)
             #ifdef USE_GETSWITCHID
               if (getSwitchIndex) then
                 ls = {};
-                ls.id = getSwitchIndex("ls" ..(fmLsNumber + 1));
-                TRACE("safemode getSwitchIndex", ls);
+                ls.id = getSwitchIndex("L" .. (fmLsNumber + 1));
+                TRACE("safemode getSwitchIndex", ls, ls.id);
               end 
             #endif
             #ifdef USE_TRIM_NAMES
@@ -345,9 +411,9 @@ local function initConfigBW(config)
   return cfg;
 end
 
-local function initConfigColor(config)
+local function initConfigColor(config, modifyModel)
   TRACE("initConfigColor");
-  local cfg = initConfigBW(config);
+  local cfg = initConfigBW(config, modifyModel);
 
   TRACE("initConfigColor2");
   if (config.navigation) then
@@ -371,44 +437,62 @@ local function initConfigColor(config)
         cfg[CFG_PageSwitchId] = info.id;
       end
     end
-    
-    if (config.navigation.previous) then
-      TRACE("config.navigation.previous");
-      local lsfId = insertLogicalSwitchFor(config.navigation.previous);
-      if (lsfId >= 0) then
-        cfg[CFG_PreviousLsId] = lsfId;
-      else
-        TRACE("config.navigation.fallbackId.previous");
-        lsfId = insertLogicalSwitchFor(config.navigation.fallbackIds.previous)
+
+    if (modifyModel) then
+      if (config.navigation.previous) then
+        local lsfId = insertLogicalSwitchFor(config.navigation.previous);
+        TRACE("config.navigation.previous", lsfId);
         if (lsfId >= 0) then
           cfg[CFG_PreviousLsId] = lsfId;
-        end         
+        else
+          #ifdef USE_FALLBACK_IDS
+          lsfId = insertLogicalSwitchFor(config.navigation.fallbackIds.previous)
+          if (lsfId >= 0) then
+            cfg[CFG_PreviousLsId] = lsfId;
+          end   
+          TRACE("config.navigation.fallbackId.previous", lsfId);
+          #else
+          TRACE("No config.navigation.previous");      
+          #endif
+        end
       end
-    end
-
-    if (config.navigation.next) then
-      local lsfId = insertLogicalSwitchFor(config.navigation.next);
-      if (lsfId >= 0) then
-        cfg[CFG_NextLsId] = lsfId;
-      else
-        lsfId = insertLogicalSwitchFor(config.navigation.fallbackIds.next);
+  
+      if (config.navigation.next) then
+        local lsfId = insertLogicalSwitchFor(config.navigation.next);
+        TRACE("config.navigation.next", lsfId);
         if (lsfId >= 0) then
           cfg[CFG_NextLsId] = lsfId;
+        else
+          #ifdef USE_FALLBACK_IDS
+          lsfId = insertLogicalSwitchFor(config.navigation.fallbackIds.next);
+          if (lsfId >= 0) then
+            cfg[CFG_NextLsId] = lsfId;
+          end 
+          TRACE("config.navigation.fallbackId.next", lsfId);
+          #else
+          TRACE("No config.navigation.next");      
+          #endif
         end 
-      end 
-    end
-
-    if (config.navigation.select) then
-      local lsfId = insertLogicalSwitchFor(config.navigation.select);
-      if (lsfId >= 0) then
-        cfg[CFG_SelectLsId] = lsfId;
-      else
-        lsfId = insertLogicalSwitchFor(config.navigation.fallbackIds.select);
+      end
+  
+      if (config.navigation.select) then
+        local lsfId = insertLogicalSwitchFor(config.navigation.select);
+        TRACE("config.navigation.select", lsfId);
         if (lsfId >= 0) then
           cfg[CFG_SelectLsId] = lsfId;
-        end
-      end  
-    end
+        else
+          #ifdef USE_FALLBACK_IDS
+          lsfId = insertLogicalSwitchFor(config.navigation.fallbackIds.select);
+          if (lsfId >= 0) then
+            cfg[CFG_SelectLsId] = lsfId;
+          end
+          TRACE("config.navigation.fallbackId.select", lsfId);
+          #else
+          TRACE("No config.navigation.select");      
+          #endif
+        end  
+      end
+    end      
   end
 
   if (config.remote) then
@@ -433,7 +517,7 @@ local function initConfigColor(config)
     footer = footer .. " Conf: " .. config.title;
   end
 
-  if (config.removeTrimsFromFlightModes) then
+  if (modifyModel) and (config.removeTrimsFromFlightModes) then
     TRACE("initConfigColor remove filghtmodes");
     for mi, modeline in ipairs(config.removeTrimsFromFlightModes) do
       local mode = modeline.mode;

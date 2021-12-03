@@ -1,6 +1,10 @@
-targets += sgvar.lua e2ibus.lua e2sbus.lua e2xjt.lua vsp.lua schotl.lua comp.lua
+targets += sgvar.lua vmap.lua e2ibus.lua e2sbus.lua e2xjt.lua vsp.lua schotl.lua comp.lua increm.lua
 
 sgvar.lua: sgvar.lpp ../../global.h ../../version.h ../../constants.h ../../functions.lh
+
+vmap.lua: vmap.lpp ../../global.h ../../version.h ../../constants.h ../../functions.lh
+
+increm.lua: increm.lpp ../../global.h ../../version.h ../../constants.h ../../functions.lh
 
 schotl.lua: schotl.lpp ../../global.h ../../version.h ../../constants.h ../../functions.lh
 

@@ -5,10 +5,9 @@
 -- This work is licensed under the Creative Commons Attribution-NonCommercial-NoDerivatives 4.0 International License.
 -- To view a copy of this license, visit http:
 -- or send a letter to Creative Commons, PO Box 1866, Mountain View, CA 94042, USA.
-       
-       
-       
-       
+
+
+
 local input = {
    {"Eing A1", SOURCE},
    {"Eing B1", SOURCE},
@@ -17,6 +16,7 @@ local input = {
    {"Deadband", VALUE, 1, 100, 10}, -- absolute value
    {"Timeout ms", VALUE, 1, 300, 100} -- milli secs
 };
+
 local output = {
    "Pow 1",
  "Dir 1",
@@ -25,18 +25,23 @@ local output = {
  "State1",
  "State2"
 };
+
 local lastDirs = {
    {0, 0},
    {0, 0}
 };
+
 local nextRunTime = 0;
+
 local function saveLastDir(index, value, timeout)
    if (getTime() > nextRunTime) then
       nextRunTime = getTime() + timeout;
+
       lastDirs[index][1] = lastDirs[index][2];
       lastDirs[index][2] = value;
    end
 end
+
 local function run(a1, b1, a2, b2, deadband, to)
    local state1 = 0;
    local state2 = 0;
@@ -48,7 +53,9 @@ local function run(a1, b1, a2, b2, deadband, to)
    local max1 = math.sqrt(min1 * min1 + 1024 * 1024) / 1024;
    local min2 = math.min(math.abs(a2), math.abs(b2));
    local max2 = math.sqrt(min2 * min2 + 1024 * 1024) / 1024;
-   ;
+
+                                      ;
+
    if (SchottelPow1 > deadband) then
       SchottelDir1 = math.atan2(b1, a1) * 1024 / math.pi;
       saveLastDir(1, SchottelDir1, timeout);
@@ -73,6 +80,7 @@ local function run(a1, b1, a2, b2, deadband, to)
    (SchottelPow2 / max2), SchottelDir2,
    state1, state2;
 end
+
 return {
    input = input,
    run = run,

@@ -1,0 +1,5 @@
+removeTrimsFromFlightModes = {
+    { mode = 0, trims = {5, 6} }, -- default
+    { mode = 1, trims = {5, 6} }, -- safeMode
+  },
+

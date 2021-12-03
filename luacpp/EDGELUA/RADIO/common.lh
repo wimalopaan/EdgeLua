@@ -1,0 +1,11 @@
+
+parameterDial = "s1",
+
+module = 0;
+
+--[[ deprecated
+mixerGlobalVariable = 6;
+stateTimeout = 10;
+--]]
+
+backend = 1; -- 1: sbus/ibus; 2: s.port/f.port (tbd); 3: tiptip (maybe); 4: solexpert (tbd)

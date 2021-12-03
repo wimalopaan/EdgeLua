@@ -2,6 +2,7 @@
 
 #define BASE_DIR "/EDGELUA"
 #define SHM_VAR 1
+#define SHM_VMAP_VAR 2
 #define GLOBAL_LUA_MIX_VAR   __Sw2MixerValue
 #define GLOABL_LUA_CONFIG    __WmSw2Config
 #define GLOBAL_LUA_STOP_MASK __stopWmSw2
@@ -29,14 +30,14 @@
 
 #define CFG_Title 1
 #define CFG_FirstColWidth 2
-#define CFG_StateTimeout 3
+// #define CFG_StateTimeout 3
 #define CFG_ScrollUdId 4
 #define CFG_ScrollLrId 5
 #define CFG_ParamaterDialId 6
 #define CFG_PageSwitchId 7
 #define CFG_RemoteId 8
 #define CFG_Encoding 9
-#define CFG_MixerGlobalVariable 10
+// #define CFG_MixerGlobalVariable 10
 #define CFG_PreviousLsId 11
 #define CFG_NextLsId 12
 #define CFG_SelectLsId 13
@@ -46,6 +47,34 @@
 #define CFG_SafeMode_LinkDropoutMax 17
 #define CFG_SafeMode_LsNumber 18
 #define CFG_Footer 19
+#define CFG_Backend_Data 20
+
+#define CFG_BEND_Bus 1
+#define CFG_BEND_SPort 2
+#define CFG_BEND_TipTip 3
+#define CFG_BEND_SolExpert 4
+
+#define BEND_BUS_StateTimeout 1
+#define BEND_BUS_MixerGlobalVariable 2
+#define BEND_BUS_DEFAULT_MixerGlobalVariable 5
+#define BEND_BUS_DEFAULT_StateTimeout 20
+
+//#define BEND_SPORT_
+
+#define BEND_TIPTIP_ShortTimeout  1
+#define BEND_TIPTIP_LongTimeout   2
+#define BEND_TIPTIP_MixerGlobalVariable  3
+#define BEND_TIPTIP_Values  4
+#define BEND_TIPTIP_DEFAULT_ShortTimeout 30 
+#define BEND_TIPTIP_DEFAULT_LongTimeout 90 
+#define BEND_TIPTIP_DEFAULT_MixerGlobalVariable 7 
+
+#define BEND_SOLEXPERT_ShortTimeout 1
+#define BEND_SOLEXPERT_LongTimeout 2
+#define BEND_SOLEXPERT_Map 3
+#define SOLEXPERT_MENT_Module 1
+#define SOLEXPERT_MENT_Channel 2
+#define SOLEXPERT_MENT_Values 3
 
 #define MENUDATA_Title 1
 #define MENUDATA_Footer 2
@@ -149,6 +178,15 @@
 #define FSMSWITCH_State 2
 #define FSMSWITCH_CyclePage 3
 #define FSMSWITCH_CycleRow 4
+
+#define FSMTIP_LastTime 1
+#define FSMTIP_State 2
+#define FSMTIP_ActualCount 3
+
+#define FSMTIP_STATE_Idle 1
+#define FSMTIP_STATE_On 2
+#define FSMTIP_STATE_Off 3
+#define FSMTIP_STATE_End 4
 
 #define FSMCONF_LastTime 1
 #define FSMCONF_State 2

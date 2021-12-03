@@ -5,13 +5,13 @@
 -- This work is licensed under the Creative Commons Attribution-NonCommercial-NoDerivatives 4.0 International License.
 -- To view a copy of this license, visit http:
 -- or send a letter to Creative Commons, PO Box 1866, Mountain View, CA 94042, USA.
+
 -- IMPORTANT
 -- Please note that the above license also covers the transfer protocol used and the encoding scheme and
 -- all further principals of tranferring state and other information.
-       
-       
-       
-       
+
+
+
 local function loadAnimations(config)
   local basedir = "/EDGELUA" .. "/ANIMS/";
   local anims = {};
@@ -31,6 +31,7 @@ local function loadAnimations(config)
   end
   return anims;
 end
+
 local function sort(table, key)
   for i = 1, (#table - 1) do
     if (table[i][key] > table[i + 1][key]) then
@@ -41,17 +42,21 @@ local function sort(table, key)
     end
   end
 end
+
 local function initAnimations(anims)
   local canims = {};
   for ia, anim in ipairs(anims) do
     local canim = {};
     canim[1] = anim.name;
+
     if not(anim.length) or (anim.length == 0) then
       canim[2] = 0;
     else
       canim[2] = math.floor(anim.length * 100);
     end
-    print("TRACE: ", "init anim", ia, canim[1], canim[2] );
+
+    print("TRACE: " , "init anim", ia, canim[1], canim[2] );
+
     if (anim.switches) then
       local swt = {};
       local sws = {};
@@ -91,13 +96,15 @@ local function initAnimations(anims)
       canims[#canims + 1] = canim;
     end
   end
-  print("TRACE: ", "init anims: number", #canims );
+  print("TRACE: " , "init anims: number", #canims );
   return canims;
 end
+
 local function setItem(fn, module, state)
-  ;
+                                      ;
   __WmSw2ForeignInput = module * 100 + fn * 10 + state;
 end
+
 local function clearAnim(anim)
   for i, swt in ipairs(anim[3]) do
     for it, transition in ipairs(swt[3]) do
@@ -110,15 +117,17 @@ local function clearAnim(anim)
     end
   end
 end
+
 local function runAnimation(anim, state)
   if not(anim) then
     return;
   end
   local t = getTime();
+
   if (state[2] == 0) then -- state: init
     __WmSw2Warning1 = "Animation";
     __WmSw2Warning2 = anim[1];
-    print("TRACE: ", "Anim:", anim[1], anim[2], #anim[3], #anim[4] );
+    print("TRACE: " , "Anim:", anim[1], anim[2], #anim[3], #anim[4] );
     state[2] = 1;
     state[3] = t; -- start of anim
     state[4] = t; -- last seq point
@@ -136,7 +145,7 @@ local function runAnimation(anim, state)
             transition[3] = 1;
             setItem(fn, module, transition[2]);
             if (it == #swt[3]) then
-              print("TRACE: ", "last t" );
+              print("TRACE: " , "last t" );
               state[7] = state[7] + 1;
             end
             break;
@@ -153,7 +162,7 @@ local function runAnimation(anim, state)
             state[4] = t;
             setItem(fn, module, seqpoint[2]);
             if (it == #sws[3]) then
-              print("TRACE: ", "last s" );
+              print("TRACE: " , "last s" );
               state[7] = state[7] + 1;
             end
             break;
@@ -165,11 +174,11 @@ local function runAnimation(anim, state)
     if (anim[2] > 0) and ((t - state[3]) >= anim[2]) then
       state[3] = t; -- restart
       state[4] = t;
-      print("TRACE: ", "restart" );
+      print("TRACE: " , "restart" );
       clearAnim(anim);
     end
     if (anim[2] == 0) and (state[7] >= 2) then
-      print("TRACE: ", "stop" );
+      print("TRACE: " , "stop" );
       state[2] = 0;
       state[5] = 0;
       __WmSw2Warning1 = nil;
@@ -179,6 +188,7 @@ local function runAnimation(anim, state)
   end
   return anim;
 end
+
 local function resetState(state)
   local t = getTime();
   state[1] = t; -- timepoint for statemachine
@@ -186,6 +196,7 @@ local function resetState(state)
   state[3] = t; -- start time of anim
   state[4] = t; -- last sequencepoint start time
 end
+
 local function initAnimationFSM(state)
   resetState(state);
   state[5] = 0; -- active anim [1...4]
@@ -193,6 +204,7 @@ local function initAnimationFSM(state)
   state[7] = 0;
   state[8] = 1;
 end
+
 local function drawButtons(anims, rects, state)
   for i, rect in ipairs(rects) do
     if (state[5] == i) then
@@ -208,6 +220,7 @@ local function drawButtons(anims, rects, state)
     lcd.drawText(rect.xmin + 5, rect.ymin + 5, anims[i][1], COLOR_THEME_PRIMARY1);
   end
 end
+
 local function covers(touch, item)
   if ((touch.x >= item.xmin) and (touch.x <= item.xmax)
     and (touch.y >= item.ymin) and (touch.y <= item.ymax)) then
@@ -215,9 +228,10 @@ local function covers(touch, item)
   end
   return false;
 end
+
 local function processKeyEvents(anims, state, event)
   if (event == EVT_VIRTUAL_ENTER) then
-    ;
+                                                                       ;
     if (state[8] == state[5]) then
       state[5] = 0;
       return 0;
@@ -227,7 +241,7 @@ local function processKeyEvents(anims, state, event)
     end
   end
   if (event == EVT_VIRTUAL_INC) then
-    ;
+                 ;
     if (state[8] >= #anims) then
       state[8] = 1;
     else
@@ -235,7 +249,7 @@ local function processKeyEvents(anims, state, event)
     end
   end
   if (event == EVT_VIRTUAL_DEC) then
-    ;
+                 ;
     if (state[8] <= 1) then
       state[8] = #anims;
     else
@@ -243,6 +257,7 @@ local function processKeyEvents(anims, state, event)
     end
   end
 end
+
 local function processEvents(anims, rects, state, event, touch)
   if (event == EVT_TOUCH_TAP) then
     for bi, rect in ipairs(rects) do
@@ -254,8 +269,9 @@ local function processEvents(anims, rects, state, event, touch)
   end
   processKeyEvents(anims, state, event);
 end
+
 local function chooseAnimationBW(config, anims, state, event)
-  ;
+                               ;
   if not(anims) or (#anims == 0) then
     return;
   end
@@ -285,6 +301,7 @@ local function chooseAnimationBW(config, anims, state, event)
     end
   end
   --]]
+
   for i, anim in ipairs(anims) do
     if (i == state[5]) then
       if (i == state[8]) then
@@ -302,12 +319,13 @@ local function chooseAnimationBW(config, anims, state, event)
     end
     lcd.drawText(30, i * 10, anim[1], SMLSIZE);
   end
-  ;
+                               ;
   if (state[5] > 0) then
     return anims[state[5]];
   end
   return nil;
 end
+
 local function chooseAnimation(config, widget, anims, state, event, touch)
   lcd.clear();
   local rects = {};
@@ -315,7 +333,9 @@ local function chooseAnimation(config, widget, anims, state, event, touch)
   local border_h = 40;
   local bw = widget[3] - 2 * border_h;;
   local vs = 5;
-  ;
+
+                                                                       ;
+
   if not(anims) then
     return;
   end
@@ -356,8 +376,10 @@ local function chooseAnimation(config, widget, anims, state, event, touch)
       ymin = widget[2] + widget[4] / 2 + bh + 3 * vs / 2, ymax = widget[2] + widget[4] / 2 + 2 * bh + 3 * vs / 2};
     rects[4] = rect;
   end
+
   drawButtons(anims, rects, state);
   processEvents(anims, rects, state, event, touch);
+
   if (state[5] > 0) then
     return anims[state[5]];
   else
@@ -365,6 +387,7 @@ local function chooseAnimation(config, widget, anims, state, event, touch)
     __WmSw2Warning2 = nil;
     return nil;
   end
+
   --[[
   if (selection > 0) then
     resetState(state);
@@ -377,6 +400,7 @@ local function chooseAnimation(config, widget, anims, state, event, touch)
   end
   --]]
 end
+
 if (LCD_W <= 128) then
   return {
     loadAnimations = loadAnimations,

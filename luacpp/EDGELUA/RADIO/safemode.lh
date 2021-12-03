@@ -1,0 +1,7 @@
+safeMode = {
+    flightMode = 1,
+    name = "Safe-Mode",
+    excludeMixesBeginnWith = "sw", -- mixer line beginning with "sw.*" are not included for deactivation by flightmode 
+    timeOut = 10, -- [s], after this time safeMode will be disabled, going to normal mode
+    linkDropoutMax = 20, --[s], after this time without link switch to safeMode again (e.g. turning off the rx). 
+  },

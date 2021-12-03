@@ -41,7 +41,7 @@ local function create(zone, options)
 
   collectgarbage();
 
-  if (CHAR_TRIM) then
+  if (CHAR_TRIM) and (getSwitchIndex) then
     local t5u = getSwitchIndex(CHAR_TRIM .. "5u");
     TRACE("5u", t5u);
   else

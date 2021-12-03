@@ -10,27 +10,19 @@
 -- Please note that the above license also covers the transfer protocol used and the encoding scheme and 
 -- all further principals of tranferring state and other information.
 
+#include "../../global.h"
 
 return {
   title = "T12",
 
   firstColumnWidth = 40;
 
-  parameterDial = "s1",
+  #include "common.lh"
 
-  stateTimeout = 10;
+  #include "flightmodes.lh"
 
-  module = 0;
+  #include "safemode.lh"
 
-  mixerGlobalVariable = 6;
+  #include "backends.lh"
 
-  backend = 1; -- 1: sbus/ibus; 2: s.port/f.port (tbd); 3: tiptip (maybe)
-
-  safeMode = {
-    flightMode = 1;
-    name = "SMode";
-    excludeMixesBeginnWith = "sw"; -- mixer line beginning with "sw.*" are not included for deactivation by flightmode 
-    timeOut = 10; -- [s], after this time safeMode will be disabled, going to normal mode
-    linkDropoutMax = 20; --[s], after this time without link switch to safeMode again (e.g. turning off the rx). 
-  };
 };

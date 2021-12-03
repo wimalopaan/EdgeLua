@@ -35,7 +35,10 @@ local function init()
             return;
          end
          __WmSw2Config = __libI.initConfig(config);
-         gvar = __WmSw2Config[CFG_MixerGlobalVariable];
+         #ifdef USE_BACKEND_BUS
+         local bendcfg = __WmSw2Config[CFG_Backend_Data][CFG_BEND_Bus];
+         gvar = bendcfg[BEND_BUS_MixerGlobalVariable];
+         #endif
          collectgarbage();
         end
       end

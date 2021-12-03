@@ -39,6 +39,9 @@ Wilhelm Meier <wilhelm.wm.meier@googlemail.com>
 :extractordir: .extractor
 :basedir: ../luacpp/EDGELUA
 
+:srcbase: ../luacpp/EDGELUA
+:srcdir: MODELS
+
 include::{idir}/defs.adoc[]
 
 <<<
@@ -59,9 +62,12 @@ include::{idir}/law.adoc[]
 include::{idir}/security.adoc[]
 
 <<< 
+ 
+include::{srcbase}/{srcdir}/{extractordir}/tiny.lua.all[]
 
-include::{basedir}/MODELS/{extractordir}/tiny.lua.all[]
-
+include::{srcbase}/{srcdir}/{extractordir}/tiny.lua.global[]
 
 [[intro]]
 == Einführung
+
+Bla

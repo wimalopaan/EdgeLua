@@ -5,19 +5,21 @@
 -- This work is licensed under the Creative Commons Attribution-NonCommercial-NoDerivatives 4.0 International License.
 -- To view a copy of this license, visit http:
 -- or send a letter to Creative Commons, PO Box 1866, Mountain View, CA 94042, USA.
+
 -- IMPORTANT
 -- Please note that the above license also covers the transfer protocol used and the encoding scheme and
 -- all further principals of tranferring state and other information.
-       
-       
-       
-       
+
+
+
 local function isDigit(v)
   return (v >= string.byte("0")) and (v <= string.byte("9"));
 end
+
 local function isLetter(v)
   return (v >= string.byte("A") and (v <= string.byte("Z"))) or (v >= string.byte("a") and (v <= string.byte("z")));
 end
+
 local function nthChar(n, v)
   local c = bit32.extract(v, n * 8, 8);
   if (isDigit(c) or isLetter(c)) then
@@ -25,6 +27,7 @@ local function nthChar(n, v)
   end
   return nil;
 end
+
 local function optionString(option)
   local s = "";
   for i = 0,3 do
@@ -37,6 +40,8 @@ local function optionString(option)
   end
   return s
 end
+
+
 local function serialize(table, filename)
     if type(table) == "table" then
         io.write("{\n")
@@ -50,52 +55,56 @@ local function serialize(table, filename)
         error("cannot serialize a " .. type(o))
       end
 end
+
 local function appendToFile(file, values)
-  print("TRACE: ", "appendToFile", file );
+  print("TRACE: " , "appendToFile", file );
   io.write(file, "\t{");
   for i, v in ipairs(values) do
     io.write(file, v .. ",");
   end
   io.write(file, "},\n");
 end
+
 local function saveValues(menu, filename, state)
   if (state[6]) then
-    print("TRACE: ", "saveValues dirty" );
+    print("TRACE: " , "saveValues dirty" );
     state[6] = false;
+
     local file = io.open(filename, "w");
     if (file) then
       io.write(file, "return {\n");
       for ip, page in ipairs(menu) do
         for il, pline in ipairs(page) do
           local pitem = pline[1];
-          print("TRACE: ", "saveValues", pitem[1] );
+          print("TRACE: " , "saveValues", pitem[1] );
           appendToFile(file, pline[2]);
         end
       end
       io.write(file, "};\n");
       io.close(file);
     else
-      print("TRACE: ", "saveValue open failed:", filename );
+      print("TRACE: " , "saveValue open failed:", filename );
     end
   end
 end
+
 local function initValues(menu, filename)
-  print("TRACE: ", "initValues", filename );
+  print("TRACE: " , "initValues", filename );
   local data = loadfile(filename);
-  print("TRACE: ", "initValues", data );
+  print("TRACE: " , "initValues", data );
   if (data) then
     local table = data();
     if (table) then
-      print("TRACE: ", "initValues", #table );
+      print("TRACE: " , "initValues", #table );
       local lineNumber = 1;
       for ip, page in ipairs(menu) do
         for il, pline in ipairs(page) do
           local pitem = pline[1];
           if (#table[lineNumber] == #pline[2]) then
-            print("TRACE: ", "initValues assign", pitem[1] );
+            print("TRACE: " , "initValues assign", pitem[1] );
             pline[2] = table[lineNumber];
           else
-            print("TRACE: ", "initValues no match", pitem[1] );
+            print("TRACE: " , "initValues no match", pitem[1] );
           end
           lineNumber = lineNumber + 1;
         end
@@ -103,7 +112,9 @@ local function initValues(menu, filename)
     end
   end
 end
+
 local debugText = {};
+
 local function initDebugTextBW()
   debugText[7] = "Vers:";
   debugText[4] = "GFLS:";
@@ -115,6 +126,7 @@ local function initDebugTextBW()
   debugText[8] = "VSto:";
   debugText[9] = "FNam:";
 end
+
 local function initDebugTextColor()
   debugText[7] = "Version:";
   debugText[4] = "SwitchID LS:";
@@ -126,13 +138,18 @@ local function initDebugTextColor()
   debugText[8] = "ValueStorage:";
   debugText[9] = "ModelFName:";
 end
+
 local function displayDebugBW(widget)
   local y = widget[2];
   local x1 = widget[1];
   local x2 = x1 + widget[3] / 4;
   local x3 = x1 + widget[3] / 2;
   local x4 = x1 + 3 * widget[3] / 4;
+
       lcd.drawText(x1, y, debugText[7] .. "2.03" .. " (dbg)", SMLSIZE);
+
+
+
   y = y + widget[8];
   lcd.drawText(x1, y, debugText[1] , SMLSIZE);
   local ver, radio, maj, minor, rev, osname = getVersion();
@@ -143,22 +160,27 @@ local function displayDebugBW(widget)
   end
   y = y + widget[8];
   lcd.drawText(x1, y, debugText[8], SMLSIZE);
+
       lcd.drawText(x2, y, "y", SMLSIZE);
+
+
+
   y = y + widget[8];
   lcd.drawText(x1, y, debugText[2], SMLSIZE);
-      local id = getFieldInfo("t5u");
-      if (id) then
-          lcd.drawText(x2, y, "y", SMLSIZE);
-      else
-          lcd.drawText(x2, y, "n", SMLSIZE);
-      end
+      lcd.drawText(x2, y, "-", SMLSIZE);
+
   y = y + widget[8];
   lcd.drawText(x1, y, debugText[3], SMLSIZE);
+
       if (getSwitchIndex) then -- getSwitchName(), getSwitchValue(), getPhysicalSwitches(), SWITCH_COUNT
           lcd.drawText(x2, y, "y", SMLSIZE);
       else
           lcd.drawText(x2, y, "n", SMLSIZE);
       end
+
+
+
+
   y = y + widget[8];
   lcd.drawText(x1, y, debugText[4], SMLSIZE);
   local id = getFieldInfo("sl1");
@@ -167,33 +189,51 @@ local function displayDebugBW(widget)
   else
       lcd.drawText(x2, y, "n", SMLSIZE);
   end
+
   y = widget[2];
   y = y + widget[8];
   y = y + widget[8];
+
   lcd.drawText(x3, y, debugText[5], SMLSIZE);
+
   if (getShmVar) and (setShmVar) then
       lcd.drawText(x4, y, "y", SMLSIZE);
   else
       lcd.drawText(x4, y, "n", SMLSIZE);
   end
+
+
+
   y = y + widget[8];
   lcd.drawText(x3, y, debugText[6], SMLSIZE);
+
   if (setStickySwitch) then -- getLogicalSwitchValue()
       lcd.drawText(x4, y, "y", SMLSIZE);
   else
       lcd.drawText(x4, y, "n", SMLSIZE);
   end
+
+
+
+
   y = y + widget[8];
   lcd.drawText(x3, y, debugText[9], SMLSIZE);
+
   if (model.getInfo().filename) then
       lcd.drawText(x4, y, "y", SMLSIZE);
   else
       lcd.drawText(x4, y, "n", SMLSIZE);
   end
+
+
+
+
 end
+
 local function displayDebugColor(widget)
   displayDebugBW(widget);
 end
+
 if (LCD_W <= 128) then
   initDebugTextBW();
   return {

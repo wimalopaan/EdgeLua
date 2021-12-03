@@ -12,19 +12,24 @@ subdirs: ${subdirs}
 
 all: subdirs  $(targets)
 
-#CPPFLAGS = -DDEBUG
+CPPFLAGS = -std=c++20
 
 %.lua: %.lpp
-	cpp $(CPPFLAGS) -E -P $< > $@
+	clang $(CPPFLAGS) -E -P -xc++ $<  > $@
 
 %.bmp: %.png
 	convert $< $@
 
 %.lpp.extract: %.lpp
-	$(EXTRACTOR) $(EXLN) -l none -a A2 -a N -o $@ -d $(EXTRACTDIR) $<
+	$(EXTRACTOR) $(EXLN) -l lua -a A2 -a N -o $@ -d $(EXTRACTDIR) $<
 
 %.lua.extract: %.lua
-	$(EXTRACTOR) $(EXLN) -l none -a A2 -a N -o $@ -d $(EXTRACTDIR) $<
+	$(EXTRACTOR) $(EXLN) -l lua -a A2 -a N -o $@ -d $(EXTRACTDIR) $<
+
+%.lua.html: %.lua
+	$(SRCHI) -slua $< > $@
+#	$(EXTRACTOR) -x -l lua --enable-block-comments --include-omitted $< | $(SRCHI) -slua > $@
+
 
 lppsources = $(wildcard *.lpp)
 luatargets = $(patsubst %.lpp, %.lua, $(lppsources))

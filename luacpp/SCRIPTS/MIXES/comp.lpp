@@ -37,7 +37,13 @@ local function initGV()
         end
       end
    end
-   gvar = __WmSw2Config[CFG_MixerGlobalVariable];
+
+   #ifdef USE_BACKEND_BUS
+   local bendcfg = __WmSw2Config[CFG_Backend_Data][CFG_BEND_Bus];
+   gvar = bendcfg[BEND_BUS_MixerGlobalVariable];
+   #endif
+
+--   gvar = __WmSw2Config[CFG_MixerGlobalVariable];
  end
 
 local function run(a)
