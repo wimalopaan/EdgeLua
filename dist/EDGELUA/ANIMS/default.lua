@@ -10,7 +10,6 @@
 -- Please note that the above license also covers the transfer protocol used and the encoding scheme and
 -- all further principals of tranferring state and other information.
 
-
 local animation1 = {
   name = "Loop 1",
   length = 20, -- total loop length [s]

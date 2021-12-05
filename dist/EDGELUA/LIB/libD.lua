@@ -11,8 +11,6 @@
 -- Please note that the above license also covers the transfer protocol used and the encoding scheme and
 -- all further principals of tranferring state and other information.
 
-
-
 local function isFullScreen(event)
   return not not event;
 end
@@ -224,7 +222,6 @@ local function displayParamMenuColorNoTheme(config, widget, pmenu, pheaders, sta
   return pvalue;
 end
 
-
 local function displayParamMenuColor(config, widget, pmenu, pheaders, state, paramScaler, event, help)
   if (config[14] > 1) then
     return;
@@ -323,7 +320,6 @@ local function displayParamMenuColor(config, widget, pmenu, pheaders, state, par
   end
   return pvalue;
 end
-
 
 local function displayMenuBW(config, widget, menu, overlays, state, pagetitles)
   lcd.clear()
@@ -628,7 +624,6 @@ local function selectItem(menu, menuState, queue)
   item[3] = menuState[2];
   queue:push(push);
 end
-
 
 local lastEvent = 0;
 
@@ -959,10 +954,8 @@ local function displayAddressConfigBW(config, encoder, pScaler, state, event)
 
     lcd.drawText(0, 30, "Switch on RX and device", MIDSIZE);
 
-
     local bendcfg = config[20][1];
     encoder(bendcfg[2], 14, adr);
-
 
     if (event == EVT_VIRTUAL_ENTER) then
       state[1] = 0;
@@ -1003,10 +996,8 @@ local function displayAddressConfigColor(config, widget, encoder, pScaler, state
     lcd.drawFilledRectangle(rect.xmin, rect.ymin, rect.xmax - rect.xmin + 1, rect.ymax - rect.ymin + 1, COLOR_THEME_ACTIVE);
     lcd.drawText(rect.xmin + 5, rect.ymin + 5, "Switch on RX and device", MIDSIZE + COLOR_THEME_PRIMARY2);
 
-
     local bendcfg = config[20][1];
     encoder(bendcfg[2], 14, adr);
-
 
     if (event == EVT_VIRTUAL_ENTER) then
       state[1] = 0;

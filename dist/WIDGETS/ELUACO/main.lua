@@ -10,13 +10,6 @@
 -- Please note that the above license also covers the transfer protocol used and the encoding scheme and
 -- all further principals of tranferring state and other information.
 
-
-
-
-
-
-
-
 local errorCode = 0;
 
 __WmSw2Config = nil;
@@ -137,13 +130,11 @@ local function create(zone, options)
 
   print("TRACE: " , "EL_Con ctreat5" );
 
-
 print("TRACE: " , "valuesFilename:", valuesFileName )
    if (valuesFileName) then
     print("TRACE: " , "valuesFilename:", valuesFileName )
     __libU.initValues(menu, valuesFileName);
   end
-
 
 print("TRACE: " , "EL_Con ctreat6" );
 

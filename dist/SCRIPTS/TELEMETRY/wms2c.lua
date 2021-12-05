@@ -10,14 +10,6 @@
 -- Please note that the above license also covers the transfer protocol used and the encoding scheme and
 -- all further principals of tranferring state and other information.
 
-
-
-
-
-
-
-
-
 local errorCode = 0;
 
 __WmSw2Config = nil;

@@ -10,8 +10,6 @@
 -- Please note that the above license also covers the transfer protocol used and the encoding scheme and
 -- all further principals of tranferring state and other information.
 
-
-
 local function run()
     lcd.clear();
     lcd.drawText(10, 10, "Version: " .. "2.04", MIDSIZE);

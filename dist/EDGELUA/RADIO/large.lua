@@ -10,14 +10,10 @@
 -- Please note that the above license also covers the transfer protocol used and the encoding scheme and
 -- all further principals of tranferring state and other information.
 
-
-
 return {
   title = "TX16s",
 
   firstColumnWidth = 110,
-
-
 
 parameterDial = "s1",
 
@@ -37,21 +33,14 @@ removeTrimsFromFlightModes = {
 
   navigation = {
 
-
-
-
-
-
     next = "5d", -- maybe jsx, jsy on x12s with curve
     previous = "5u",
     select = "6u",
-
 
     scrollUpDn = "ls", -- direct navigating
     scrollLR = "rs",
     pageSwitch = "6pos",
     -- pageSwitch = "ext1",
-
 
     fallbackIds = { -- switch IDs, if determining via above strings does not work (OpenTx)
       next = 69, -- "5d"
@@ -60,7 +49,6 @@ removeTrimsFromFlightModes = {
     },
 
    },
-
 
 backends = {
     bus = {

@@ -10,8 +10,6 @@
 -- Please note that the above license also covers the transfer protocol used and the encoding scheme and
 -- all further principals of tranferring state and other information.
 
-
-
 local Class = {};
 
 function Class.new(prototype)
@@ -497,15 +495,10 @@ local function getEncoder(cfg)
     end
     return encodeSBus, parameterValueSbus, encodeParamSBus;
 
-
-
-
   else
     if (cfg[14] == 2) then
 
       return encodeSPort, parameterValueSPort, encodeParamSPort;
-
-
 
     elseif (cfg[14] == 3) then
       return function() end, function() end, function() end;
@@ -559,9 +552,6 @@ else -- color radio
     print("TRACE: " , "libP: use transportGV" );
     transportToMixer = transportGV;
   end
-
-
-
 
   return {
     Class = Class,

@@ -10,14 +10,10 @@
 -- Please note that the above license also covers the transfer protocol used and the encoding scheme and
 -- all further principals of tranferring state and other information.
 
-
-
 return {
    title = "X9E",
 
    firstColumnWidth = 70;
-
-
 
 parameterDial = "s1",
 

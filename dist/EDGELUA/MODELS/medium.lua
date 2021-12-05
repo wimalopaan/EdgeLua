@@ -10,8 +10,6 @@
 -- Please note that the above license also covers the transfer protocol used and the encoding scheme and
 -- all further principals of tranferring state and other information.
 
-
-
 -- Default menu for medium radios
 
 local gstates1 = {"aus", "ein", "blk1", "blk2"};

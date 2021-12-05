@@ -10,8 +10,6 @@
 -- Please note that the above license also covers the transfer protocol used and the encoding scheme and
 -- all further principals of tranferring state and other information.
 
-
-
 local function isDigit(v)
   return (v >= string.byte("0")) and (v <= string.byte("9"));
 end
@@ -40,7 +38,6 @@ local function optionString(option)
   end
   return s
 end
-
 
 local function serialize(table, filename)
     if type(table) == "table" then
@@ -148,8 +145,6 @@ local function displayDebugBW(widget)
 
       lcd.drawText(x1, y, debugText[7] .. "2.04" .. " (dbg)", SMLSIZE);
 
-
-
   y = y + widget[8];
   lcd.drawText(x1, y, debugText[1] , SMLSIZE);
   local ver, radio, maj, minor, rev, osname = getVersion();
@@ -163,8 +158,6 @@ local function displayDebugBW(widget)
 
       lcd.drawText(x2, y, "y", SMLSIZE);
 
-
-
   y = y + widget[8];
   lcd.drawText(x1, y, debugText[2], SMLSIZE);
       lcd.drawText(x2, y, "-", SMLSIZE);
@@ -177,9 +170,6 @@ local function displayDebugBW(widget)
       else
           lcd.drawText(x2, y, "n", SMLSIZE);
       end
-
-
-
 
   y = y + widget[8];
   lcd.drawText(x1, y, debugText[4], SMLSIZE);
@@ -202,8 +192,6 @@ local function displayDebugBW(widget)
       lcd.drawText(x4, y, "n", SMLSIZE);
   end
 
-
-
   y = y + widget[8];
   lcd.drawText(x3, y, debugText[6], SMLSIZE);
 
@@ -213,9 +201,6 @@ local function displayDebugBW(widget)
       lcd.drawText(x4, y, "n", SMLSIZE);
   end
 
-
-
-
   y = y + widget[8];
   lcd.drawText(x3, y, debugText[9], SMLSIZE);
 
@@ -224,9 +209,6 @@ local function displayDebugBW(widget)
   else
       lcd.drawText(x4, y, "n", SMLSIZE);
   end
-
-
-
 
 end
 

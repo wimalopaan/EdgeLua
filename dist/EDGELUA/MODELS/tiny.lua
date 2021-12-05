@@ -11,8 +11,6 @@
 -- all further principals of tranferring state and other information.
 --]]
 
-
-
 -- Default Menu for tiny radios
 
 --{ global

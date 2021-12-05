@@ -10,8 +10,6 @@
 -- Please note that the above license also covers the transfer protocol used and the encoding scheme and
 -- all further principals of tranferring state and other information.
 
-
-
 local function isEdgeTx()
   local ver, radio, maj, minor, rev, osname = getVersion();
   return osname ~= nil;
@@ -87,7 +85,6 @@ end
 local function insertLogicalSwitchFor(id)
   print("TRACE: " , "insertLogicalSwitchFor", id );
 
-
   if (type(id) == "string") then
     if (getSwitchIndex) then
       local swid = getSwitchIndex(CHAR_TRIM .. id);
@@ -145,7 +142,6 @@ local function insertSettableSwitch(number)
   return -1;
 end
 
-
 local function loadFile(baseDir)
   local content = nil;
   local filename = nil;
@@ -199,7 +195,6 @@ local function loadConfig()
   return nil;
 end
 
-
 local function initBackendBus(config)
   print("TRACE: " , "initBackendBus" );
   local data = {};
@@ -216,14 +211,10 @@ local function initBackendBus(config)
   return data;
 end
 
-
-
 local function initBackendSPort(config)
   local data = {};
   return data;
 end
-
-
 
 local function initBackendTipTip(config)
   print("TRACE: " , "initBackendTipTip" );
@@ -252,35 +243,26 @@ local function initBackendTipTip(config)
 
   print("TRACE: " , "initBackendTipTip VALUES: ", data[2], data[1] );
 
-
   return data;
 end
-
-
 
 local function initBackendSolExpert(config)
   local data = {};
   return data;
 end
 
-
 local function initConfigBW(config, modifyModel)
   print("TRACE: " , "initConfigBW" );
   local cfg = {};
   cfg[20] = {};
 
-
   cfg[20][1] = initBackendBus(config);
-
 
   cfg[20][2] = initBackendSPort(config);
 
-
   cfg[20][3] = initBackendTipTip(config);
 
-
   cfg[20][4] = initBackendSolExpert(config);
-
 
   if (config.title) then
     cfg[1] = config.title;
@@ -363,12 +345,6 @@ local function initConfigBW(config, modifyModel)
                 print("TRACE: " , "safemode getSwitchIndex", ls, ls.id );
               end
 
-
-
-
-
-
-
             if (ls) then
               print("TRACE: " , "safeMode ls.id", ls.id );
               if (config.safeMode.name) then
@@ -442,8 +418,6 @@ local function initConfigColor(config, modifyModel)
           end
           print("TRACE: " , "config.navigation.fallbackId.previous", lsfId );
 
-
-
         end
       end
 
@@ -460,8 +434,6 @@ local function initConfigColor(config, modifyModel)
           end
           print("TRACE: " , "config.navigation.fallbackId.next", lsfId );
 
-
-
         end
       end
 
@@ -477,8 +449,6 @@ local function initConfigColor(config, modifyModel)
             cfg[13] = lsfId;
           end
           print("TRACE: " , "config.navigation.fallbackId.select", lsfId );
-
-
 
         end
       end
@@ -878,7 +848,6 @@ local function initMenuColor(cfg, menu, filename)
   end
   return cmenu, shortCuts, overlays, pagetitles, menudata;
 end
-
 
 local function initFSM(state)
   if not(state[1]) then

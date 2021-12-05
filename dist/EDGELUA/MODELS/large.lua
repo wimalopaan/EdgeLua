@@ -10,8 +10,6 @@
 -- Please note that the above license also covers the transfer protocol used and the encoding scheme and
 -- all further principals of tranferring state and other information.
 
-
-
 -- Default menu for large radios w/ color lcd
 
 local gstates1 = {"aus", "ein", "blink 1", "blink 2"};

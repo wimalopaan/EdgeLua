@@ -10,8 +10,6 @@
 -- Please note that the above license also covers the transfer protocol used and the encoding scheme and
 -- all further principals of tranferring state and other information.
 
-
-
 local output = {
    "sw_var",
 
@@ -56,8 +54,6 @@ local function transportGlobalLua()
 
    return __Sw2MixerValue, 0, 0;
 
-
-
 end
 
 local function transportGV()
@@ -65,15 +61,11 @@ local function transportGV()
 
    return model.getGlobalVariable(gvar, 0), 1, model.getGlobalVariable((gvar + 1), 0);
 
-
-
 end
 
 local function transportShm()
 
    return getShmVar(1), 2, 0;
-
-
 
 end
 
