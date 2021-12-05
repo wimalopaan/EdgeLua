@@ -249,6 +249,10 @@ local function initBackendTipTip(config)
   else
     data[4] = {0, 100, -100};
   end
+
+  print("TRACE: " , "initBackendTipTip VALUES: ", data[2], data[1] );
+
+
   return data;
 end
 
@@ -489,7 +493,7 @@ local function initConfigColor(config, modifyModel)
     end
   end
 
-  local footer = "Vers: " .. "2.03";
+  local footer = "Vers: " .. "2.04";
   if (cfg[9] == 0) then
     footer = footer .. " Mod: xjt";
   elseif (cfg[9] == 1) then
@@ -610,7 +614,7 @@ local function initParamMenu(cfg, menu, map, modInfos, mode)
         end
       end
     end
-    print("TRACE: " , "initParamMenu: saveValues:", valuesFileName );
+    print("TRACE: " , "initParamMenu: saveValues1:", valuesFileName );
   end
 
   local miTable = moduleItems(menu);
@@ -771,7 +775,9 @@ local function initMenuBW(menu)
           lsmode = item.lsmode;
         end
       end
-      local citem = {item[1], item.states, item.state, item.fn, item.module, nil, nil};
+      -- all components mus be set
+      -- todo: remove nil
+      local citem = {item[1], item.states, item.state, item.fn, item.module, nil, nil, nil};
       if (item.export) then
         citem[6] = item.export;
       end

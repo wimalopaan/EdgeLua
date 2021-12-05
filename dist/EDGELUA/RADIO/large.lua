@@ -71,6 +71,8 @@ backends = {
     sport = {
       map = {
         {module = 1, id = 226},
+        {module = 2, id = 256},
+        {module = 3, id = 128},
       },
     },
 

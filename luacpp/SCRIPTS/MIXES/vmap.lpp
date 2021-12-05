@@ -54,14 +54,22 @@ if (LCD_W <= 212) then
    GLOBAL_LUA_MIX_VAR = 0;
 end
 
+local lastValue = 0;
+
 local function demux(value)
-    local chValue = math.min(value % 10 + 1, #values);
+   if (value ~= lastValue) then
+      TRACE("vmap value:", value);
+      lastValue = value;
+   end
+
+
+    local chValue = math.min(value % 10, #values);
     value = math.floor(value / 10);
 
     local chValues = {0, 0, 0, 0, 0};
-    local channel = math.min(value % 10 + 1, #chValues);
+    local channel = math.min(value % 10, #chValues);
 
-    chValues[channel] = values[chValue];
+    chValues[channel] = values[chValue] * 10.24;
 
     TRACE3("vmap: chValue:", chValue, "chan:", channel, "chValues:", chValues[channel]);
 
@@ -77,7 +85,7 @@ local function transportGV()
 end
 
 local function transportShm()
-   return demux(getShmVar(SHM_VMAP_VAR));
+   return demux(getShmVar(SHM_VAR));
 end
 
 if (LCD_W <= 212) then

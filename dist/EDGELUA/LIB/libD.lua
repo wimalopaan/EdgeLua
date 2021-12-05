@@ -226,6 +226,10 @@ end
 
 
 local function displayParamMenuColor(config, widget, pmenu, pheaders, state, paramScaler, event, help)
+  if (config[14] > 1) then
+    return;
+  end
+
   local activePageIndex = state[3];
   local page = pmenu[activePageIndex];
   local header = pheaders[activePageIndex];
@@ -373,7 +377,8 @@ local function displayMenuBW(config, widget, menu, overlays, state, pagetitles)
   end
 end
 
-local function displayMenuColor(config, widget, menu, overlays, state, event, remote, warning1, warning2, pagetitles, menudata)
+local function displayMenuColor(config, widget, menu, overlays, state, event, remote,
+                                warning1, warning2, pagetitles, menudata, fsmState)
   lcd.clear()
 
   if (warning1) then
@@ -403,6 +408,13 @@ local function displayMenuColor(config, widget, menu, overlays, state, event, re
 
   if (menudata[2]) then
     displayFooter(widget, menudata[2]);
+  end
+
+  if ((fsmState) and (config[14] == 3)) then
+    if (fsmState[6]) then
+      lcd.drawText(widget[1] + widget[3] - 40, widget[2] + widget[4] - widget[5],
+                  "Busy!", SMLSIZE + COLOR_THEME_WARNING);
+    end
   end
 
   if (config[8]) then
@@ -612,8 +624,9 @@ local function selectItem(menu, menuState, queue)
   makeSelection(menuState);
   local page = menu[menuState[3]];
   local item = page[menuState[1]];
+  local push = {[1] = item, [2] = item[3]};
   item[3] = menuState[2];
-  queue:push(item);
+  queue:push(push);
 end
 
 
@@ -733,8 +746,9 @@ local function processShortCuts(shortCuts, queue)
     if not (v == sc[4]) then
       sc[4] = v;
       local item = sc[2];
+      local push = {[1] = item, [2] = item[3]};
       item[3] = v;
-      queue:push(item);
+      queue:push(push);
     end
   end
 end
@@ -882,9 +896,9 @@ local function processForeignInput(config, foreignInput, menu, queue)
 
   local item = findItem(menu, fn, module);
   if (item) then
--- print("foreign: ", module, fn, state);
+    local push = {[1] = item, [2] = item[3]};
     item[3] = state;
-    queue:push(item);
+    queue:push(push);
   end
 end
 
@@ -910,8 +924,9 @@ local function processRemoteInput(config, menu, queue, remoteState)
     remoteState[3] = fn;
     remoteState[4] = state;
     print("TRACE: " , "remote: ", module, fn, state );
+    local push = {[1] = item, [2] = item[3]};
     item[3] = state;
-    queue:push(item);
+    queue:push(push);
   end
 end
 

@@ -263,6 +263,10 @@ local function initBackendTipTip(config)
   else
     data[BEND_TIPTIP_Values] = {0, 100, -100};
   end
+
+  TRACE("initBackendTipTip VALUES: ", data[BEND_TIPTIP_LongTimeout], data[BEND_TIPTIP_ShortTimeout]);
+
+
   return data;
 end
 #endif
@@ -624,7 +628,7 @@ local function initParamMenu(cfg, menu, map, modInfos, mode)
         end
       end 
     end
-    TRACE("initParamMenu: saveValues:", valuesFileName);
+    TRACE("initParamMenu: saveValues1:", valuesFileName);
   end
   
   local miTable = moduleItems(menu);
@@ -785,7 +789,9 @@ local function initMenuBW(menu)
           lsmode = item.lsmode;
         end
       end
-      local citem = {item[ITEM_Name], item.states, item.state, item.fn, item.module, nil, nil};
+      -- all components mus be set
+      -- todo: remove nil
+      local citem = {item[ITEM_Name], item.states, item.state, item.fn, item.module, nil, nil, nil};
       if (item.export) then
         citem[ITEM_Export] = item.export;
       end
@@ -891,7 +897,7 @@ end
 local function initFSM(state)
   if not(state[FSMSWITCH_LastTime]) then
     state[FSMSWITCH_LastTime] = getTime();
-    state[FSMSWITCH_State] = 0;
+    state[FSMSWITCH_State] = ALLFSMS_STATE_Init;
     state[FSMSWITCH_CyclePage] = 1;
     state[FSMSWITCH_CycleRow] = 1;
     return;

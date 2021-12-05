@@ -126,6 +126,7 @@ local function rssiState(cfg, state)
 end
 
 local function transportToMixer(gv, value)
+  -- dummy: function is set to real transport function based on radio and capabilities
 end
 
 local function sportConfigFSM()
@@ -188,21 +189,95 @@ end
 local function sportSwitchFSM()
 end
 
-local function tiptipSwitchFSM(config, menu, queue, state)
-  print("TRACE: " , "tiptipSwitchFSM" );
+local function tiptipEncode(config, state, on)
+  local bendCfg = config[20][3];
+  local encoded = state[5] + 10 * state[4];
+  if not(on) then
+    encoded = 1 + 10 * state[4];
+  end
+  print("TRACE: " , "tiptipEncode:", bendCfg[3], encoded )
+  transportToMixer(bendCfg[3], encoded);
+end
 
-  if (state[2] == 1) then
-    print("TRACE: " , "tiptipSwitchFSM idle size:", queue:size() );
+local function tiptipSwitchFSM(config, menu, queue, state)
+                           ;
+  local bendCfg = config[20][3];
+  local t = getTime();
+  local difftime = t - state[1];
+  if (state[2] == 0) then
+                                                      ;
     if (queue:size() > 0) then
-      local item = queue:pop();
-      state[1] = getTime();
+      local push = queue:pop();
+      local item = push[1];
+      local before = push[2];
+      if (item[3] <= 3) and (before <= 3) then
+        local pulse = 0;
+        print("TRACE: " , "tiptipSwitchFSM idle: ", item[3], before );
+        if (item[3] == 1) then
+          pulse = before; -- off
+        else
+          if (before == 1) then
+            pulse = item[3];
+          else
+            local offItem = {[4] = item[4],
+                             [5] = item[5],
+                             [3] = 1};
+            local pushOff = {offItem, before};
+            queue:push(pushOff);
+            local pushOn = {item, 1};
+            queue:push(pushOn);
+          end
+        end
+        if (pulse > 0) then
+          state[4] = item[5];
+          state[3] = item[4];
+          state[1] = t;
+          state[5] = pulse;
+          tiptipEncode(config, state, true);
+          state[6] = true;
+          if (state[3] == 1) then
+            state[2] = 3;
+          else
+            state[2] = 1;
+          end
+                                                                              ;
+        end
+      end
+    end
+  elseif (state[2] == 1) then
+                                                              ;
+    if (difftime >= bendCfg[1]) then
+      state[1] = t;
       state[2] = 2;
+      tiptipEncode(config, state, false);
     end
   elseif (state[2] == 2) then
+                                                               ;
+    if (difftime >= bendCfg[1]) then
+      state[1] = t;
+      state[3] = state[3] - 1;
+      if (state[3] == 1) then
+        state[2] = 3;
+      else
+        state[2] = 1;
+      end
+      tiptipEncode(config, state, true);
+    end
   elseif (state[2] == 3) then
+                                                                ;
+    if (difftime >= bendCfg[2]) then
+      state[1] = t;
+      state[2] = 4;
+      tiptipEncode(config, state, false);
+    end
   elseif (state[2] == 4) then
+                                                               ;
+    if (difftime >= bendCfg[1]) then
+      state[1] = t;
+      state[2] = 0;
+      state[6] = false;
+    end
   end
-
 end
 
 local function solExportSwitchFSM()
@@ -215,7 +290,7 @@ local function sbusSwitchFSM(config, menu, queue, state, encoder, exportValues)
   if ((t - state[1]) > bendCfg[1]) then
     local item = nil;
     if (queue:size() > 0) then
-      item = queue:pop();
+      item = queue:pop()[1];
     else
       local page = menu[state[3]];
       item = page[state[4]];
@@ -227,8 +302,9 @@ local function sbusSwitchFSM(config, menu, queue, state, encoder, exportValues)
     if (item) then
       if (item[7]) then
         for i, virt in ipairs(item[7]) do
+          local push = {[1] = virt, [2] = virt[3]};
           virt[3] = item[3];
-          queue:push(virt);
+          queue:push(push);
         end
       else
         encoder(bendCfg[2], item);
@@ -249,7 +325,7 @@ end
 
 local function transportShm(gv, value)
   setShmVar(1, value)
-                               ;
+  print("TRACE: " , "transportShm", value );
 end
 
 local function transportGlobalLua(gv, value)
@@ -406,9 +482,6 @@ local function parameterValueSbus(config)
 end
 
 local function encodeSPort(gv, item)
-end
-
-local function encodeTipTip(gv, item)
 end
 
 local function getEncoder(cfg)

@@ -99,6 +99,10 @@
 #define ITEM_Virtual 7
 #define ITEM_Rects 8
 
+#define PUSHED_ITEM_Item 1
+#define PUSHED_ITEM_BeforeState 2
+
+
 #define OVERLAY_SwitchID 1
 #define OVERLAY_Item 2
 #define OVERLAY_LSMode 3
@@ -155,7 +159,9 @@
 #define FSMANIM_LastReached 7
 #define FSMANIM_CursorRow 8
 
-#define FSMANIM_STATE_Init 0
+#define ALLFSMS_STATE_Init 0
+
+#define FSMANIM_STATE_Init ALLFSMS_STATE_Init
 #define FSMANIM_STATE_Run 1
 
 #define REMOTE_LastValue  1
@@ -171,7 +177,7 @@
 #define BUTTONS_SLIDER_LR 6
 
 #define FSMADR_State 1
-#define FSMADR_STATE_Initial 0
+#define FSMADR_STATE_Initial ALLFSMS_STATE_Init
 #define FSMADR_STATE_Output 1
 
 #define FSMSWITCH_LastTime 1
@@ -182,17 +188,21 @@
 #define FSMTIP_LastTime 1
 #define FSMTIP_State 2
 #define FSMTIP_ActualCount 3
+#define FSMTIP_ActualChannel 4
+#define FSMTIP_ActualPulse 5
+#define FSMTIP_Busy 6
 
-#define FSMTIP_STATE_Idle 1
-#define FSMTIP_STATE_On 2
-#define FSMTIP_STATE_Off 3
+#define FSMTIP_STATE_Idle ALLFSMS_STATE_Init
+#define FSMTIP_STATE_On 1
+#define FSMTIP_STATE_Off 2
+#define FSMTIP_STATE_Last 3
 #define FSMTIP_STATE_End 4
 
 #define FSMCONF_LastTime 1
 #define FSMCONF_State 2
 #define FSMCONF_Row 3
 
-#define FSMCONF_STATE_Wait 0
+#define FSMCONF_STATE_Wait ALLFSMS_STATE_Init
 #define FSMCONF_STATE_BCastOff 1
 #define FSMCONF_STATE_SelectOn 2
 #define FSMCONF_STATE_SendValue 3
@@ -201,7 +211,7 @@
 #define FSMRSSI_State 1
 #define FSMRSSI_LastTime 2
 
-#define FSMRSSI_STATE_SafeMode 0
+#define FSMRSSI_STATE_SafeMode ALLFSMS_STATE_Init
 #define FSMRSSI_STATE_WaitUp 1
 #define FSMRSSI_STATE_Normal 2
 #define FSMRSSI_STATE_WaitDown 3

@@ -226,6 +226,10 @@ end
 
 
 local function displayParamMenuColor(config, widget, pmenu, pheaders, state, paramScaler, event, help)
+  if (config[CFG_Backend] > 1) then
+    return;
+  end
+
   local activePageIndex = state[MENUSTATE_Page];
   local page = pmenu[activePageIndex];
   local header = pheaders[activePageIndex];
@@ -373,7 +377,8 @@ local function displayMenuBW(config, widget, menu, overlays, state, pagetitles)
   end
 end
 
-local function displayMenuColor(config, widget, menu, overlays, state, event, remote, warning1, warning2, pagetitles, menudata)
+local function displayMenuColor(config, widget, menu, overlays, state, event, remote, 
+                                warning1, warning2, pagetitles, menudata, fsmState)
   lcd.clear()
 
   if (warning1) then
@@ -404,6 +409,13 @@ local function displayMenuColor(config, widget, menu, overlays, state, event, re
   if (menudata[MENUDATA_Footer]) then
     displayFooter(widget, menudata[MENUDATA_Footer]);
   end
+
+  if ((fsmState) and (config[CFG_Backend] == CFG_BEND_TipTip)) then
+    if (fsmState[FSMTIP_Busy]) then
+      lcd.drawText(widget[W_X] + widget[W_Width] - 40, widget[W_Y] + widget[W_Height] - widget[W_FontHeight], 
+                  "Busy!", SMLSIZE + COLOR_THEME_WARNING);
+    end
+  end 
 
   if (config[CFG_RemoteId]) then
     lcd.drawText(widget[W_X] + widget[W_Width] - 70, widget[W_Y] + widget[W_Height] - widget[W_FontHeight],
@@ -612,8 +624,9 @@ local function selectItem(menu, menuState, queue)
   makeSelection(menuState);
   local page = menu[menuState[MENUSTATE_Page]];
   local item = page[menuState[MENUSTATE_Row]];
+  local push = {[PUSHED_ITEM_Item] = item, [PUSHED_ITEM_BeforeState] = item[ITEM_State]};
   item[ITEM_State] = menuState[MENUSTATE_Col];
-  queue:push(item);
+  queue:push(push);
 end
 
 #ifdef DEBUG
@@ -733,8 +746,9 @@ local function processShortCuts(shortCuts, queue)
     if not (v == sc[SHORTCUT_LastValue]) then
       sc[SHORTCUT_LastValue] = v;
       local item = sc[SHORTCUT_Item];
+      local push = {[PUSHED_ITEM_Item] = item, [PUSHED_ITEM_BeforeState] = item[ITEM_State]};
       item[ITEM_State] = v;
-      queue:push(item);
+      queue:push(push);
     end
   end
 end
@@ -882,9 +896,9 @@ local function processForeignInput(config, foreignInput, menu, queue)
 
   local item = findItem(menu, fn, module);
   if (item) then
---      print("foreign: ", module, fn, state);
+    local push = {[PUSHED_ITEM_Item] = item, [PUSHED_ITEM_BeforeState] = item[ITEM_State]};
     item[ITEM_State] = state;
-    queue:push(item);
+    queue:push(push);
   end
 end
 
@@ -910,8 +924,9 @@ local function processRemoteInput(config, menu, queue, remoteState)
     remoteState[REMOTE_Function] = fn;
     remoteState[REMOTE_State] = state;
     TRACE("remote: ", module, fn, state);
+    local push = {[PUSHED_ITEM_Item] = item, [PUSHED_ITEM_BeforeState] = item[ITEM_State]};
     item[ITEM_State] = state;
-    queue:push(item);
+    queue:push(push);
   end
 end
 

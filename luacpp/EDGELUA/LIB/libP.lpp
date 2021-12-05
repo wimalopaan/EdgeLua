@@ -126,6 +126,7 @@ local function rssiState(cfg, state)
 end
 
 local function transportToMixer(gv, value)
+  -- dummy: function is set to real transport function based on radio and capabilities
 end
 
 local function sportConfigFSM()
@@ -188,21 +189,95 @@ end
 local function sportSwitchFSM()
 end
 
-local function tiptipSwitchFSM(config, menu, queue, state)
-  TRACE("tiptipSwitchFSM");
+local function tiptipEncode(config, state, on)
+  local bendCfg = config[CFG_Backend_Data][CFG_BEND_TipTip];
+  local encoded = state[FSMTIP_ActualPulse] + 10 * state[FSMTIP_ActualChannel];
+  if not(on) then
+    encoded = 1 + 10 * state[FSMTIP_ActualChannel];    
+  end
+  TRACE("tiptipEncode:", bendCfg[BEND_TIPTIP_MixerGlobalVariable], encoded)
+  transportToMixer(bendCfg[BEND_TIPTIP_MixerGlobalVariable], encoded);
+end
 
+local function tiptipSwitchFSM(config, menu, queue, state)
+  TRACE3("tiptipSwitchFSM");
+  local bendCfg = config[CFG_Backend_Data][CFG_BEND_TipTip];
+  local t = getTime();
+  local difftime = t - state[FSMTIP_LastTime];
   if (state[FSMTIP_State] == FSMTIP_STATE_Idle) then
-    TRACE("tiptipSwitchFSM idle size:", queue:size());
+    TRACE1("tiptipSwitchFSM idle size:", queue:size());
     if (queue:size() > 0) then
-      local item = queue:pop();
-      state[FSMTIP_LastTime] = getTime();
-      state[FSMTIP_State] = FSMTIP_STATE_On;
+      local push = queue:pop();
+      local item = push[PUSHED_ITEM_Item];
+      local before = push[PUSHED_ITEM_BeforeState];
+      if (item[ITEM_State] <= 3) and (before <= 3) then
+        local pulse = 0;
+        TRACE("tiptipSwitchFSM idle: ", item[ITEM_State], before);
+        if (item[ITEM_State] == 1) then
+          pulse = before; -- off
+        else
+          if (before == 1) then
+            pulse = item[ITEM_State];
+          else 
+            local offItem = {[ITEM_Function] = item[ITEM_Function], 
+                             [ITEM_Module] = item[ITEM_Module],
+                             [ITEM_State] = 1};
+            local pushOff = {offItem, before};
+            queue:push(pushOff);
+            local pushOn = {item, 1};
+            queue:push(pushOn);
+          end
+        end
+        if (pulse > 0) then
+          state[FSMTIP_ActualChannel] = item[ITEM_Module]; 
+          state[FSMTIP_ActualCount] = item[ITEM_Function];
+          state[FSMTIP_LastTime] = t;
+          state[FSMTIP_ActualPulse] = pulse;
+          tiptipEncode(config, state, true);
+          state[FSMTIP_Busy] = true;
+          if (state[FSMTIP_ActualCount] == 1) then
+            state[FSMTIP_State] = FSMTIP_STATE_Last;
+          else          
+            state[FSMTIP_State] = FSMTIP_STATE_On;
+          end
+          TRACE1("tiptipSwitchFSM idle to on/last", state[FSMTIP_ActualCount]);  
+        end
+      end
     end    
   elseif (state[FSMTIP_State] == FSMTIP_STATE_On) then
+    TRACE1("tiptipSwitchFSM on size:", queue:size(), difftime);
+    if (difftime >= bendCfg[BEND_TIPTIP_ShortTimeout]) then
+      state[FSMTIP_LastTime] = t;      
+      state[FSMTIP_State] = FSMTIP_STATE_Off;
+      tiptipEncode(config, state, false);
+    end
   elseif (state[FSMTIP_State] == FSMTIP_STATE_Off) then 
+    TRACE1("tiptipSwitchFSM off size:", queue:size(), difftime);
+    if (difftime >= bendCfg[BEND_TIPTIP_ShortTimeout]) then
+      state[FSMTIP_LastTime] = t;      
+      state[FSMTIP_ActualCount] = state[FSMTIP_ActualCount] - 1;
+      if (state[FSMTIP_ActualCount] == 1) then
+        state[FSMTIP_State] = FSMTIP_STATE_Last;
+      else          
+        state[FSMTIP_State] = FSMTIP_STATE_On;
+      end
+      tiptipEncode(config, state, true);
+    end
+  elseif (state[FSMTIP_State] == FSMTIP_STATE_Last) then 
+    TRACE1("tiptipSwitchFSM Last size:", queue:size(), difftime);
+    if (difftime >= bendCfg[BEND_TIPTIP_LongTimeout]) then
+      state[FSMTIP_LastTime] = t;      
+      state[FSMTIP_State] = FSMTIP_STATE_End;
+      tiptipEncode(config, state, false);
+    end
   elseif (state[FSMTIP_State] == FSMTIP_STATE_End) then 
+    TRACE1("tiptipSwitchFSM End size:", queue:size(), difftime);
+    if (difftime >= bendCfg[BEND_TIPTIP_ShortTimeout]) then
+      state[FSMTIP_LastTime] = t;      
+      state[FSMTIP_State] = FSMTIP_STATE_Idle;
+      state[FSMTIP_Busy] = false;
+    end
   end
-
 end
 
 local function solExportSwitchFSM()
@@ -215,7 +290,7 @@ local function sbusSwitchFSM(config, menu, queue, state, encoder, exportValues)
   if ((t - state[FSMSWITCH_LastTime]) > bendCfg[BEND_BUS_StateTimeout]) then
     local item = nil;
     if (queue:size() > 0) then
-      item = queue:pop();
+      item = queue:pop()[PUSHED_ITEM_Item];
     else
       local page = menu[state[FSMSWITCH_CyclePage]]; 
       item = page[state[FSMSWITCH_CycleRow]]; 
@@ -227,8 +302,9 @@ local function sbusSwitchFSM(config, menu, queue, state, encoder, exportValues)
     if (item) then
       if (item[ITEM_Virtual]) then
         for i, virt in ipairs(item[ITEM_Virtual]) do
+          local push = {[PUSHED_ITEM_Item] = virt, [PUSHED_ITEM_BeforeState] = virt[ITEM_State]};
           virt[ITEM_State] = item[ITEM_State];
-          queue:push(virt);
+          queue:push(push);
         end
       else
         encoder(bendCfg[BEND_BUS_MixerGlobalVariable], item);
@@ -249,7 +325,7 @@ end
 
 local function transportShm(gv, value)
   setShmVar(SHM_VAR, value)
-  TRACE3("transportShm", value);
+  TRACE("transportShm", value);
 end
 
 local function transportGlobalLua(gv, value)
@@ -406,9 +482,6 @@ local function parameterValueSbus(config)
 end
 
 local function encodeSPort(gv, item)
-end
-
-local function encodeTipTip(gv, item)
 end
 
 local function getEncoder(cfg)

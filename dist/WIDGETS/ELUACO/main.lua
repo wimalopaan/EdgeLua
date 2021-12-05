@@ -98,6 +98,7 @@ local function create(zone, options)
   local widget = __libI.initWidget(zone, options);
   collectgarbage();
 
+  print("TRACE: " , "EL_Con ctreat1" );
   if not(__WmSw2Config) then
     local config = __libI.loadConfig();
     if not (config) then
@@ -108,6 +109,8 @@ local function create(zone, options)
   end
   collectgarbage();
 
+  print("TRACE: " , "EL_Con ctreat2" );
+
   local map = nil;
   local modInfos = nil;
   local filename = {};
@@ -115,15 +118,24 @@ local function create(zone, options)
   menu, exportValues, filename, map, modInfos = __libI.loadMenu();
   exportValues = nil;
 
+  print("TRACE: " , "EL_Con ctreat3" );
+
   if not (menu) then
     errorCode = 5;
     return widget;
   end
 
+  print("TRACE: " , "EL_Con ctreat4" );
+
   encoder, paramScaler, paramEncoder = __libP.getEncoder(__WmSw2Config);
+  print("TRACE: " , "EL_Con ctreat41" );
+
   configFSM = __libP.getConfigFSM(__WmSw2Config);
+  print("TRACE: " , "EL_Con ctreat42" );
 
   headers, menu, help, valuesFileName = __libI.initParamMenu(__WmSw2Config, menu, map, modInfos, filename)
+
+  print("TRACE: " , "EL_Con ctreat5" );
 
 
 print("TRACE: " , "valuesFilename:", valuesFileName )
@@ -132,6 +144,8 @@ print("TRACE: " , "valuesFilename:", valuesFileName )
     __libU.initValues(menu, valuesFileName);
   end
 
+
+print("TRACE: " , "EL_Con ctreat6" );
 
   __libI.initConfigFSM(fsmState);
 

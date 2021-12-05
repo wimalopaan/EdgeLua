@@ -165,7 +165,8 @@ local function refresh(widget, event, touch)
     __libD.processTouch(menu, menuState, event, touch);
     __libD.processButtons(__WmSw2Config, menu, menuState, buttonState, queue, __libD.selectItem);
     __libD.processOverlays(overlays, menuState, queue);
-    __libD.displayMenu(__WmSw2Config, widget, menu, overlays, menuState, event, remoteInput, __WmSw2Warning1, __WmSw2Warning2, pagetitles, menudata);
+    __libD.displayMenu(__WmSw2Config, widget, menu, overlays, menuState, event, remoteInput,
+                       __WmSw2Warning1, __WmSw2Warning2, pagetitles, menudata, fsmState);
 
     __libD.displayFmRssiWarning(__WmSw2Config, widget, rssiState);
 

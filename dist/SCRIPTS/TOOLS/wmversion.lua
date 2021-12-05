@@ -14,7 +14,7 @@
 
 local function run()
     lcd.clear();
-    lcd.drawText(10, 10, "Version: " .. "2.03", MIDSIZE);
+    lcd.drawText(10, 10, "Version: " .. "2.04", MIDSIZE);
     return 0;
 end
 
