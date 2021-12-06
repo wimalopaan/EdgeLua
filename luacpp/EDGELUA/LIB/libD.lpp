@@ -77,6 +77,12 @@ local function displayParamMenuBW(config, widget, pmenu, pheaders, state, paramS
   local page = pmenu[activePageIndex];
   local header = pheaders[activePageIndex];
   lcd.clear()
+
+  if (config[CFG_Backend] == CFG_BEND_TipTip) or (config[CFG_Backend] == CFG_BEND_SolExpert) then
+    lcd.drawText(widget[W_X], widget[W_Y], "Not usable with backend: " .. config[CFG_Backend], MIDSIZE);
+    return 0;
+  end
+
   lcd.drawScreenTitle(header[PHEADER_Title] .. "/" .. header[PHEADER_Module], activePageIndex, #pheaders);
 
   local maxParamsPerLine = 1;
@@ -139,11 +145,16 @@ local function displayParamMenuBW(config, widget, pmenu, pheaders, state, paramS
 end
 
 local function displayParamMenuColorNoTheme(config, widget, pmenu, pheaders, state, paramScaler, event, help)
+  lcd.clear()
   local activePageIndex = state[MENUSTATE_Page];
   local page = pmenu[activePageIndex];
   local header = pheaders[activePageIndex];
 
---  lcd.clear()
+  if (config[CFG_Backend] == CFG_BEND_TipTip) or (config[CFG_Backend] == CFG_BEND_SolExpert) then
+    lcd.drawText(widget[W_X], widget[W_Y], "Not usable with backend: " .. config[CFG_Backend], MIDSIZE);
+    return 0;
+  end
+
   lcd.drawText(widget[W_X], widget[W_Y], header[PHEADER_Title] .. " [" .. header[PHEADER_Module] .."]", MIDSIZE);
 
   displayHeaderNoTheme(widget, "Page " .. activePageIndex .. "/" .. #pmenu);
@@ -226,15 +237,16 @@ end
 
 
 local function displayParamMenuColor(config, widget, pmenu, pheaders, state, paramScaler, event, help)
-  if (config[CFG_Backend] > 1) then
-    return;
+  lcd.clear()
+  if (config[CFG_Backend] == CFG_BEND_TipTip) or (config[CFG_Backend] == CFG_BEND_SolExpert) then
+    lcd.drawText(widget[W_X], widget[W_Y], "Not usable with backend: " .. config[CFG_Backend], MIDSIZE + COLOR_THEME_WARNING);
+    return 0;
   end
 
   local activePageIndex = state[MENUSTATE_Page];
   local page = pmenu[activePageIndex];
   local header = pheaders[activePageIndex];
 
-  lcd.clear()
   lcd.drawText(widget[W_X], widget[W_Y], header[PHEADER_Title] .. " [" .. header[PHEADER_Module] .."]", MIDSIZE + COLOR_THEME_PRIMARY3);
 
   displayHeader(widget, "Page " .. activePageIndex .. "/" .. #pmenu);
@@ -609,6 +621,12 @@ local function makeSelection(menuState)
   menuState[MENUSTATE_SelCol] = menuState[MENUSTATE_Col];
 end
 
+local function setAndPushItem(queue, item, newState)
+  local push = {[PUSHED_ITEM_Item] = item, [PUSHED_ITEM_BeforeState] = item[ITEM_State]};
+  item[ITEM_State] = newState;
+  queue:push(push);
+end
+
 local function selectParamItem(menu, menuState, queue)
   makeSelection(menuState);
   local page = menu[menuState[MENUSTATE_Page]];
@@ -624,9 +642,10 @@ local function selectItem(menu, menuState, queue)
   makeSelection(menuState);
   local page = menu[menuState[MENUSTATE_Page]];
   local item = page[menuState[MENUSTATE_Row]];
-  local push = {[PUSHED_ITEM_Item] = item, [PUSHED_ITEM_BeforeState] = item[ITEM_State]};
-  item[ITEM_State] = menuState[MENUSTATE_Col];
-  queue:push(push);
+  setAndPushItem(queue, item, menuState[MENUSTATE_Col]);
+  -- local push = {[PUSHED_ITEM_Item] = item, [PUSHED_ITEM_BeforeState] = item[ITEM_State]};
+  -- item[ITEM_State] = menuState[MENUSTATE_Col];
+  -- queue:push(push);
 end
 
 #ifdef DEBUG
@@ -746,9 +765,10 @@ local function processShortCuts(shortCuts, queue)
     if not (v == sc[SHORTCUT_LastValue]) then
       sc[SHORTCUT_LastValue] = v;
       local item = sc[SHORTCUT_Item];
-      local push = {[PUSHED_ITEM_Item] = item, [PUSHED_ITEM_BeforeState] = item[ITEM_State]};
-      item[ITEM_State] = v;
-      queue:push(push);
+      setAndPushItem(queue, item, v);
+      -- local push = {[PUSHED_ITEM_Item] = item, [PUSHED_ITEM_BeforeState] = item[ITEM_State]};
+      -- item[ITEM_State] = v;
+      -- queue:push(push);
     end
   end
 end
@@ -759,8 +779,44 @@ local function processOverlays(overlays, menuState, queue)
   processShortCuts(overlay, queue);
 end
 
+local function processTrimsSelect(config, buttonState, callback)
+  if (config[CFG_SelectLsId]) then
+    local value = getValue(config[CFG_SelectLsId]);
+    if (value > buttonState[BUTTONS_SELECT]) then
+      callback();
+    end
+    buttonState[BUTTONS_SELECT] = value;
+  end
+end
+
+local function processTrimsPrevious(config, buttonState, callback)
+  if (config[CFG_PreviousLsId]) then
+    local value = getValue(config[CFG_PreviousLsId]);
+    if (value > buttonState[BUTTONS_PREV]) then
+      callback();
+    end
+    buttonState[BUTTONS_PREV] = value;
+  end
+end
+
+local function processTrimsNext(config, buttonState, callback)
+  if (config[CFG_NextLsId]) then
+    local value = getValue(config[CFG_NextLsId]);
+    if (value > buttonState[BUTTONS_NEXT]) then
+      callback();
+    end
+    buttonState[BUTTONS_NEXT] = value;
+  end
+end
+
 local function processTrims(config, menu, menuState, buttonState, queue, callback)
   TRACE3("processTrims");
+  local prevCB = function() 
+    prevCol(menu, menuState);
+    menuDeselect(menuState);
+  end
+  processTrimsPrevious(config, buttonState, prevCB);
+  --[[
   if (config[CFG_PreviousLsId]) then
     local value = getValue(config[CFG_PreviousLsId]);
     TRACE3("processTrims prev", config[CFG_PreviousLsId], value);
@@ -770,6 +826,13 @@ local function processTrims(config, menu, menuState, buttonState, queue, callbac
     end
     buttonState[BUTTONS_PREV] = value;
   end
+  --]]
+  local nextCB = function()
+    nextCol(menu, menuState);
+    menuDeselect(menuState);
+  end
+  processTrimsNext(config, buttonState, nextCB);
+  --[[
   if (config[CFG_NextLsId]) then
     local value = getValue(config[CFG_NextLsId]);
 --    TRACE("processTrims next", config[CFG_NextLsId], value);
@@ -779,6 +842,15 @@ local function processTrims(config, menu, menuState, buttonState, queue, callbac
     end
     buttonState[BUTTONS_NEXT] = value;
   end
+  --]]
+
+  local selectCB = function()
+    TRACE("selectCB");
+    callback(menu, menuState, queue);
+  end
+  processTrimsSelect(config, buttonState, selectCB);
+
+  --[[
   if (config[CFG_SelectLsId]) then
     local value = getValue(config[CFG_SelectLsId]);
 --    TRACE("processTrims select", config[CFG_SelectLsId], value);
@@ -787,6 +859,7 @@ local function processTrims(config, menu, menuState, buttonState, queue, callbac
     end
     buttonState[BUTTONS_SELECT] = value;
   end
+  --]]
 end
 
 local function processPots(config, menu, menuState, buttonState)
@@ -896,9 +969,10 @@ local function processForeignInput(config, foreignInput, menu, queue)
 
   local item = findItem(menu, fn, module);
   if (item) then
-    local push = {[PUSHED_ITEM_Item] = item, [PUSHED_ITEM_BeforeState] = item[ITEM_State]};
-    item[ITEM_State] = state;
-    queue:push(push);
+    setAndPushItem(queue, item, state);
+    -- local push = {[PUSHED_ITEM_Item] = item, [PUSHED_ITEM_BeforeState] = item[ITEM_State]};
+    -- item[ITEM_State] = state;
+    -- queue:push(push);
   end
 end
 
@@ -924,9 +998,10 @@ local function processRemoteInput(config, menu, queue, remoteState)
     remoteState[REMOTE_Function] = fn;
     remoteState[REMOTE_State] = state;
     TRACE("remote: ", module, fn, state);
-    local push = {[PUSHED_ITEM_Item] = item, [PUSHED_ITEM_BeforeState] = item[ITEM_State]};
-    item[ITEM_State] = state;
-    queue:push(push);
+    setAndPushItem(queue, item, state);
+    -- local push = {[PUSHED_ITEM_Item] = item, [PUSHED_ITEM_BeforeState] = item[ITEM_State]};
+    -- item[ITEM_State] = state;
+    -- queue:push(push);
   end
 end
 
@@ -938,6 +1013,11 @@ local function displayFmRssiWarningColor(config, widget, state)
 end 
 
 local function displayAddressConfigBW(config, encoder, pScaler, state, event)
+  if (config[CFG_Backend] == CFG_BEND_TipTip) or (config[CFG_Backend] == CFG_BEND_SolExpert) then
+    lcd.drawText(widget[W_X], widget[W_Y], "Not usable with backend: " .. config[CFG_Backend], MIDSIZE);
+    return;
+  end
+
   if (state[FSMADR_State] == FSMADR_STATE_Initial) then
 
     lcd.drawText(0, 0, "Attach only one device to the RX.", SMLSIZE);
@@ -973,6 +1053,11 @@ end
 
 local function displayAddressConfigColor(config, widget, encoder, pScaler, state, event, touch)
   lcd.clear();
+
+  if (config[CFG_Backend] == CFG_BEND_TipTip) or (config[CFG_Backend] == CFG_BEND_SolExpert) then
+    lcd.drawText(widget[W_X], widget[W_Y], "Not usable with backend: " .. config[CFG_Backend], MIDSIZE + COLOR_THEME_WARNING);
+    return;
+  end
 
   local bh = 2 * widget[W_FontHLarge];
   local border_h = 20;
@@ -1016,6 +1101,52 @@ local function displayAddressConfigColor(config, widget, encoder, pScaler, state
 end
 
 local function displayAddressConfigColorNoTheme(config, widget, encoder, pScaler, state, event, touch)
+  lcd.clear();
+
+  if (config[CFG_Backend] == CFG_BEND_TipTip) or (config[CFG_Backend] == CFG_BEND_SolExpert) then
+    lcd.drawText(widget[W_X], widget[W_Y], "Not usable with backend: " .. config[CFG_Backend], MIDSIZE);
+    return;
+  end
+
+  local bh = 2 * widget[W_FontHLarge];
+  local border_h = 20;
+  local bw = widget[W_Width] - 2 * border_h;;
+
+  local rect = {xmin = widget[W_X] + border_h, xmax = widget[W_X] + bw,
+    ymin = widget[W_Y] + widget[W_Height] / 2 - bh / 2, ymax = widget[W_Y] + widget[W_Height] / 2 + bh / 2};
+
+  if (state[FSMADR_State] == FSMADR_STATE_Initial) then
+
+    lcd.drawText(widget[W_X] + border_h, widget[W_Y] + widget[W_FontHLarge], "Attach only one device to the RX.", SMLSIZE);
+
+    lcd.drawFilledRectangle(rect.xmin, rect.ymin, rect.xmax - rect.xmin + 1, rect.ymax - rect.ymin + 1);
+    lcd.drawText(rect.xmin + 5, rect.ymin + 5, "Press [Enter] to start learning", MIDSIZE);
+    if (event == EVT_VIRTUAL_ENTER) then
+      state[FSMADR_State] = FSMADR_STATE_Output;
+    end
+  elseif (state[FSMADR_State] == FSMADR_STATE_Output) then    
+    local adr = pScaler(config) + 1;
+    if (adr > 8) then
+      adr = 8;
+    end 
+
+    lcd.drawText(widget[W_X] + border_h, widget[W_Y] + widget[W_FontHLarge], "Address: " .. adr, MIDSIZE);
+
+    lcd.drawText(widget[W_X] + border_h, widget[W_Y] + widget[W_Height] - widget[W_FontHLarge], "Watch for the device to respond.", SMLSIZE);
+
+    lcd.drawFilledRectangle(rect.xmin, rect.ymin, rect.xmax - rect.xmin + 1, rect.ymax - rect.ymin + 1);
+    lcd.drawText(rect.xmin + 5, rect.ymin + 5, "Switch on RX and device", MIDSIZE);
+
+    #ifdef USE_BACKEND_BUS
+    local bendcfg = config[CFG_Backend_Data][CFG_BEND_Bus];
+    encoder(bendcfg[BEND_BUS_MixerGlobalVariable], 14, adr);
+    #endif
+
+    if (event == EVT_VIRTUAL_ENTER) then
+      state[FSMADR_State] = FSMADR_STATE_Initial;
+    end
+  else
+  end
 end
 
 local function processEventsBW()

@@ -463,7 +463,7 @@ local function initConfigColor(config, modifyModel)
     end
   end
 
-  local footer = "Vers: " .. "2.04";
+  local footer = "Vers: " .. "2.05";
   if (cfg[9] == 0) then
     footer = footer .. " Mod: xjt";
   elseif (cfg[9] == 1) then

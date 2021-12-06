@@ -75,6 +75,12 @@ local function displayParamMenuBW(config, widget, pmenu, pheaders, state, paramS
   local page = pmenu[activePageIndex];
   local header = pheaders[activePageIndex];
   lcd.clear()
+
+  if (config[14] == 3) or (config[14] == 4) then
+    lcd.drawText(widget[1], widget[2], "Not usable with backend: " .. config[14], MIDSIZE);
+    return 0;
+  end
+
   lcd.drawScreenTitle(header[1] .. "/" .. header[2], activePageIndex, #pheaders);
 
   local maxParamsPerLine = 1;
@@ -137,11 +143,16 @@ local function displayParamMenuBW(config, widget, pmenu, pheaders, state, paramS
 end
 
 local function displayParamMenuColorNoTheme(config, widget, pmenu, pheaders, state, paramScaler, event, help)
+  lcd.clear()
   local activePageIndex = state[3];
   local page = pmenu[activePageIndex];
   local header = pheaders[activePageIndex];
 
--- lcd.clear()
+  if (config[14] == 3) or (config[14] == 4) then
+    lcd.drawText(widget[1], widget[2], "Not usable with backend: " .. config[14], MIDSIZE);
+    return 0;
+  end
+
   lcd.drawText(widget[1], widget[2], header[1] .. " [" .. header[2] .."]", MIDSIZE);
 
   displayHeaderNoTheme(widget, "Page " .. activePageIndex .. "/" .. #pmenu);
@@ -223,15 +234,16 @@ local function displayParamMenuColorNoTheme(config, widget, pmenu, pheaders, sta
 end
 
 local function displayParamMenuColor(config, widget, pmenu, pheaders, state, paramScaler, event, help)
-  if (config[14] > 1) then
-    return;
+  lcd.clear()
+  if (config[14] == 3) or (config[14] == 4) then
+    lcd.drawText(widget[1], widget[2], "Not usable with backend: " .. config[14], MIDSIZE + COLOR_THEME_WARNING);
+    return 0;
   end
 
   local activePageIndex = state[3];
   local page = pmenu[activePageIndex];
   local header = pheaders[activePageIndex];
 
-  lcd.clear()
   lcd.drawText(widget[1], widget[2], header[1] .. " [" .. header[2] .."]", MIDSIZE + COLOR_THEME_PRIMARY3);
 
   displayHeader(widget, "Page " .. activePageIndex .. "/" .. #pmenu);
@@ -605,6 +617,12 @@ local function makeSelection(menuState)
   menuState[5] = menuState[2];
 end
 
+local function setAndPushItem(queue, item, newState)
+  local push = {[1] = item, [2] = item[3]};
+  item[3] = newState;
+  queue:push(push);
+end
+
 local function selectParamItem(menu, menuState, queue)
   makeSelection(menuState);
   local page = menu[menuState[3]];
@@ -620,9 +638,10 @@ local function selectItem(menu, menuState, queue)
   makeSelection(menuState);
   local page = menu[menuState[3]];
   local item = page[menuState[1]];
-  local push = {[1] = item, [2] = item[3]};
-  item[3] = menuState[2];
-  queue:push(push);
+  setAndPushItem(queue, item, menuState[2]);
+  -- local push = {[1] = item, [2] = item[3]};
+  -- item[3] = menuState[2];
+  -- queue:push(push);
 end
 
 local lastEvent = 0;
@@ -741,9 +760,10 @@ local function processShortCuts(shortCuts, queue)
     if not (v == sc[4]) then
       sc[4] = v;
       local item = sc[2];
-      local push = {[1] = item, [2] = item[3]};
-      item[3] = v;
-      queue:push(push);
+      setAndPushItem(queue, item, v);
+      -- local push = {[1] = item, [2] = item[3]};
+      -- item[3] = v;
+      -- queue:push(push);
     end
   end
 end
@@ -754,8 +774,44 @@ local function processOverlays(overlays, menuState, queue)
   processShortCuts(overlay, queue);
 end
 
+local function processTrimsSelect(config, buttonState, callback)
+  if (config[13]) then
+    local value = getValue(config[13]);
+    if (value > buttonState[3]) then
+      callback();
+    end
+    buttonState[3] = value;
+  end
+end
+
+local function processTrimsPrevious(config, buttonState, callback)
+  if (config[11]) then
+    local value = getValue(config[11]);
+    if (value > buttonState[1]) then
+      callback();
+    end
+    buttonState[1] = value;
+  end
+end
+
+local function processTrimsNext(config, buttonState, callback)
+  if (config[12]) then
+    local value = getValue(config[12]);
+    if (value > buttonState[2]) then
+      callback();
+    end
+    buttonState[2] = value;
+  end
+end
+
 local function processTrims(config, menu, menuState, buttonState, queue, callback)
                         ;
+  local prevCB = function()
+    prevCol(menu, menuState);
+    menuDeselect(menuState);
+  end
+  processTrimsPrevious(config, buttonState, prevCB);
+  --[[
   if (config[11]) then
     local value = getValue(config[11]);
                                                                 ;
@@ -765,6 +821,13 @@ local function processTrims(config, menu, menuState, buttonState, queue, callbac
     end
     buttonState[1] = value;
   end
+  --]]
+  local nextCB = function()
+    nextCol(menu, menuState);
+    menuDeselect(menuState);
+  end
+  processTrimsNext(config, buttonState, nextCB);
+  --[[
   if (config[12]) then
     local value = getValue(config[12]);
 -- print("TRACE: " , "processTrims next", config[12], value );
@@ -774,6 +837,15 @@ local function processTrims(config, menu, menuState, buttonState, queue, callbac
     end
     buttonState[2] = value;
   end
+  --]]
+
+  local selectCB = function()
+    print("TRACE: " , "selectCB" );
+    callback(menu, menuState, queue);
+  end
+  processTrimsSelect(config, buttonState, selectCB);
+
+  --[[
   if (config[13]) then
     local value = getValue(config[13]);
 -- print("TRACE: " , "processTrims select", config[13], value );
@@ -782,6 +854,7 @@ local function processTrims(config, menu, menuState, buttonState, queue, callbac
     end
     buttonState[3] = value;
   end
+  --]]
 end
 
 local function processPots(config, menu, menuState, buttonState)
@@ -891,9 +964,10 @@ local function processForeignInput(config, foreignInput, menu, queue)
 
   local item = findItem(menu, fn, module);
   if (item) then
-    local push = {[1] = item, [2] = item[3]};
-    item[3] = state;
-    queue:push(push);
+    setAndPushItem(queue, item, state);
+    -- local push = {[1] = item, [2] = item[3]};
+    -- item[3] = state;
+    -- queue:push(push);
   end
 end
 
@@ -919,9 +993,10 @@ local function processRemoteInput(config, menu, queue, remoteState)
     remoteState[3] = fn;
     remoteState[4] = state;
     print("TRACE: " , "remote: ", module, fn, state );
-    local push = {[1] = item, [2] = item[3]};
-    item[3] = state;
-    queue:push(push);
+    setAndPushItem(queue, item, state);
+    -- local push = {[1] = item, [2] = item[3]};
+    -- item[3] = state;
+    -- queue:push(push);
   end
 end
 
@@ -933,6 +1008,11 @@ local function displayFmRssiWarningColor(config, widget, state)
 end
 
 local function displayAddressConfigBW(config, encoder, pScaler, state, event)
+  if (config[14] == 3) or (config[14] == 4) then
+    lcd.drawText(widget[1], widget[2], "Not usable with backend: " .. config[14], MIDSIZE);
+    return;
+  end
+
   if (state[1] == 0) then
 
     lcd.drawText(0, 0, "Attach only one device to the RX.", SMLSIZE);
@@ -966,6 +1046,11 @@ end
 
 local function displayAddressConfigColor(config, widget, encoder, pScaler, state, event, touch)
   lcd.clear();
+
+  if (config[14] == 3) or (config[14] == 4) then
+    lcd.drawText(widget[1], widget[2], "Not usable with backend: " .. config[14], MIDSIZE + COLOR_THEME_WARNING);
+    return;
+  end
 
   local bh = 2 * widget[9];
   local border_h = 20;
@@ -1007,6 +1092,50 @@ local function displayAddressConfigColor(config, widget, encoder, pScaler, state
 end
 
 local function displayAddressConfigColorNoTheme(config, widget, encoder, pScaler, state, event, touch)
+  lcd.clear();
+
+  if (config[14] == 3) or (config[14] == 4) then
+    lcd.drawText(widget[1], widget[2], "Not usable with backend: " .. config[14], MIDSIZE);
+    return;
+  end
+
+  local bh = 2 * widget[9];
+  local border_h = 20;
+  local bw = widget[3] - 2 * border_h;;
+
+  local rect = {xmin = widget[1] + border_h, xmax = widget[1] + bw,
+    ymin = widget[2] + widget[4] / 2 - bh / 2, ymax = widget[2] + widget[4] / 2 + bh / 2};
+
+  if (state[1] == 0) then
+
+    lcd.drawText(widget[1] + border_h, widget[2] + widget[9], "Attach only one device to the RX.", SMLSIZE);
+
+    lcd.drawFilledRectangle(rect.xmin, rect.ymin, rect.xmax - rect.xmin + 1, rect.ymax - rect.ymin + 1);
+    lcd.drawText(rect.xmin + 5, rect.ymin + 5, "Press [Enter] to start learning", MIDSIZE);
+    if (event == EVT_VIRTUAL_ENTER) then
+      state[1] = 1;
+    end
+  elseif (state[1] == 1) then
+    local adr = pScaler(config) + 1;
+    if (adr > 8) then
+      adr = 8;
+    end
+
+    lcd.drawText(widget[1] + border_h, widget[2] + widget[9], "Address: " .. adr, MIDSIZE);
+
+    lcd.drawText(widget[1] + border_h, widget[2] + widget[4] - widget[9], "Watch for the device to respond.", SMLSIZE);
+
+    lcd.drawFilledRectangle(rect.xmin, rect.ymin, rect.xmax - rect.xmin + 1, rect.ymax - rect.ymin + 1);
+    lcd.drawText(rect.xmin + 5, rect.ymin + 5, "Switch on RX and device", MIDSIZE);
+
+    local bendcfg = config[20][1];
+    encoder(bendcfg[2], 14, adr);
+
+    if (event == EVT_VIRTUAL_ENTER) then
+      state[1] = 0;
+    end
+  else
+  end
 end
 
 local function processEventsBW()
