@@ -780,9 +780,12 @@ local function processOverlays(overlays, menuState, queue)
 end
 
 local function processTrimsSelect(config, buttonState, callback)
+  TRACE3("processTrimsSelect: ", config[CFG_SelectLsId], buttonState, callback);
   if (config[CFG_SelectLsId]) then
     local value = getValue(config[CFG_SelectLsId]);
+    TRACE3("processTrimsSelect value:", value);
     if (value > buttonState[BUTTONS_SELECT]) then
+      TRACE3("processTrimsSelect select cb");
       callback();
     end
     buttonState[BUTTONS_SELECT] = value;
@@ -1051,13 +1054,18 @@ local function displayAddressConfigBW(config, encoder, pScaler, state, event)
   end
 end
 
-local function displayAddressConfigColor(config, widget, encoder, pScaler, state, event, touch)
+local function displayAddressConfigColor(config, widget, encoder, pScaler, state, event, touch, buttonState)
   lcd.clear();
 
   if (config[CFG_Backend] == CFG_BEND_TipTip) or (config[CFG_Backend] == CFG_BEND_SolExpert) then
     lcd.drawText(widget[W_X], widget[W_Y], "Not usable with backend: " .. config[CFG_Backend], MIDSIZE + COLOR_THEME_WARNING);
     return;
   end
+
+  processTrimsSelect(config, buttonState, function()
+    TRACE("selectCB");
+    event = EVT_VIRTUAL_ENTER;
+  end);
 
   local bh = 2 * widget[W_FontHLarge];
   local border_h = 20;
@@ -1100,13 +1108,17 @@ local function displayAddressConfigColor(config, widget, encoder, pScaler, state
   end
 end
 
-local function displayAddressConfigColorNoTheme(config, widget, encoder, pScaler, state, event, touch)
+local function displayAddressConfigColorNoTheme(config, widget, encoder, pScaler, state, event, touch, buttonState)
   lcd.clear();
 
   if (config[CFG_Backend] == CFG_BEND_TipTip) or (config[CFG_Backend] == CFG_BEND_SolExpert) then
     lcd.drawText(widget[W_X], widget[W_Y], "Not usable with backend: " .. config[CFG_Backend], MIDSIZE);
     return;
   end
+
+  processTrimsSelect(config, buttonState, function()
+    event = EVT_VIRTUAL_ENTER;
+  end);
 
   local bh = 2 * widget[W_FontHLarge];
   local border_h = 20;
@@ -1121,6 +1133,7 @@ local function displayAddressConfigColorNoTheme(config, widget, encoder, pScaler
 
     lcd.drawFilledRectangle(rect.xmin, rect.ymin, rect.xmax - rect.xmin + 1, rect.ymax - rect.ymin + 1);
     lcd.drawText(rect.xmin + 5, rect.ymin + 5, "Press [Enter] to start learning", MIDSIZE);
+
     if (event == EVT_VIRTUAL_ENTER) then
       state[FSMADR_State] = FSMADR_STATE_Output;
     end

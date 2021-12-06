@@ -58,7 +58,7 @@ local lastValue = 0;
 
 local function demux(value)
    if (value ~= lastValue) then
-      TRACE("vmap value:", value);
+      TRACE3("vmap value:", value);
       lastValue = value;
    end
 

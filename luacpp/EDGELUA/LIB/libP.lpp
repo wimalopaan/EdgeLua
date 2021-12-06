@@ -325,7 +325,7 @@ end
 
 local function transportShm(gv, value)
   setShmVar(SHM_VAR, value)
-  TRACE("transportShm", value);
+  TRACE3("transportShm", value);
 end
 
 local function transportGlobalLua(gv, value)

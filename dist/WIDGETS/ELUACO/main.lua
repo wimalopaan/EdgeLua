@@ -98,7 +98,7 @@ local function create(zone, options)
       errorCode = 4;
       return widget;
     end
-    __WmSw2Config = __libI.initConfig(config);
+    __WmSw2Config = __libI.initConfig(config, true);
   end
   collectgarbage();
 

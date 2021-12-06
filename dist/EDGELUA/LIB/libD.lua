@@ -775,9 +775,12 @@ local function processOverlays(overlays, menuState, queue)
 end
 
 local function processTrimsSelect(config, buttonState, callback)
+                                                                               ;
   if (config[13]) then
     local value = getValue(config[13]);
+                                              ;
     if (value > buttonState[3]) then
+                                            ;
       callback();
     end
     buttonState[3] = value;
@@ -1044,13 +1047,18 @@ local function displayAddressConfigBW(config, encoder, pScaler, state, event)
   end
 end
 
-local function displayAddressConfigColor(config, widget, encoder, pScaler, state, event, touch)
+local function displayAddressConfigColor(config, widget, encoder, pScaler, state, event, touch, buttonState)
   lcd.clear();
 
   if (config[14] == 3) or (config[14] == 4) then
     lcd.drawText(widget[1], widget[2], "Not usable with backend: " .. config[14], MIDSIZE + COLOR_THEME_WARNING);
     return;
   end
+
+  processTrimsSelect(config, buttonState, function()
+    print("TRACE: " , "selectCB" );
+    event = EVT_VIRTUAL_ENTER;
+  end);
 
   local bh = 2 * widget[9];
   local border_h = 20;
@@ -1091,13 +1099,17 @@ local function displayAddressConfigColor(config, widget, encoder, pScaler, state
   end
 end
 
-local function displayAddressConfigColorNoTheme(config, widget, encoder, pScaler, state, event, touch)
+local function displayAddressConfigColorNoTheme(config, widget, encoder, pScaler, state, event, touch, buttonState)
   lcd.clear();
 
   if (config[14] == 3) or (config[14] == 4) then
     lcd.drawText(widget[1], widget[2], "Not usable with backend: " .. config[14], MIDSIZE);
     return;
   end
+
+  processTrimsSelect(config, buttonState, function()
+    event = EVT_VIRTUAL_ENTER;
+  end);
 
   local bh = 2 * widget[9];
   local border_h = 20;
@@ -1112,6 +1124,7 @@ local function displayAddressConfigColorNoTheme(config, widget, encoder, pScaler
 
     lcd.drawFilledRectangle(rect.xmin, rect.ymin, rect.xmax - rect.xmin + 1, rect.ymax - rect.ymin + 1);
     lcd.drawText(rect.xmin + 5, rect.ymin + 5, "Press [Enter] to start learning", MIDSIZE);
+
     if (event == EVT_VIRTUAL_ENTER) then
       state[1] = 1;
     end

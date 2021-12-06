@@ -67,6 +67,7 @@ local options = {};
 local paramEncoder = nil;
 local paramScaler = nil;
 local menuState = {};
+local buttonState = {0, 0, 0, 0, 0, 0};
 
 local lastRun = 0;
 
@@ -85,7 +86,7 @@ local function create(zone, options)
       errorCode = 4;
       return widget;
     end
-    __WmSw2Config = __libI.initConfig(config);
+    __WmSw2Config = __libI.initConfig(config, true);
   end
   collectgarbage();
 
@@ -124,7 +125,7 @@ local function refresh(widget, event, touch)
   if (errorCode == 0) then
     __stopWmSw2 = bit32.bor(__stopWmSw2, 2);
     lastRun = getTime();
-    __libD.displayAddressConfig(__WmSw2Config, widget, paramEncoder, paramScaler, menuState, event, touch);
+    __libD.displayAddressConfig(__WmSw2Config, widget, paramEncoder, paramScaler, menuState, event, touch, buttonState);
     background();
   else
     lcd.drawText(widget[1], widget[2], "Error: " .. errorCode, DBLSIZE);

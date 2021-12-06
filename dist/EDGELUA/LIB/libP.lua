@@ -323,7 +323,7 @@ end
 
 local function transportShm(gv, value)
   setShmVar(1, value)
-  print("TRACE: " , "transportShm", value );
+                               ;
 end
 
 local function transportGlobalLua(gv, value)
