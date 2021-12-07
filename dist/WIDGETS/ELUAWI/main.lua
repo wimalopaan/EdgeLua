@@ -165,7 +165,13 @@ local function refresh(widget, event, touch)
 
     lcd.drawFilledRectangle(f1.x + border, f1.y + border, f1.w - (2 * border), f1.h - (2 * border), YELLOW);
     lcd.drawFilledRectangle(f5.x + border, f5.y + border, f5.w - (2 * border), f5.h - (2 * border), YELLOW);
-    lcd.drawText(f6.x + border, f6.y + f6.h / 2 - 16, __libU.optionString(widget[11].Name));
+
+      local title = widget[11].Name;
+      if (type(title) == "string") then
+        lcd.drawText(f6.x + border, f6.y + f6.h / 2 - 16, title);
+      else
+        lcd.drawText(f6.x + border, f6.y + f6.h / 2 - 16, __libU.optionString(title));
+      end
 
     buttonText(holdBtn, "Halt");
     buttonText(leftBtn, "Links");
