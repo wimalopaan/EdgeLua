@@ -15,7 +15,8 @@
 #define USE_SHM // only for color/edgetx (PR 1018)
 #define USE_LS_STICKY // (PR 1056)
 #define USE_MODEL_FILENAME // (PR 1132)
-#define USE_FUNCTION_NAMES
+#define USE_FUNCTION_NAMES // (PR 1223)
+#define USE_NEW_STRING_OPTION // (PR 1218)
 
 #define USE_FALLBACK_IDS
 
@@ -24,8 +25,10 @@
 #define USE_BACKEND_TIPTIP
 #define USE_BACKEND_SOLEXPERT
 
+#ifndef USE_FUNCTION_NAMES
 #define LSFUNC_A_EQ_X 1
 #define LSFUNC_A_GT_X 3
+#endif
 
 #define TRIMS_MODE_DISABLE_TRIM 31
 

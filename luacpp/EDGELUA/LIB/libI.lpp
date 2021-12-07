@@ -66,9 +66,15 @@ local function getLogicalSwitchFor(id)
   for lsNumber = 63, 0, -1 do
     local ls = model.getLogicalSwitch(lsNumber);
     if (ls) then
-      if (ls.func == LSFUNC_A_GT_X) and (ls.v1 == maxId) and (ls.v2 == 0) and (ls["and"] == id) then
-        return lsNumber;
-      end
+      #ifdef USE_FUNCTION_NAMES
+        if (ls.func == LS_FUNC_VPOS) and (ls.v1 == maxId) and (ls.v2 == 0) and (ls["and"] == id) then
+          return lsNumber;
+        end
+      #else 
+        if (ls.func == LSFUNC_A_GT_X) and (ls.v1 == maxId) and (ls.v2 == 0) and (ls["and"] == id) then
+          return lsNumber;
+        end
+      #endif 
     end
   end
   return -1;
@@ -123,7 +129,11 @@ local function insertLogicalSwitchFor(id)
       if (lsNumber < 0) then
         lsNumber = getFirstFreeLogicalSwitch();
         if (lsNumber >= 0) then
-          model.setLogicalSwitch(lsNumber, {func = LSFUNC_A_GT_X, v1 = maxId, v2 = 0, ["and"] = id});
+          #ifdef USE_FUNCTION_NAMES
+            model.setLogicalSwitch(lsNumber, {func = LS_FUNC_VPOS, v1 = maxId, v2 = 0, ["and"] = id});
+          #else 
+            model.setLogicalSwitch(lsNumber, {func = LSFUNC_A_GT_X, v1 = maxId, v2 = 0, ["and"] = id});
+          #endif 
         end
       end
       if (lsNumber >= 0) then
@@ -146,13 +156,23 @@ local function insertSettableSwitch(number)
 
     for n = 63, 0, -1 do
       local ls = model.getLogicalSwitch(n);
-      if ((ls.func == LSFUNC_A_EQ_X) or (ls.func == LSFUNC_A_GT_X)) and (ls.v1 == maxId) and (ls.v2 == number) then
-        return n;
-      end
+      #ifdef USE_FUNCTION_NAMES
+        if ((ls.func == LS_FUNC_VEQUAL) or (ls.func == LS_FUNC_VPOS)) and (ls.v1 == maxId) and (ls.v2 == number) then
+          return n;
+        end
+      #else
+        if ((ls.func == LSFUNC_A_EQ_X) or (ls.func == LSFUNC_A_GT_X)) and (ls.v1 == maxId) and (ls.v2 == number) then
+          return n;
+        end
+      #endif
     end 
     local lsNumber = getFirstFreeLogicalSwitch();
     if (lsNumber >= 0) then
-      model.setLogicalSwitch(lsNumber, {func = LSFUNC_A_EQ_X, v1 = maxId, v2 = number}); -- func: 1: a == 0, 3: a > x 
+      #ifdef USE_FUNCTION_NAMES 
+        model.setLogicalSwitch(lsNumber, {func = LS_FUNC_VEQUAL, v1 = maxId, v2 = number}); -- func: 1: a == 0, 3: a > x 
+      #else 
+        model.setLogicalSwitch(lsNumber, {func = LSFUNC_A_EQ_X, v1 = maxId, v2 = number}); -- func: 1: a == 0, 3: a > x 
+      #endif 
       return lsNumber;
     end 
   end 

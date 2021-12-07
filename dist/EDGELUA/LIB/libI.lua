@@ -64,9 +64,11 @@ local function getLogicalSwitchFor(id)
   for lsNumber = 63, 0, -1 do
     local ls = model.getLogicalSwitch(lsNumber);
     if (ls) then
-      if (ls.func == 3) and (ls.v1 == maxId) and (ls.v2 == 0) and (ls["and"] == id) then
-        return lsNumber;
-      end
+
+        if (ls.func == LS_FUNC_VPOS) and (ls.v1 == maxId) and (ls.v2 == 0) and (ls["and"] == id) then
+          return lsNumber;
+        end
+
     end
   end
   return -1;
@@ -106,7 +108,9 @@ local function insertLogicalSwitchFor(id)
       if (lsNumber < 0) then
         lsNumber = getFirstFreeLogicalSwitch();
         if (lsNumber >= 0) then
-          model.setLogicalSwitch(lsNumber, {func = 3, v1 = maxId, v2 = 0, ["and"] = id});
+
+            model.setLogicalSwitch(lsNumber, {func = LS_FUNC_VPOS, v1 = maxId, v2 = 0, ["and"] = id});
+
         end
       end
       if (lsNumber >= 0) then
@@ -129,13 +133,17 @@ local function insertSettableSwitch(number)
 
     for n = 63, 0, -1 do
       local ls = model.getLogicalSwitch(n);
-      if ((ls.func == 1) or (ls.func == 3)) and (ls.v1 == maxId) and (ls.v2 == number) then
-        return n;
-      end
+
+        if ((ls.func == LS_FUNC_VEQUAL) or (ls.func == LS_FUNC_VPOS)) and (ls.v1 == maxId) and (ls.v2 == number) then
+          return n;
+        end
+
     end
     local lsNumber = getFirstFreeLogicalSwitch();
     if (lsNumber >= 0) then
-      model.setLogicalSwitch(lsNumber, {func = 1, v1 = maxId, v2 = number}); -- func: 1: a == 0, 3: a > x
+
+        model.setLogicalSwitch(lsNumber, {func = LS_FUNC_VEQUAL, v1 = maxId, v2 = number}); -- func: 1: a == 0, 3: a > x
+
       return lsNumber;
     end
   end
