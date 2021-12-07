@@ -487,7 +487,7 @@ local function initConfigColor(config, modifyModel)
         local tmodes = {0, 0, 0, 0, 0, 0};
         --[[
         for k, v in pairs(fm.trimsModes) do
-          print("t:", k, v);
+                           ;
           tmodes[k + 1] = v;
         end
         ]]
