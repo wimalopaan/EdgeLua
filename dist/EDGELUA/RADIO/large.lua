@@ -91,9 +91,9 @@ safeMode = {
     linkDropoutMax = 20, --[s], after this time without link switch to safeMode again (e.g. turning off the rx).
   },
 
-local export = {
+export = {
     [1] = {gv = 1, values = {0, -50, 50, 100}},
     [2] = {gv = 2, values = {-100, 0, 100}},
     [3] = {gv = 3, values = {-75, -25, 25, 75}},
-  };
+  },
  };

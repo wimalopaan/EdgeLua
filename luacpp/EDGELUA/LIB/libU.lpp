@@ -125,6 +125,8 @@ local function initDebugTextBW()
   debugText[DEBUG_TEXT_TrimSwitchId] = "TrSw:";
   debugText[DEBUG_TEXT_ValueStorage] = "VSto:";
   debugText[DEBUG_TEXT_Filename] = "FNam:";
+  debugText[DEBUG_TEXT_StringOption] = "SOpt:";
+  debugText[DEBUG_TEXT_FuncNames] = "Func:";
 end
 
 local function initDebugTextColor() 
@@ -137,6 +139,8 @@ local function initDebugTextColor()
   debugText[DEBUG_TEXT_TrimSwitchId] = "TrimSwitch:";
   debugText[DEBUG_TEXT_ValueStorage] = "ValueStorage:";
   debugText[DEBUG_TEXT_Filename] = "ModelFName:";
+  debugText[DEBUG_TEXT_StringOption] = "StringOption:";
+  debugText[DEBUG_TEXT_FuncNames] = "FunctionNames:";
 end
 
 local function displayDebugBW(widget) 
@@ -228,6 +232,31 @@ local function displayDebugBW(widget)
   lcd.drawText(x3, y, debugText[DEBUG_TEXT_Filename], SMLSIZE);
   #ifdef USE_MODEL_FILENAME
   if (model.getInfo().filename) then 
+      lcd.drawText(x4, y, "y", SMLSIZE);
+  else
+      lcd.drawText(x4, y, "n", SMLSIZE);
+  end
+  #else
+      lcd.drawText(x4, y, "-", SMLSIZE);
+  #endif 
+
+  y = y + widget[W_FontHSmall]; 
+  lcd.drawText(x3, y, debugText[DEBUG_TEXT_StringOption], SMLSIZE);
+  #ifdef USE_NEW_STRING_OPTION
+  local opt = widget[W_Options].Test;
+  if (type(opt) == "string") then 
+      lcd.drawText(x4, y, "y", SMLSIZE);
+  else
+      lcd.drawText(x4, y, "n", SMLSIZE);
+  end
+  #else
+      lcd.drawText(x4, y, "-", SMLSIZE);
+  #endif 
+
+  y = y + widget[W_FontHSmall]; 
+  lcd.drawText(x3, y, debugText[DEBUG_TEXT_FuncNames], SMLSIZE);
+  #ifdef USE_NEW_STRING_OPTION
+  if (LS_FUNC_VEQUAL) then 
       lcd.drawText(x4, y, "y", SMLSIZE);
   else
       lcd.drawText(x4, y, "n", SMLSIZE);

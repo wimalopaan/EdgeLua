@@ -25,10 +25,9 @@
 #define USE_BACKEND_TIPTIP
 #define USE_BACKEND_SOLEXPERT
 
-#ifndef USE_FUNCTION_NAMES
+// fallback IDs for functions
 #define LSFUNC_A_EQ_X 1
 #define LSFUNC_A_GT_X 3
-#endif
 
 #define TRIMS_MODE_DISABLE_TRIM 31
 

@@ -65,9 +65,15 @@ local function getLogicalSwitchFor(id)
     local ls = model.getLogicalSwitch(lsNumber);
     if (ls) then
 
+      if (LS_FUNC_VPOS) then
         if (ls.func == LS_FUNC_VPOS) and (ls.v1 == maxId) and (ls.v2 == 0) and (ls["and"] == id) then
           return lsNumber;
         end
+      else
+        if (ls.func == 3) and (ls.v1 == maxId) and (ls.v2 == 0) and (ls["and"] == id) then
+          return lsNumber;
+        end
+      end
 
     end
   end
@@ -109,7 +115,11 @@ local function insertLogicalSwitchFor(id)
         lsNumber = getFirstFreeLogicalSwitch();
         if (lsNumber >= 0) then
 
+          if (LS_FUNC_VPOS) then
             model.setLogicalSwitch(lsNumber, {func = LS_FUNC_VPOS, v1 = maxId, v2 = 0, ["and"] = id});
+          else
+            model.setLogicalSwitch(lsNumber, {func = 3, v1 = maxId, v2 = 0, ["and"] = id});
+          end
 
         end
       end
@@ -134,15 +144,25 @@ local function insertSettableSwitch(number)
     for n = 63, 0, -1 do
       local ls = model.getLogicalSwitch(n);
 
+      if (LS_FUNC_VEQUAL) then
         if ((ls.func == LS_FUNC_VEQUAL) or (ls.func == LS_FUNC_VPOS)) and (ls.v1 == maxId) and (ls.v2 == number) then
           return n;
         end
+      else
+        if ((ls.func == 1) or (ls.func == 3)) and (ls.v1 == maxId) and (ls.v2 == number) then
+          return n;
+        end
+      end
 
     end
     local lsNumber = getFirstFreeLogicalSwitch();
     if (lsNumber >= 0) then
 
+      if (LS_FUNC_VEQUAL) then
         model.setLogicalSwitch(lsNumber, {func = LS_FUNC_VEQUAL, v1 = maxId, v2 = number}); -- func: 1: a == 0, 3: a > x
+      else
+        model.setLogicalSwitch(lsNumber, {func = 1, v1 = maxId, v2 = number}); -- func: 1: a == 0, 3: a > x
+      end
 
       return lsNumber;
     end
@@ -471,7 +491,7 @@ local function initConfigColor(config, modifyModel)
     end
   end
 
-  local footer = "Vers: " .. "2.06";
+  local footer = "Vers: " .. "2.07";
   if (cfg[9] == 0) then
     footer = footer .. " Mod: xjt";
   elseif (cfg[9] == 1) then

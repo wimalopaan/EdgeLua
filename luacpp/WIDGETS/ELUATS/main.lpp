@@ -13,7 +13,9 @@
 #include "../../widget.h"
 
 local name = "EL_Test";
-local options = {};
+local options = {
+  {"Test", STRING}
+};
 
 local function create(zone, options)
   load();

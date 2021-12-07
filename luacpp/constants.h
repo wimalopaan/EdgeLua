@@ -225,3 +225,5 @@
 #define DEBUG_TEXT_Version 7
 #define DEBUG_TEXT_ValueStorage 8
 #define DEBUG_TEXT_Filename 9
+#define DEBUG_TEXT_StringOption 10
+#define DEBUG_TEXT_FuncNames 11
