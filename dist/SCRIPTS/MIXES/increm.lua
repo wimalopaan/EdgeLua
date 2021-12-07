@@ -12,7 +12,7 @@ local input = {
     {"Scale", VALUE, 0, 100, 10}
  };
 
- local output = { "Incremental" }
+local output = { "Inc" }
 
  local value = 0;
 
