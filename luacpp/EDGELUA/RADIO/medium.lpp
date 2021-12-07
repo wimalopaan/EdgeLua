@@ -25,4 +25,6 @@ return {
 
   #include "backends.lh"
 
+  #include "export.lh"
+
 };

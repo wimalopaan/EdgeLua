@@ -44,7 +44,7 @@ local function initConfig()
    local bendcfg = __WmSw2Config[20][3];
    gvar = bendcfg[3];
    values = bendcfg[4];
-   print("TRACE: " , "vmap: gvar: ", gvar, values );
+                                      ;
 
 end
 
@@ -86,7 +86,7 @@ local function transportShm()
 end
 
 if (LCD_W <= 212) then
-   print("TRACE: " , "vmap: use transportGlobalLua" );
+                                        ;
    return {
        init = initConfig,
        output = output,
@@ -94,14 +94,14 @@ if (LCD_W <= 212) then
    };
 else
    if (getShmVar) then
-      print("TRACE: " , "vmap: use transportShm" );
+                                     ;
       return {
         init = initConfig,
         output = output,
         run = transportShm
       };
    else
-      print("TRACE: " , "vmap: use transportGV" );
+                                    ;
       return {
          init = initConfig,
          output = output,

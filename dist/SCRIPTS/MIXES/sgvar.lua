@@ -13,9 +13,6 @@
 local output = {
    "sw_var",
 
-   "transp",
-   "raw"
-
 };
 
 local errorCode = 0;
@@ -42,7 +39,7 @@ local function initGV()
 
    local bendcfg = __WmSw2Config[20][1];
    gvar = bendcfg[2];
-   print("TRACE: " , "sgvar: gvar: ", gvar );
+                               ;
 
 end
 
@@ -52,25 +49,25 @@ end
 
 local function transportGlobalLua()
 
-   return __Sw2MixerValue, 0, 0;
+   return __Sw2MixerValue;
 
 end
 
 local function transportGV()
                                            ;
 
-   return model.getGlobalVariable(gvar, 0), 1, model.getGlobalVariable((gvar + 1), 0);
+   return model.getGlobalVariable(gvar, 0);
 
 end
 
 local function transportShm()
 
-   return getShmVar(1), 2, 0;
+   return getShmVar(1);
 
 end
 
 if (LCD_W <= 212) then
-   print("TRACE: " , "sgvar: use transportGlobalLua" );
+                                         ;
    return {
       output = output,
       run = transportGlobalLua
@@ -78,13 +75,13 @@ if (LCD_W <= 212) then
 else
 
    if (getShmVar) then
-      print("TRACE: " , "sgvar: use transportShm" );
+                                      ;
       return {
          output = output,
          run = transportShm
       };
    else
-      print("TRACE: " , "sgvar: use transportGV" );
+                                     ;
       return {
          init = initGV,
          output = output,

@@ -85,37 +85,37 @@ local function rssiState(cfg, state)
     end
     if (state[1] == 0) then -- safeMode
       if (getRSSI() > 10) then
-        print("TRACE: " , "safemode: on" );
+                             ;
         state[1] = 1;
         state[2] = t;
       end
     elseif (state[1] == 1) then -- wait rssi
       if (getRSSI() < 10) then
-        print("TRACE: " , "safemode: wait up: down" );
+                                        ;
         state[2] = t;
         state[1] = 0;
       end
       if ((t - state[2]) > cfg[16]) then
         setSwitchOn(cfg[18]);
-        print("TRACE: " , "safemode: wait up: up" );
+                                      ;
         state[2] = t;
         state[1] = 2;
       end
     elseif (state[1] == 2) then -- normal
       if (getRSSI() < 10) then
-        print("TRACE: " , "safemode normal: down" );
+                                      ;
         state[2] = t;
         state[1] = 3;
       end
     elseif (state[1] == 3) then -- wait normal
       if (getRSSI() > 10) then
-        print("TRACE: " , "safemode: wait down: up" );
+                                        ;
         state[2] = t;
         state[1] = 2;
       end
       if ((t - state[2]) > cfg[17]) then
         setSwitchOff(cfg[18]);
-        print("TRACE: " , "safemode: wait down: down" );
+                                          ;
         state[2] = t;
         state[1] = 0;
       end
@@ -137,13 +137,13 @@ local function sbusConfigFSM(config, menu, headers, menuState, queue, state, enc
     if (state[2] == 0) then
       if (queue:size() > 0) then
         state[3] = queue:pop(); -- line
-        print("TRACE: " , "cFSM: ", state[2], state[3][1][1] );
+                                                                                         ;
         state[2] = 1;
         state[1] = t;
         paramEncoder(bendCfg[2], 31, 31); -- bcast off (handles sbus correct)
       end
     elseif (state[2] == 1) then -- broadcast off
-      print("TRACE: " , "cFSM: ", state[2] );
+                                           ;
       if ((t - state[1]) > 50) then
         state[2] = 2;
         state[1] = t;
@@ -155,7 +155,7 @@ local function sbusConfigFSM(config, menu, headers, menuState, queue, state, enc
         encoder(bendCfg[2], item); -- set laston in module
       end
     elseif (state[2] == 2) then -- select item
-      print("TRACE: " , "cFSM: ", state[2] );
+                                           ;
       if ((t - state[1]) > 50) then
         state[2] = 3;
         state[1] = t;
@@ -173,11 +173,11 @@ local function sbusConfigFSM(config, menu, headers, menuState, queue, state, enc
         local pageHeaders = headers[ menuState[3] ];
         local header = pageHeaders[itemLine + 3 - 1];
         local paramNumber = header[col][2];
-        print("TRACE: " , "cFSM: ", state[2], "P:", paramNumber, "V:", value, header );
+                                                                                     ;
         paramEncoder(bendCfg[2], paramNumber, value);
       end
     elseif (state[2] == 4) then -- end
-      print("TRACE: " , "cFSM: ", state[2] );
+                                           ;
       state[2] = 0;
       state[1] = t;
     end
@@ -193,7 +193,7 @@ local function tiptipEncode(config, state, on)
   if not(on) then
     encoded = 1 + 10 * state[4];
   end
-  print("TRACE: " , "tiptipEncode:", bendCfg[3], encoded )
+
   transportToMixer(bendCfg[3], encoded);
 end
 
@@ -210,7 +210,7 @@ local function tiptipSwitchFSM(config, menu, queue, state)
       local before = push[2];
       if (item[3] <= 3) and (before <= 3) then
         local pulse = 0;
-        print("TRACE: " , "tiptipSwitchFSM idle: ", item[3], before );
+                                                                 ;
         if (item[3] == 1) then
           pulse = before; -- off
         else
@@ -364,23 +364,17 @@ local function setXJT(gv, sbusValue)
   local v = math.modf(scaleXJT(sbusValue));
   transportToMixer(gv, v);
 
-  transportToMixer(gv + 1, scaleXJT(sbusValue));
-
 end
 
 local function setIBus(gv, ibusValue)
   local v = math.modf(scaleIBus(ibusValue));
   transportToMixer(gv, v);
 
-  transportToMixer(gv + 1, scaleIBus(ibusValue));
-
 end
 
 local function setSBus(gv, sbusValue)
   local v = math.modf(scaleSBus(sbusValue));
   transportToMixer(gv, v);
-
-  transportToMixer(gv + 1, scaleSBus(sbusValue));
 
 end
 
@@ -533,7 +527,7 @@ local function getSwitchFSM(cfg)
 end
 
 if (LCD_W <= 212) then -- BW radio
-  print("TRACE: " , "libP: use transportGlobalLua" );
+                                       ;
   __Sw2MixerValue = 0;
   transportToMixer = transportGlobalLua;
   return {
@@ -546,10 +540,10 @@ if (LCD_W <= 212) then -- BW radio
 else -- color radio
 
   if (getShmVar) then
-    print("TRACE: " , "libP: use transportShm" );
+                                   ;
     transportToMixer = transportShm;
   else
-    print("TRACE: " , "libP: use transportGV" );
+                                  ;
     transportToMixer = transportGV;
   end
 

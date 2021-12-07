@@ -63,13 +63,19 @@ backends = {
     solexpert = {
       shortTimeout = 50, -- unit: 10ms
       longTimeout = 90, -- unit: 10ms
-      mixerGlobalVariable = 6, -- mixer script vmap.lua maps modules 1-5 to script output, , only if SHM is not supported
+      mixerGlobalVariable = 6, -- mixer script vmap.lua maps modules 1-5 to script output, only if SHM is not supported
       map = {
-        {module = 1, values = {0, -75, -25, 25, 75}},
+        {module = 1, values = {0, -75, -25, 25, 75}}, -- Selektor 8
         {module = 2, values = {0, -100, 100}},
         {module = 3, values = {0, -100, 100}},
       },
     },
   },
+
+local export = {
+    [1] = {gv = 1, values = {0, -50, 50, 100}},
+    [2] = {gv = 2, values = {-100, 0, 100}},
+    [3] = {gv = 3, values = {-75, -25, 25, 75}},
+  };
 
 };

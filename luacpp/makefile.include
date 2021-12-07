@@ -12,7 +12,9 @@ subdirs: ${subdirs}
 
 all: subdirs  $(targets)
 
-CPPFLAGS = -std=c++20
+#DEBUG = -DDEBUG
+
+CPPFLAGS = -std=c++20 $(DEBUG)
 
 %.lua: %.lpp
 	clang $(CPPFLAGS) -E -P -xc++ $< | cat -s  > $@
@@ -36,7 +38,7 @@ luatargets = $(patsubst %.lpp, %.lua, $(lppsources))
 
 ${subdirs}:
 	@if [ -d $@ ]; then \
-		${MAKE} -C $@ all; \
+		${MAKE} ${MAKEVARS} -C $@ all; \
 	fi
 
 

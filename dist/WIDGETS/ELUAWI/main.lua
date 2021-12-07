@@ -43,7 +43,7 @@ end
 local function loadLibA()
   local basedir = "/EDGELUA" .. "/LIB/";
   if not __libA then
-      print("TRACE: " , "LOAD_A", basedir );
+                              ;
     __libA = loadScript(basedir .. "libA.lua")();
     if not __libA then
       errorCode = 3.1;
@@ -54,7 +54,7 @@ end
 local function loadLibU()
   local basedir = "/EDGELUA" .. "/LIB/";
   if not __libU then
-      print("TRACE: " , "LOAD_U", basedir );
+                              ;
     __libU = loadScript(basedir .. "libU.lua")();
     if not __libU then
       errorCode = 3.2;
@@ -215,19 +215,19 @@ local function refresh(widget, event, touch)
       local module = widget[11].Adresse;
       if (covers(touch, holdBtn)) then
         buttonState = 1;
-        print("TRACE: " , "buttonState", buttonState );
+                                         ;
       elseif (covers(touch, leftBtn)) then
         buttonState = 2;
-        print("TRACE: " , "buttonState", buttonState );
+                                         ;
       elseif (covers(touch, rightBtn)) then
         buttonState = 3;
-        print("TRACE: " , "buttonState", buttonState );
+                                         ;
       elseif (covers(touch, stopBtn)) then
         buttonState = 4;
-        print("TRACE: " , "buttonState", buttonState );
+                                         ;
       end
       __WmSw2ForeignInput = buttonState + 10 * fn + 100 * module;
-      print("TRACE: " , "buttonState FI", __WmSw2ForeignInput );
+                                                  ;
     end
 
   else

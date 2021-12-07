@@ -43,7 +43,7 @@ end
 local function loadLibA()
   local basedir = "/EDGELUA" .. "/LIB/";
   if not __libA then
-      print("TRACE: " , "LOAD_A", basedir );
+                              ;
     __libA = loadScript(basedir .. "libA.lua")();
     if not __libA then
       errorCode = 3.1;
@@ -54,7 +54,7 @@ end
 local function loadLibU()
   local basedir = "/EDGELUA" .. "/LIB/";
   if not __libU then
-      print("TRACE: " , "LOAD_U", basedir );
+                              ;
     __libU = loadScript(basedir .. "libU.lua")();
     if not __libU then
       errorCode = 3.2;

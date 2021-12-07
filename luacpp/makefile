@@ -1,5 +1,8 @@
 
-.PHONY: dist copy clean filelist.txt
+.PHONY: dist debug copy clean filelist.txt
+
+debug: MAKEVARS="DEBUG=-DDEBUG"
+debug: all filelist.txt copy clean
 
 dist: all filelist.txt copy clean
 

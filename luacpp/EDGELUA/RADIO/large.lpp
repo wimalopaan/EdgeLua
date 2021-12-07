@@ -51,4 +51,5 @@ return {
 
   #include "safemode.lh"
 
+  #include "export.lh"
 };

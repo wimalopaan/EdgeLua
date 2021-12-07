@@ -43,7 +43,7 @@ end
 local function loadLibA()
   local basedir = "/EDGELUA" .. "/LIB/";
   if not __libA then
-      print("TRACE: " , "LOAD_A", basedir );
+                              ;
     __libA = loadScript(basedir .. "libA.lua")();
     if not __libA then
       errorCode = 3.1;
@@ -54,7 +54,7 @@ end
 local function loadLibU()
   local basedir = "/EDGELUA" .. "/LIB/";
   if not __libU then
-      print("TRACE: " , "LOAD_U", basedir );
+                              ;
     __libU = loadScript(basedir .. "libU.lua")();
     if not __libU then
       errorCode = 3.2;
@@ -91,7 +91,7 @@ local function create(zone, options)
   local widget = __libI.initWidget(zone, options);
   collectgarbage();
 
-  print("TRACE: " , "EL_Con ctreat1" );
+                         ;
   if not(__WmSw2Config) then
     local config = __libI.loadConfig();
     if not (config) then
@@ -102,7 +102,7 @@ local function create(zone, options)
   end
   collectgarbage();
 
-  print("TRACE: " , "EL_Con ctreat2" );
+                         ;
 
   local map = nil;
   local modInfos = nil;
@@ -111,32 +111,31 @@ local function create(zone, options)
   menu, exportValues, filename, map, modInfos = __libI.loadMenu();
   exportValues = nil;
 
-  print("TRACE: " , "EL_Con ctreat3" );
+                         ;
 
   if not (menu) then
     errorCode = 5;
     return widget;
   end
 
-  print("TRACE: " , "EL_Con ctreat4" );
+                         ;
 
   encoder, paramScaler, paramEncoder = __libP.getEncoder(__WmSw2Config);
-  print("TRACE: " , "EL_Con ctreat41" );
+                          ;
 
   configFSM = __libP.getConfigFSM(__WmSw2Config);
-  print("TRACE: " , "EL_Con ctreat42" );
+                          ;
 
   headers, menu, help, valuesFileName = __libI.initParamMenu(__WmSw2Config, menu, map, modInfos, filename)
 
-  print("TRACE: " , "EL_Con ctreat5" );
+                         ;
 
-print("TRACE: " , "valuesFilename:", valuesFileName )
    if (valuesFileName) then
-    print("TRACE: " , "valuesFilename:", valuesFileName )
+
     __libU.initValues(menu, valuesFileName);
   end
 
-print("TRACE: " , "EL_Con ctreat6" );
+                       ;
 
   __libI.initConfigFSM(fsmState);
 

@@ -484,7 +484,7 @@ end
 
 local function displayMenuColorNoTheme(config, widget, menu, overlays, state, event, remote, warning1, warning2, pagetitles, menudata)
 -- lcd.clear()
--- print("TRACE: " , "displayMenuColorNoTheme", widget[1], widget[2], widget[3], widget[4] );
+-- ;
 
   if (warning) then
     local ww, wh = lcd.sizeText(warning, DBLSIZE);
@@ -644,17 +644,10 @@ local function selectItem(menu, menuState, queue)
   -- queue:push(push);
 end
 
-local lastEvent = 0;
-
 local function processEventsBWScroll(config, menu, menuState, event, queue, callback)
   if (event == EVT_VIRTUAL_ENTER) then
     callback(menu, menuState, queue);
   else
-
-    if (event ~= lastEvent) then
-                                            ;
-      lastEvent = event;
-    end
 
     if (event > 0) then
       menuDeselect(menuState);
@@ -676,11 +669,6 @@ local function processEventsBWKeys(config, menu, menuState, event, queue, callba
   if (event == EVT_VIRTUAL_ENTER) then
     callback(menu, menuState, queue);
   else
-
-    if (event ~= lastEvent) then
-                                          ;
-      lastEvent = event;
-    end
 
     if (event > 0) then
       menuDeselect(menuState);
@@ -833,7 +821,7 @@ local function processTrims(config, menu, menuState, buttonState, queue, callbac
   --[[
   if (config[12]) then
     local value = getValue(config[12]);
--- print("TRACE: " , "processTrims next", config[12], value );
+-- ;
     if (value > buttonState[2]) then
       nextCol(menu, menuState);
       menuDeselect(menuState);
@@ -843,7 +831,7 @@ local function processTrims(config, menu, menuState, buttonState, queue, callbac
   --]]
 
   local selectCB = function()
-    print("TRACE: " , "selectCB" );
+                     ;
     callback(menu, menuState, queue);
   end
   processTrimsSelect(config, buttonState, selectCB);
@@ -851,7 +839,7 @@ local function processTrims(config, menu, menuState, buttonState, queue, callbac
   --[[
   if (config[13]) then
     local value = getValue(config[13]);
--- print("TRACE: " , "processTrims select", config[13], value );
+-- ;
     if (value > buttonState[3]) then
       callback(menu, menuState, queue);
     end
@@ -995,7 +983,7 @@ local function processRemoteInput(config, menu, queue, remoteState)
     remoteState[2] = module;
     remoteState[3] = fn;
     remoteState[4] = state;
-    print("TRACE: " , "remote: ", module, fn, state );
+                                        ;
     setAndPushItem(queue, item, state);
     -- local push = {[1] = item, [2] = item[3]};
     -- item[3] = state;
@@ -1056,7 +1044,7 @@ local function displayAddressConfigColor(config, widget, encoder, pScaler, state
   end
 
   processTrimsSelect(config, buttonState, function()
-    print("TRACE: " , "selectCB" );
+                     ;
     event = EVT_VIRTUAL_ENTER;
   end);
 

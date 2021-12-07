@@ -1,6 +1,6 @@
 #pragma once
 
-#define DEBUG 
+//#define DEBUG 
 
 // #define TEST1
 
@@ -15,6 +15,7 @@
 #define USE_SHM // only for color/edgetx (PR 1018)
 #define USE_LS_STICKY // (PR 1056)
 #define USE_MODEL_FILENAME // (PR 1132)
+#define USE_FUNCTION_NAMES
 
 #define USE_FALLBACK_IDS
 
