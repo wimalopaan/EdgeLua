@@ -80,7 +80,7 @@ local function getLogicalSwitchFor(id)
         if (ls.func == LSFUNC_A_GT_X) and (ls.v1 == maxId) and (ls.v2 == 0) and (ls["and"] == id) then
           return lsNumber;
         end
-      #endif 
+      #endif
     end
   end
   return -1;
@@ -197,8 +197,7 @@ local function insertSettableSwitch(number)
     end 
   end 
   return -1;
-end 
-
+end
 
 local function loadFile(baseDir)
   local content = nil;
@@ -654,6 +653,7 @@ local function initParamMenu(cfg, menu, map, modInfos, mode)
 
   local valuesFileName = nil;
 
+  #ifdef USE_VALUE_STORAGE
   if (menu.saveValues) then
     if (model.getInfo().filename) then
       local fullname = model.getInfo().filename;
@@ -670,6 +670,7 @@ local function initParamMenu(cfg, menu, map, modInfos, mode)
     end
     TRACE("initParamMenu: saveValues1:", valuesFileName);
   end
+  #endif
   
   local miTable = moduleItems(menu);
 
@@ -954,6 +955,9 @@ local function initConfigFSM(state)
 end
 
 if (LCD_W <= 128) then
+  initMenuColor = nil;
+  initParamMenuColor = nil;
+  initConfigColor = nil;
   return { 
     loadConfig = loadConfig,
     loadMenu = loadMenu,
@@ -965,6 +969,9 @@ if (LCD_W <= 128) then
     initConfigFSM = initConfigFSM,
   };
 elseif (LCD_W <= 212) then
+  initMenuColor = nil;
+  initParamMenuColor = nil;
+  initConfigColor = nil;
   return { 
     loadConfig = loadConfig,
     loadMenu = loadMenu,

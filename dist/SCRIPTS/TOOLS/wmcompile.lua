@@ -25,7 +25,7 @@ end
 local function compile(filename)
   local chunk = loadScript(filename);
   if (chunk) then
-    lcd.drawText(0, 40, "ok", TEXT_COLOR);
+    lcd.drawText(0, 40, "  ok", TEXT_COLOR);
   else
     lcd.drawText(0, 40, "fail", TEXT_COLOR);
   end
@@ -56,7 +56,8 @@ local dirs = {
 };
 
 local function run()
-  lcd.drawText(0, 0, "Compiling ..." .. "2.08", TEXT_COLOR);
+-- lcd.clear();
+  lcd.drawText(0, 0, "Compiling ..." .. "2.09", TEXT_COLOR);
   local t = getTime();
   local dir = nil;
   if ((t - lastTime) > 50) then

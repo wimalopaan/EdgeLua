@@ -1149,6 +1149,13 @@ else
 end
 
 if (LCD_W <= 128) then
+  displayMenuColor = nil;
+  displayMenuColorNoTheme = nil;
+  displayParamMenuColor = nil;
+  displayParamMenuColorNoTheme = nil;
+  displayAddressConfigColor = nil;
+  displayAddressConfigColorNoTheme = nil;
+   processEventsColor = nil;
   return {
     displayMenu = displayMenuBW,
     displayParamMenu = displayParamMenuBW,
@@ -1161,6 +1168,13 @@ if (LCD_W <= 128) then
     displayAddressConfig = displayAddressConfigBW,
   };
 elseif (LCD_W <= 212) then
+  displayMenuColor = nil;
+  displayMenuColorNoTheme = nil;
+  displayParamMenuColor = nil;
+  displayParamMenuColorNoTheme = nil;
+  displayAddressConfigColor = nil;
+  displayAddressConfigColorNoTheme = nil;
+  processEventsColor = nil;
   return {
     displayMenu = displayMenuBW,
     displayParamMenu = displayParamMenuBW,

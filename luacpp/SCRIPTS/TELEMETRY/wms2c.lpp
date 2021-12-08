@@ -22,6 +22,7 @@ local configFSM = nil;
 local encoder = nil;
 local paramScaler = nil;
 local paramEncoder = nil;
+local valuesFileName = nul;
 
 local lastRun = 0;
 
@@ -33,6 +34,11 @@ local function run_telemetry(event)
     __libD.processEvents(__WmSw2Config, menu, menuState, event, queue, __libD.selectParamItem);
     local pvalue = __libD.displayParamMenu(__WmSw2Config, widget, menu, headers, menuState, paramScaler);
     configFSM(__WmSw2Config, menu, headers, menuState, queue, fsmState, encoder, paramEncoder, pvalue);
+    #ifdef USE_VALUE_STORAGE
+    if (valuesFileName) and (__libU) then
+      __libU.saveValues(menu, valuesFileName, menuState);      
+    end
+    #endif
   else
     lcd.clear();
     lcd.drawText(0, 0, "Error: " .. errorCode, DBLSIZE);
@@ -84,11 +90,24 @@ local function init_telemetry()
     return;
   end
 
-  headers, menu = __libI.initParamMenu(__WmSw2Config, menu, map, modInfos)      
+  local help;
+  headers, menu, help, valuesFileName = __libI.initParamMenu(__WmSw2Config, menu, map, modInfos)      
   map = nil;
   modInfos = nil;
+  help = nil;
 
   collectgarbage();
+
+  #ifdef USE_VALUE_STORAGE
+    TRACE("valuesFilename:", valuesFileName)
+    if (valuesFileName) then
+      loadLibU();
+      TRACE("valuesFilename:", valuesFileName)
+      if (__libU) then
+        __libU.initValues(menu, valuesFileName);        
+      end
+    end
+  #endif
 
   __libI.initConfigFSM(fsmState);
 

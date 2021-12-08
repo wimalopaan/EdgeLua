@@ -21,45 +21,65 @@ __WmSw2Warning2 = nil;
 local function load()
   local basedir = "/EDGELUA" .. "/LIB/";
   if not __libI then
-    __libI = loadScript(basedir .. "libI.lua")();
+    local chunk = loadScript(basedir .. "libI.lua");
+    if (chunk) then
+      __libI = chunk();
+    end
     if not __libI then
       errorCode = 1;
     end
   end
+  collectgarbage();
   if not __libD then
-    __libD = loadScript(basedir .. "libD.lua")();
+    local chunk = loadScript(basedir .. "libD.lua");
+    if (chunk) then
+      __libD = chunk();
+    end
     if not __libD then
       errorCode = 2;
     end
   end
+  collectgarbage();
   if not __libP then
-    __libP = loadScript(basedir .. "libP.lua")();
+    local chunk = loadScript(basedir .. "libP.lua");
+    if (chunk) then
+      __libP = chunk();
+    end
     if not __libP then
       errorCode = 3;
     end
   end
+  collectgarbage();
 end
 
 local function loadLibA()
   local basedir = "/EDGELUA" .. "/LIB/";
   if not __libA then
-                              ;
-    __libA = loadScript(basedir .. "libA.lua")();
+                            ;
+    local chunk = loadScript(basedir .. "libA.lua");
+    if (chunk) then
+      __libA = chunk();
+    end
     if not __libA then
       errorCode = 3.1;
     end
   end
+  collectgarbage();
 end
 
 local function loadLibU()
   local basedir = "/EDGELUA" .. "/LIB/";
   if not __libU then
-                              ;
-    __libU = loadScript(basedir .. "libU.lua")();
+                            ;
+    local chunk = loadScript(basedir .. "libU.lua");
+    if (chunk) then
+      __libU = chunk();
+    end
     if not __libU then
       errorCode = 3.2;
     end
   end
+  collectgarbage();
 end
 
 local menuState = {1, 1, 1, 0, 0}; -- row, col, page, selrow, selcol
@@ -71,6 +91,7 @@ local configFSM = nil;
 local encoder = nil;
 local paramScaler = nil;
 local paramEncoder = nil;
+local valuesFileName = nul;
 
 local lastRun = 0;
 
@@ -82,6 +103,11 @@ local function run_telemetry(event)
     __libD.processEvents(__WmSw2Config, menu, menuState, event, queue, __libD.selectParamItem);
     local pvalue = __libD.displayParamMenu(__WmSw2Config, widget, menu, headers, menuState, paramScaler);
     configFSM(__WmSw2Config, menu, headers, menuState, queue, fsmState, encoder, paramEncoder, pvalue);
+
+    if (valuesFileName) and (__libU) then
+      __libU.saveValues(menu, valuesFileName, menuState);
+    end
+
   else
     lcd.clear();
     lcd.drawText(0, 0, "Error: " .. errorCode, DBLSIZE);
@@ -133,11 +159,21 @@ local function init_telemetry()
     return;
   end
 
-  headers, menu = __libI.initParamMenu(__WmSw2Config, menu, map, modInfos)
+  local help;
+  headers, menu, help, valuesFileName = __libI.initParamMenu(__WmSw2Config, menu, map, modInfos)
   map = nil;
   modInfos = nil;
+  help = nil;
 
   collectgarbage();
+
+    if (valuesFileName) then
+      loadLibU();
+
+      if (__libU) then
+        __libU.initValues(menu, valuesFileName);
+      end
+    end
 
   __libI.initConfigFSM(fsmState);
 

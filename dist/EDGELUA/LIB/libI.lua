@@ -491,7 +491,7 @@ local function initConfigColor(config, modifyModel)
     end
   end
 
-  local footer = "Vers: " .. "2.08";
+  local footer = "Vers: " .. "2.09";
   if (cfg[9] == 0) then
     footer = footer .. " Mod: xjt";
   elseif (cfg[9] == 1) then
@@ -897,6 +897,9 @@ local function initConfigFSM(state)
 end
 
 if (LCD_W <= 128) then
+  initMenuColor = nil;
+  initParamMenuColor = nil;
+  initConfigColor = nil;
   return {
     loadConfig = loadConfig,
     loadMenu = loadMenu,
@@ -908,6 +911,9 @@ if (LCD_W <= 128) then
     initConfigFSM = initConfigFSM,
   };
 elseif (LCD_W <= 212) then
+  initMenuColor = nil;
+  initParamMenuColor = nil;
+  initConfigColor = nil;
   return {
     loadConfig = loadConfig,
     loadMenu = loadMenu,

@@ -49,17 +49,18 @@ local function run_telemetry(event)
     else
       lcd.drawText(widget[W_X], widget[W_Y], "Error: " .. errorCode, DBLSIZE);
     end
-  end
+    return 0;
+end
 
 local function background_telemetry()
-    if (errorCode == 0) then
-    end
+  if (errorCode == 0) then
+  end
 end
 
 if (LCD_W <= 128) then
     return {
         init = init_telemetry,
-        run = run_telemetry_small,
+        run = run_telemetry,
         background = background_telemetry,
     };
 else

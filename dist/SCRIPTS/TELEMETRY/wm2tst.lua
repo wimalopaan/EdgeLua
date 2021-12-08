@@ -21,45 +21,65 @@ __WmSw2Warning2 = nil;
 local function load()
   local basedir = "/EDGELUA" .. "/LIB/";
   if not __libI then
-    __libI = loadScript(basedir .. "libI.lua")();
+    local chunk = loadScript(basedir .. "libI.lua");
+    if (chunk) then
+      __libI = chunk();
+    end
     if not __libI then
       errorCode = 1;
     end
   end
+  collectgarbage();
   if not __libD then
-    __libD = loadScript(basedir .. "libD.lua")();
+    local chunk = loadScript(basedir .. "libD.lua");
+    if (chunk) then
+      __libD = chunk();
+    end
     if not __libD then
       errorCode = 2;
     end
   end
+  collectgarbage();
   if not __libP then
-    __libP = loadScript(basedir .. "libP.lua")();
+    local chunk = loadScript(basedir .. "libP.lua");
+    if (chunk) then
+      __libP = chunk();
+    end
     if not __libP then
       errorCode = 3;
     end
   end
+  collectgarbage();
 end
 
 local function loadLibA()
   local basedir = "/EDGELUA" .. "/LIB/";
   if not __libA then
-                              ;
-    __libA = loadScript(basedir .. "libA.lua")();
+                            ;
+    local chunk = loadScript(basedir .. "libA.lua");
+    if (chunk) then
+      __libA = chunk();
+    end
     if not __libA then
       errorCode = 3.1;
     end
   end
+  collectgarbage();
 end
 
 local function loadLibU()
   local basedir = "/EDGELUA" .. "/LIB/";
   if not __libU then
-                              ;
-    __libU = loadScript(basedir .. "libU.lua")();
+                            ;
+    local chunk = loadScript(basedir .. "libU.lua");
+    if (chunk) then
+      __libU = chunk();
+    end
     if not __libU then
       errorCode = 3.2;
     end
   end
+  collectgarbage();
 end
 
 local widget = {};
@@ -99,17 +119,18 @@ local function run_telemetry(event)
     else
       lcd.drawText(widget[1], widget[2], "Error: " .. errorCode, DBLSIZE);
     end
-  end
+    return 0;
+end
 
 local function background_telemetry()
-    if (errorCode == 0) then
-    end
+  if (errorCode == 0) then
+  end
 end
 
 if (LCD_W <= 128) then
     return {
         init = init_telemetry,
-        run = run_telemetry_small,
+        run = run_telemetry,
         background = background_telemetry,
     };
 else
