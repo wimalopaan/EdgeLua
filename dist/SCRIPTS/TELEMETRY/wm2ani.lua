@@ -62,6 +62,7 @@ local function loadLibU()
   end
 end
 
+local widget = {};
 local animations = nil;
 local fsmState = {};
 local currentAnimation = nil;
@@ -74,6 +75,9 @@ local function init_telemetry()
     if (errorCode > 0) then
        return;
     end
+
+    widget = __libI.initWidget();
+    collectgarbage();
 
     if not(__WmSw2Config) then
         local config = __libI.loadConfig();
@@ -108,7 +112,8 @@ end
 local function run_telemetry(event)
     lcd.clear();
     if (errorCode == 0) then
-      currentAnimation = __libA.chooseAnimation(__WmSw2Config, animations, fsmState, event);
+      lcd.drawScreenTitle("Animations", 1, 1);
+      currentAnimation = __libA.chooseAnimation(__WmSw2Config, widget, animations, fsmState, event);
     else
       lcd.drawText(0, 0, "Error: " .. errorCode, DBLSIZE);
     end

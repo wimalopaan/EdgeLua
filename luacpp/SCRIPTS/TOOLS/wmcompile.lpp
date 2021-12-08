@@ -53,6 +53,8 @@ local dirs = {
   "/WIDGETS/ELUACO",
   "/WIDGETS/ELUASW",
   "/WIDGETS/ELUAWI",
+  "/WIDGETS/ELUAIC",
+  "/WIDGETS/ELUATS",
 };
 
 local function run() 

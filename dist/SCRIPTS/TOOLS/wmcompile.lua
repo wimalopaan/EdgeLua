@@ -51,10 +51,12 @@ local dirs = {
   "/WIDGETS/ELUACO",
   "/WIDGETS/ELUASW",
   "/WIDGETS/ELUAWI",
+  "/WIDGETS/ELUAIC",
+  "/WIDGETS/ELUATS",
 };
 
 local function run()
-  lcd.drawText(0, 0, "Compiling ..." .. "2.07", TEXT_COLOR);
+  lcd.drawText(0, 0, "Compiling ..." .. "2.08", TEXT_COLOR);
   local t = getTime();
   local dir = nil;
   if ((t - lastTime) > 50) then

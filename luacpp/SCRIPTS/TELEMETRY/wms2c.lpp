@@ -55,9 +55,14 @@ local function init_telemetry()
       errorCode = 4;
       return;
     end
-    __WmSw2Config = __libI.initConfig(config);
+    __WmSw2Config = __libI.initConfig(config, true);
   end 
   collectgarbage();
+
+  if not(__WmSw2Config) then
+    errorCode = 4.1;
+    return;
+  end
 
   local map = nil;
   local modInfos = nil;

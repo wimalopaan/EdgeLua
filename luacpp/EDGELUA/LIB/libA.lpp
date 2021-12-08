@@ -12,6 +12,11 @@
 
 #include "../../global.h"
 
+local function isEdgeTx()
+  local ver, radio, maj, minor, rev, osname = getVersion();
+  return osname ~= nil;
+end
+
 local function loadAnimations(config)
   local basedir = BASE_DIR .. "/ANIMS/";
   local anims = {};
@@ -221,6 +226,7 @@ local function drawButtons(anims, rects, state)
   end
 end
 
+
 local function covers(touch, item) 
   if ((touch.x >= item.xmin) and (touch.x <= item.xmax)
     and (touch.y >= item.ymin) and (touch.y <= item.ymax)) then
@@ -270,54 +276,33 @@ local function processEvents(anims, rects, state, event, touch)
   processKeyEvents(anims, state, event);
 end
 
-local function chooseAnimationBW(config, anims, state, event)
+local function chooseAnimationBW(config, widget, anims, state, event)
   TRACE3("chooseAnimationBW A");
   if not(anims) or (#anims == 0) then
     return;
   end 
+
   processKeyEvents(anims, state, event);
-  --[[
-  if (event == EVT_VIRTUAL_INC) then
-    if (state[FSMANIM_CursorRow] >= #anims) then 
-      state[FSMANIM_CursorRow] = 1;
-    else
-      state[FSMANIM_CursorRow] = state[FSMANIM_CursorRow] + 1;
-    end 
-  end
-  if (event == EVT_VIRTUAL_DEC) then
-    if (state[FSMANIM_CursorRow] <= 1) then
-      state[FSMANIM_CursorRow] = #anims;
-    else
-      state[FSMANIM_CursorRow] = state[FSMANIM_CursorRow] - 1;
-    end
-  end
-  if (event == EVT_VIRTUAL_ENTER) then
-    if (state[FSMANIM_ActiveAnim] == state[FSMANIM_CursorRow]) then
-      state[FSMANIM_ActiveAnim] = 0;
-      return nil;
-    else
-      state[FSMANIM_ActiveAnim] = state[FSMANIM_CursorRow];
-      return anims[state[FSMANIM_CursorRow] ];
-    end
-  end
-  --]]
 
   for i, anim in ipairs(anims) do
+    local x1 = widget[W_X] + 10;
+    local x2 = widget[W_X] + 30;
+    local y = widget[W_Y] + i * widget[W_FontHSmall];
     if (i == state[FSMANIM_ActiveAnim]) then
       if (i == state[FSMANIM_CursorRow]) then
-        lcd.drawText(10, i * 10, "[x]", SMLSIZE + INVERS);
+        lcd.drawText(x1, y, "[x]", SMLSIZE + INVERS);
       else
-        lcd.drawText(10, i * 10, "[x]", SMLSIZE);
+        lcd.drawText(x1, y, "[x]", SMLSIZE);
       end 
-      lcd.drawText(30, i * 10, anim[ANIM_Name], SMLSIZE);
+      lcd.drawText(x2, y, anim[ANIM_Name], SMLSIZE);
     else
       if (i == state[FSMANIM_CursorRow]) then
-        lcd.drawText(10, i * 10, "[ ]", SMLSIZE + INVERS);
+        lcd.drawText(x1, y, "[ ]", SMLSIZE + INVERS);
       else
-        lcd.drawText(10, i * 10, "[ ]", SMLSIZE);
+        lcd.drawText(x1, y, "[ ]", SMLSIZE);
       end 
     end
-    lcd.drawText(30, i * 10, anim[ANIM_Name], SMLSIZE);
+    lcd.drawText(x2, y, anim[ANIM_Name], SMLSIZE);
   end
   TRACE3("chooseAnimationBW E");
   if (state[FSMANIM_ActiveAnim] > 0) then
@@ -325,6 +310,40 @@ local function chooseAnimationBW(config, anims, state, event)
   end
   return nil;
 end 
+
+local function chooseAnimationNoTheme(config, widget, anims, state, event, touch)
+  TRACE3("chooseAnimationNoTheme A");
+  if not(anims) or (#anims == 0) then
+    return;
+  end 
+
+  processKeyEvents(anims, state, event);
+
+  for i, anim in ipairs(anims) do
+    local x1 = widget[W_X] + 10;
+    local x2 = widget[W_X] + 30;
+    local y = widget[W_Y] + i * 2 * widget[W_FontHSmall];
+    if (i == state[FSMANIM_ActiveAnim]) then
+      if (i == state[FSMANIM_CursorRow]) then
+        lcd.drawText(x1, y, "[x]", SMLSIZE + INVERS);
+      else
+        lcd.drawText(x1, y, "[x]", SMLSIZE);
+      end 
+      lcd.drawText(x2, y, anim[ANIM_Name], SMLSIZE);
+    else
+      if (i == state[FSMANIM_CursorRow]) then
+        lcd.drawText(x1, y, "[ ]", SMLSIZE + INVERS);
+      else
+        lcd.drawText(x1, y, "[ ]", SMLSIZE);
+      end 
+    end
+    lcd.drawText(x2, y, anim[ANIM_Name], SMLSIZE);
+  end
+  if (state[FSMANIM_ActiveAnim] > 0) then
+    return anims[state[FSMANIM_ActiveAnim]];
+  end
+  return nil;
+end
 
 local function chooseAnimation(config, widget, anims, state, event, touch)
   lcd.clear();
@@ -388,17 +407,6 @@ local function chooseAnimation(config, widget, anims, state, event, touch)
     return nil;
   end
 
-  --[[
-  if (selection > 0) then
-    resetState(state);
-    state[FSMANIM_ActiveAnim] = selection;
-    return anims[selection];
-  else
-    if (state[FSMANIM_ActiveAnim] > 0) and (state[FSMANIM_ActiveAnim] <= #anims) then
-      return anims[state[FSMANIM_ActiveAnim] ];
-    end
-  end
-  --]]
 end
 
 if (LCD_W <= 128) then
@@ -409,21 +417,31 @@ if (LCD_W <= 128) then
     chooseAnimation = chooseAnimationBW,
     initAnimationFSM = initAnimationFSM,
   };
-  elseif (LCD_W <= 212) then
-    return {
-      loadAnimations = loadAnimations,
-      initAnimations = initAnimations,
-      runAnimation = runAnimation,
-      chooseAnimation = chooseAnimationBW,
-      initAnimationFSM = initAnimationFSM,
-    };
-    else  
+elseif (LCD_W <= 212) then
   return {
     loadAnimations = loadAnimations,
     initAnimations = initAnimations,
     runAnimation = runAnimation,
-    chooseAnimation = chooseAnimation,
+    chooseAnimation = chooseAnimationBW,
     initAnimationFSM = initAnimationFSM,
   };
+else  
+  if (isEdgeTx()) then
+    return {
+      loadAnimations = loadAnimations,
+      initAnimations = initAnimations,
+      runAnimation = runAnimation,
+      chooseAnimation = chooseAnimation,
+      initAnimationFSM = initAnimationFSM,
+    };
+  else
+    return {
+      loadAnimations = loadAnimations,
+      initAnimations = initAnimations,
+      runAnimation = runAnimation,
+      chooseAnimation = chooseAnimationNoTheme,
+      initAnimationFSM = initAnimationFSM,
+    };
   end
+end
 

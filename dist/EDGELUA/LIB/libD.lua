@@ -998,7 +998,7 @@ local function displayFmRssiWarningColor(config, widget, state)
   end
 end
 
-local function displayAddressConfigBW(config, encoder, pScaler, state, event)
+local function displayAddressConfigBW(config, widget, encoder, pScaler, state, event)
   if (config[14] == 3) or (config[14] == 4) then
     lcd.drawText(widget[1], widget[2], "Not usable with backend: " .. config[14], MIDSIZE);
     return;
@@ -1006,9 +1006,9 @@ local function displayAddressConfigBW(config, encoder, pScaler, state, event)
 
   if (state[1] == 0) then
 
-    lcd.drawText(0, 0, "Attach only one device to the RX.", SMLSIZE);
+    lcd.drawText(widget[1], widget[2] + widget[5], "Attach only one device to the RX.", SMLSIZE);
 
-    lcd.drawText(0, 10, "Press [Enter] to start learning", MIDSIZE);
+    lcd.drawText(widget[1], widget[2] + 2 * widget[5], "Press [Enter] to start learning", MIDSIZE);
 
     if (event == EVT_VIRTUAL_ENTER) then
       state[1] = 1;
@@ -1019,11 +1019,11 @@ local function displayAddressConfigBW(config, encoder, pScaler, state, event)
       adr = 8;
     end
 
-    lcd.drawText(0, 0, "Address: " .. adr, MIDSIZE + INVERS);
+    lcd.drawText(widget[1], widget[2] + widget[5], "Address: " .. adr, MIDSIZE + INVERS);
 
-    lcd.drawText(0, 20, "Watch for the device to respond.", SMLSIZE);
+    lcd.drawText(widget[1], widget[2] + 2 * widget[9], "Watch for the device to respond.", SMLSIZE);
 
-    lcd.drawText(0, 30, "Switch on RX and device", MIDSIZE);
+    lcd.drawText(widget[1], widget[2] + 3 * widget[9], "Switch on RX and device", MIDSIZE);
 
     local bendcfg = config[20][1];
     encoder(bendcfg[2], 14, adr);
@@ -1110,7 +1110,7 @@ local function displayAddressConfigColorNoTheme(config, widget, encoder, pScaler
 
     lcd.drawText(widget[1] + border_h, widget[2] + widget[9], "Attach only one device to the RX.", SMLSIZE);
 
-    lcd.drawFilledRectangle(rect.xmin, rect.ymin, rect.xmax - rect.xmin + 1, rect.ymax - rect.ymin + 1);
+    lcd.drawRectangle(rect.xmin, rect.ymin, rect.xmax - rect.xmin + 1, rect.ymax - rect.ymin + 1, 0, 3);
     lcd.drawText(rect.xmin + 5, rect.ymin + 5, "Press [Enter] to start learning", MIDSIZE);
 
     if (event == EVT_VIRTUAL_ENTER) then
@@ -1126,7 +1126,7 @@ local function displayAddressConfigColorNoTheme(config, widget, encoder, pScaler
 
     lcd.drawText(widget[1] + border_h, widget[2] + widget[4] - widget[9], "Watch for the device to respond.", SMLSIZE);
 
-    lcd.drawFilledRectangle(rect.xmin, rect.ymin, rect.xmax - rect.xmin + 1, rect.ymax - rect.ymin + 1);
+    lcd.drawRectangle(rect.xmin, rect.ymin, rect.xmax - rect.xmin + 1, rect.ymax - rect.ymin + 1, 0, 3);
     lcd.drawText(rect.xmin + 5, rect.ymin + 5, "Switch on RX and device", MIDSIZE);
 
     local bendcfg = config[20][1];

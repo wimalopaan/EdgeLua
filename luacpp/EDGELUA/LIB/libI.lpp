@@ -25,7 +25,7 @@ local function initWidgetBW()
   widget[W_Height] = LCD_H;
   widget[W_FontHeight] = 8;
   widget[W_FontHSmall] = 8;
-  widget[W_FontHLarge] = 8;
+  widget[W_FontHLarge] = 16;
   widget[W_YOffset] = 8;
   widget[W_YPOffset] = 16;
   return widget;

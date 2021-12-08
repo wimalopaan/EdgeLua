@@ -10,6 +10,11 @@
 -- Please note that the above license also covers the transfer protocol used and the encoding scheme and
 -- all further principals of tranferring state and other information.
 
+local function isEdgeTx()
+  local ver, radio, maj, minor, rev, osname = getVersion();
+  return osname ~= nil;
+end
+
 local function loadAnimations(config)
   local basedir = "/EDGELUA" .. "/ANIMS/";
   local anims = {};
@@ -268,56 +273,69 @@ local function processEvents(anims, rects, state, event, touch)
   processKeyEvents(anims, state, event);
 end
 
-local function chooseAnimationBW(config, anims, state, event)
+local function chooseAnimationBW(config, widget, anims, state, event)
                                ;
   if not(anims) or (#anims == 0) then
     return;
   end
+
   processKeyEvents(anims, state, event);
-  --[[
-  if (event == EVT_VIRTUAL_INC) then
-    if (state[8] >= #anims) then
-      state[8] = 1;
-    else
-      state[8] = state[8] + 1;
-    end
-  end
-  if (event == EVT_VIRTUAL_DEC) then
-    if (state[8] <= 1) then
-      state[8] = #anims;
-    else
-      state[8] = state[8] - 1;
-    end
-  end
-  if (event == EVT_VIRTUAL_ENTER) then
-    if (state[5] == state[8]) then
-      state[5] = 0;
-      return nil;
-    else
-      state[5] = state[8];
-      return anims[state[8] ];
-    end
-  end
-  --]]
 
   for i, anim in ipairs(anims) do
+    local x1 = widget[1] + 10;
+    local x2 = widget[1] + 30;
+    local y = widget[2] + i * widget[8];
     if (i == state[5]) then
       if (i == state[8]) then
-        lcd.drawText(10, i * 10, "[x]", SMLSIZE + INVERS);
+        lcd.drawText(x1, y, "[x]", SMLSIZE + INVERS);
       else
-        lcd.drawText(10, i * 10, "[x]", SMLSIZE);
+        lcd.drawText(x1, y, "[x]", SMLSIZE);
       end
-      lcd.drawText(30, i * 10, anim[1], SMLSIZE);
+      lcd.drawText(x2, y, anim[1], SMLSIZE);
     else
       if (i == state[8]) then
-        lcd.drawText(10, i * 10, "[ ]", SMLSIZE + INVERS);
+        lcd.drawText(x1, y, "[ ]", SMLSIZE + INVERS);
       else
-        lcd.drawText(10, i * 10, "[ ]", SMLSIZE);
+        lcd.drawText(x1, y, "[ ]", SMLSIZE);
       end
     end
-    lcd.drawText(30, i * 10, anim[1], SMLSIZE);
+    lcd.drawText(x2, y, anim[1], SMLSIZE);
   end
                                ;
+  if (state[5] > 0) then
+    return anims[state[5]];
+  end
+  return nil;
+end
+
+local function chooseAnimationNoTheme(config, widget, anims, state, event, touch)
+                                    ;
+  if not(anims) or (#anims == 0) then
+    return;
+  end
+
+  processKeyEvents(anims, state, event);
+
+  for i, anim in ipairs(anims) do
+    local x1 = widget[1] + 10;
+    local x2 = widget[1] + 30;
+    local y = widget[2] + i * 2 * widget[8];
+    if (i == state[5]) then
+      if (i == state[8]) then
+        lcd.drawText(x1, y, "[x]", SMLSIZE + INVERS);
+      else
+        lcd.drawText(x1, y, "[x]", SMLSIZE);
+      end
+      lcd.drawText(x2, y, anim[1], SMLSIZE);
+    else
+      if (i == state[8]) then
+        lcd.drawText(x1, y, "[ ]", SMLSIZE + INVERS);
+      else
+        lcd.drawText(x1, y, "[ ]", SMLSIZE);
+      end
+    end
+    lcd.drawText(x2, y, anim[1], SMLSIZE);
+  end
   if (state[5] > 0) then
     return anims[state[5]];
   end
@@ -386,17 +404,6 @@ local function chooseAnimation(config, widget, anims, state, event, touch)
     return nil;
   end
 
-  --[[
-  if (selection > 0) then
-    resetState(state);
-    state[5] = selection;
-    return anims[selection];
-  else
-    if (state[5] > 0) and (state[5] <= #anims) then
-      return anims[state[5] ];
-    end
-  end
-  --]]
 end
 
 if (LCD_W <= 128) then
@@ -407,20 +414,30 @@ if (LCD_W <= 128) then
     chooseAnimation = chooseAnimationBW,
     initAnimationFSM = initAnimationFSM,
   };
-  elseif (LCD_W <= 212) then
-    return {
-      loadAnimations = loadAnimations,
-      initAnimations = initAnimations,
-      runAnimation = runAnimation,
-      chooseAnimation = chooseAnimationBW,
-      initAnimationFSM = initAnimationFSM,
-    };
-    else
+elseif (LCD_W <= 212) then
   return {
     loadAnimations = loadAnimations,
     initAnimations = initAnimations,
     runAnimation = runAnimation,
-    chooseAnimation = chooseAnimation,
+    chooseAnimation = chooseAnimationBW,
     initAnimationFSM = initAnimationFSM,
   };
+else
+  if (isEdgeTx()) then
+    return {
+      loadAnimations = loadAnimations,
+      initAnimations = initAnimations,
+      runAnimation = runAnimation,
+      chooseAnimation = chooseAnimation,
+      initAnimationFSM = initAnimationFSM,
+    };
+  else
+    return {
+      loadAnimations = loadAnimations,
+      initAnimations = initAnimations,
+      runAnimation = runAnimation,
+      chooseAnimation = chooseAnimationNoTheme,
+      initAnimationFSM = initAnimationFSM,
+    };
   end
+end

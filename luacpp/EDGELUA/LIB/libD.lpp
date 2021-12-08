@@ -1015,7 +1015,7 @@ local function displayFmRssiWarningColor(config, widget, state)
   end   
 end 
 
-local function displayAddressConfigBW(config, encoder, pScaler, state, event)
+local function displayAddressConfigBW(config, widget, encoder, pScaler, state, event)
   if (config[CFG_Backend] == CFG_BEND_TipTip) or (config[CFG_Backend] == CFG_BEND_SolExpert) then
     lcd.drawText(widget[W_X], widget[W_Y], "Not usable with backend: " .. config[CFG_Backend], MIDSIZE);
     return;
@@ -1023,9 +1023,9 @@ local function displayAddressConfigBW(config, encoder, pScaler, state, event)
 
   if (state[FSMADR_State] == FSMADR_STATE_Initial) then
 
-    lcd.drawText(0, 0, "Attach only one device to the RX.", SMLSIZE);
+    lcd.drawText(widget[W_X], widget[W_Y] + widget[W_FontHeight], "Attach only one device to the RX.", SMLSIZE);
 
-    lcd.drawText(0, 10, "Press [Enter] to start learning", MIDSIZE);
+    lcd.drawText(widget[W_X], widget[W_Y] + 2 * widget[W_FontHeight], "Press [Enter] to start learning", MIDSIZE);
 
     if (event == EVT_VIRTUAL_ENTER) then
       state[FSMADR_State] = FSMADR_STATE_Output;
@@ -1036,11 +1036,11 @@ local function displayAddressConfigBW(config, encoder, pScaler, state, event)
       adr = 8;
     end 
 
-    lcd.drawText(0, 0, "Address: " .. adr, MIDSIZE + INVERS);
+    lcd.drawText(widget[W_X], widget[W_Y] +  widget[W_FontHeight], "Address: " .. adr, MIDSIZE + INVERS);
 
-    lcd.drawText(0, 20, "Watch for the device to respond.", SMLSIZE);
+    lcd.drawText(widget[W_X], widget[W_Y] + 2 * widget[W_FontHLarge], "Watch for the device to respond.", SMLSIZE);
 
-    lcd.drawText(0, 30, "Switch on RX and device", MIDSIZE);
+    lcd.drawText(widget[W_X], widget[W_Y] + 3 * widget[W_FontHLarge], "Switch on RX and device", MIDSIZE);
 
     #ifdef USE_BACKEND_BUS
     local bendcfg = config[CFG_Backend_Data][CFG_BEND_Bus];
@@ -1131,7 +1131,7 @@ local function displayAddressConfigColorNoTheme(config, widget, encoder, pScaler
 
     lcd.drawText(widget[W_X] + border_h, widget[W_Y] + widget[W_FontHLarge], "Attach only one device to the RX.", SMLSIZE);
 
-    lcd.drawFilledRectangle(rect.xmin, rect.ymin, rect.xmax - rect.xmin + 1, rect.ymax - rect.ymin + 1);
+    lcd.drawRectangle(rect.xmin, rect.ymin, rect.xmax - rect.xmin + 1, rect.ymax - rect.ymin + 1, 0, 3);
     lcd.drawText(rect.xmin + 5, rect.ymin + 5, "Press [Enter] to start learning", MIDSIZE);
 
     if (event == EVT_VIRTUAL_ENTER) then
@@ -1147,7 +1147,7 @@ local function displayAddressConfigColorNoTheme(config, widget, encoder, pScaler
 
     lcd.drawText(widget[W_X] + border_h, widget[W_Y] + widget[W_Height] - widget[W_FontHLarge], "Watch for the device to respond.", SMLSIZE);
 
-    lcd.drawFilledRectangle(rect.xmin, rect.ymin, rect.xmax - rect.xmin + 1, rect.ymax - rect.ymin + 1);
+    lcd.drawRectangle(rect.xmin, rect.ymin, rect.xmax - rect.xmin + 1, rect.ymax - rect.ymin + 1, 0, 3);
     lcd.drawText(rect.xmin + 5, rect.ymin + 5, "Switch on RX and device", MIDSIZE);
 
     #ifdef USE_BACKEND_BUS

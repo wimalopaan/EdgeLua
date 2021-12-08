@@ -23,7 +23,7 @@ local function initWidgetBW()
   widget[4] = LCD_H;
   widget[5] = 8;
   widget[8] = 8;
-  widget[9] = 8;
+  widget[9] = 16;
   widget[6] = 8;
   widget[7] = 16;
   return widget;
@@ -491,7 +491,7 @@ local function initConfigColor(config, modifyModel)
     end
   end
 
-  local footer = "Vers: " .. "2.07";
+  local footer = "Vers: " .. "2.08";
   if (cfg[9] == 0) then
     footer = footer .. " Mod: xjt";
   elseif (cfg[9] == 1) then

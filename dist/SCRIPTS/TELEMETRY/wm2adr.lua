@@ -62,6 +62,7 @@ local function loadLibU()
   end
 end
 
+local widget = {};
 local menuState = {};
 local paramEncoder = nil;
 local paramScaler = nil;
@@ -75,6 +76,9 @@ local function init_telemetry()
     if (errorCode > 0) then
        return;
     end
+
+    widget = __libI.initWidget();
+    collectgarbage();
 
     if not(__WmSw2Config) then
         local config = __libI.loadConfig();
@@ -100,7 +104,8 @@ local function run_telemetry(event)
     if (errorCode == 0) then
         __stopWmSw2 = bit32.bor(__stopWmSw2, 2);
         lastRun = getTime();
-        __libD.displayAddressConfig(__WmSw2Config, paramEncoder, paramScaler, menuState, event, touch);
+        lcd.drawScreenTitle("Learn address", 1, 1);
+        __libD.displayAddressConfig(__WmSw2Config, widget, paramEncoder, paramScaler, menuState, event, touch);
     else
       lcd.drawText(0, 0, "Error: " .. errorCode, DBLSIZE);
     end
