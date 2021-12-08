@@ -217,11 +217,15 @@ local function displayDebugBW(widget)
   y = y + widget[8];
   lcd.drawText(x3, y, debugText[10], SMLSIZE);
 
-  local opt = widget[11].Test;
-  if (type(opt) == "string") then
+  if (widget[11]) then
+    local opt = widget[11].Test;
+    if (type(opt) == "string") then
       lcd.drawText(x4, y, "y", SMLSIZE);
-  else
+    else
       lcd.drawText(x4, y, "n", SMLSIZE);
+    end
+  else
+    lcd.drawText(x4, y, "na", SMLSIZE);
   end
 
   y = y + widget[8];

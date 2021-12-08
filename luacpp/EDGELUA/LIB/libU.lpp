@@ -243,11 +243,15 @@ local function displayDebugBW(widget)
   y = y + widget[W_FontHSmall]; 
   lcd.drawText(x3, y, debugText[DEBUG_TEXT_StringOption], SMLSIZE);
   #ifdef USE_NEW_STRING_OPTION
-  local opt = widget[W_Options].Test;
-  if (type(opt) == "string") then 
+  if (widget[W_Options]) then
+    local opt = widget[W_Options].Test;
+    if (type(opt) == "string") then 
       lcd.drawText(x4, y, "y", SMLSIZE);
-  else
+    else
       lcd.drawText(x4, y, "n", SMLSIZE);
+    end      
+  else
+    lcd.drawText(x4, y, "na", SMLSIZE);
   end
   #else
       lcd.drawText(x4, y, "-", SMLSIZE);
