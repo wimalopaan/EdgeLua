@@ -61,7 +61,16 @@ local function setSwitchOn(lsNumber)
   if (max) then
     local maxId = max.id;
     local ls = model.getLogicalSwitch(lsNumber);
-    ls.func = 3;
+    #ifdef USE_FUNCTION_NAMES
+      if (LS_FUNC_VPOS) then
+        ls.func = LS_FUNC_VPOS;
+      else
+        ls.func = LSFUNC_A_GT_X;
+      end
+    #else 
+      ls.func = LSFUNC_A_GT_X;
+    #endif 
+    TRACE("setSwitchOn", lsNumber, ls.func);
     model.setLogicalSwitch(lsNumber, ls); 
   end 
 end  
@@ -71,16 +80,28 @@ local function setSwitchOff(lsNumber)
   if (max) then
     local maxId = max.id;
     local ls = model.getLogicalSwitch(lsNumber);
-    ls.func = 1;
+    #ifdef USE_FUNCTION_NAMES
+      if (LS_FUNC_VEQUAL) then
+        ls.func = LS_FUNC_VEQUAL;
+      else
+        ls.func = LSFUNC_A_EQ_X;
+      end
+    #else
+      ls.func = LSFUNC_A_EQ_X;
+    #endif
+    TRACE("setSwitchOff", lsNumber, ls.func);
     model.setLogicalSwitch(lsNumber, ls); 
   end 
 end 
 
 local function rssiState(cfg, state)
+--  TRACE("safemode: A", cfg[CFG_SafeMode_LsNumber], cfg[CFG_Footer]);
   if (cfg[CFG_SafeMode_LsNumber]) then
+    TRACE3("safemode: B");
     local t = getTime();
 
     if not(state[FSMRSSI_State]) then
+      TRACE("safemode: init");
       state[FSMRSSI_State] = 0;
       state[FSMRSSI_LastTime] = t;
       setSwitchOff(cfg[CFG_SafeMode_LsNumber]);

@@ -335,6 +335,19 @@ local function initConfigBW(config, modifyModel)
     cfg[9] = 2; --sbus
   end
 
+  local footer = "Vers: " .. "2.10";
+  if (cfg[9] == 0) then
+    footer = footer .. " Mod: xjt";
+  elseif (cfg[9] == 1) then
+    footer = footer .. " Mod: ibus";
+  else
+    footer = footer .. " Mod: sbus";
+  end
+  if (config.title) then
+    footer = footer .. " Conf: " .. config.title;
+  end
+  cfg[19] = footer;
+
   if (config.backend >= 1) and (config.backend <= 4) then
     cfg[14] = config.backend;
   else
@@ -397,6 +410,7 @@ local function initConfigBW(config, modifyModel)
           cfg[16] = config.safeMode.timeOut * 100;
           cfg[17] = config.safeMode.linkDropoutMax * 100;
           cfg[18] = fmLsNumber;
+                                                                  ;
         end
       end
     end
@@ -491,7 +505,8 @@ local function initConfigColor(config, modifyModel)
     end
   end
 
-  local footer = "Vers: " .. "2.09";
+  --[[ to initConfigBW
+  local footer = "Vers: " .. "2.10";
   if (cfg[9] == 0) then
     footer = footer .. " Mod: xjt";
   elseif (cfg[9] == 1) then
@@ -504,6 +519,7 @@ local function initConfigColor(config, modifyModel)
   if (config.title) then
     footer = footer .. " Conf: " .. config.title;
   end
+  --]]
 
   if (modifyModel) and (config.removeTrimsFromFlightModes) then
                                                ;

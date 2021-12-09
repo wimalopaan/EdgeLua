@@ -1021,6 +1021,8 @@ local function displayAddressConfigBW(config, widget, encoder, pScaler, state, e
     return;
   end
 
+  lcd.drawText(widget[W_X], widget[W_Y] + widget[W_Height] - widget[W_FontHSmall], config[CFG_Footer], SMLSIZE);
+
   if (state[FSMADR_State] == FSMADR_STATE_Initial) then
 
     lcd.drawText(widget[W_X], widget[W_Y] + widget[W_FontHeight], "Attach only one device to the RX.", SMLSIZE);
@@ -1043,8 +1045,9 @@ local function displayAddressConfigBW(config, widget, encoder, pScaler, state, e
     lcd.drawText(widget[W_X], widget[W_Y] + 3 * widget[W_FontHLarge], "Switch on RX and device", MIDSIZE);
 
     #ifdef USE_BACKEND_BUS
+
     local bendcfg = config[CFG_Backend_Data][CFG_BEND_Bus];
-    encoder(bendcfg[BEND_BUS_MixerGlobalVariable], 14, adr);
+    encoder(bendcfg[BEND_BUS_MixerGlobalVariable], 14, adr); -- learn code
     #endif
 
     if (event == EVT_VIRTUAL_ENTER) then

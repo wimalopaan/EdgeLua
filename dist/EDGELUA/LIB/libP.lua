@@ -59,7 +59,14 @@ local function setSwitchOn(lsNumber)
   if (max) then
     local maxId = max.id;
     local ls = model.getLogicalSwitch(lsNumber);
-    ls.func = 3;
+
+      if (LS_FUNC_VPOS) then
+        ls.func = LS_FUNC_VPOS;
+      else
+        ls.func = 3;
+      end
+
+                                           ;
     model.setLogicalSwitch(lsNumber, ls);
   end
 end
@@ -69,16 +76,26 @@ local function setSwitchOff(lsNumber)
   if (max) then
     local maxId = max.id;
     local ls = model.getLogicalSwitch(lsNumber);
-    ls.func = 1;
+
+      if (LS_FUNC_VEQUAL) then
+        ls.func = LS_FUNC_VEQUAL;
+      else
+        ls.func = 1;
+      end
+
+                                            ;
     model.setLogicalSwitch(lsNumber, ls);
   end
 end
 
 local function rssiState(cfg, state)
+-- ;
   if (cfg[18]) then
+                         ;
     local t = getTime();
 
     if not(state[1]) then
+                             ;
       state[1] = 0;
       state[2] = t;
       setSwitchOff(cfg[18]);

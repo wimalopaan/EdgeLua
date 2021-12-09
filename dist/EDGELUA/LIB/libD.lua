@@ -1004,6 +1004,8 @@ local function displayAddressConfigBW(config, widget, encoder, pScaler, state, e
     return;
   end
 
+  lcd.drawText(widget[1], widget[2] + widget[4] - widget[8], config[19], SMLSIZE);
+
   if (state[1] == 0) then
 
     lcd.drawText(widget[1], widget[2] + widget[5], "Attach only one device to the RX.", SMLSIZE);
@@ -1026,7 +1028,7 @@ local function displayAddressConfigBW(config, widget, encoder, pScaler, state, e
     lcd.drawText(widget[1], widget[2] + 3 * widget[9], "Switch on RX and device", MIDSIZE);
 
     local bendcfg = config[20][1];
-    encoder(bendcfg[2], 14, adr);
+    encoder(bendcfg[2], 14, adr); -- learn code
 
     if (event == EVT_VIRTUAL_ENTER) then
       state[1] = 0;

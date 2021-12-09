@@ -105,7 +105,7 @@ local function init_telemetry()
           errorCode = 4;
           return;
         end
-        __WmSw2Config = __libI.initConfig(config);
+        __WmSw2Config = __libI.initConfig(config, true); --todo
       end
       collectgarbage();
 

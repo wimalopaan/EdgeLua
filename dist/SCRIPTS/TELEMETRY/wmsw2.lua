@@ -128,6 +128,7 @@ local function init_telemetry()
     end
     __WmSw2Config = __libI.initConfig(config, true); -- modify model
   end
+
   collectgarbage();
 
   if not(__WmSw2Config) then
@@ -177,6 +178,7 @@ local function background_telemetry()
       switchFSM(__WmSw2Config, menu, queue, fsmState, encoder, exportValues);
     end
     __libP.rssiState(__WmSw2Config, rssiState);
+                                                                   ;
   end
 end
 

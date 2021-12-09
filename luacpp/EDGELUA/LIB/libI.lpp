@@ -378,6 +378,19 @@ local function initConfigBW(config, modifyModel)
     cfg[CFG_Encoding] = 2; --sbus
   end
 
+  local footer = "Vers: " .. VERSION;
+  if (cfg[CFG_Encoding] == 0) then
+    footer = footer .. " Mod: xjt";
+  elseif (cfg[CFG_Encoding] == 1) then
+    footer = footer .. " Mod: ibus";
+  else
+    footer = footer .. " Mod: sbus";
+  end
+  if (config.title) then
+    footer = footer .. " Conf: " .. config.title;
+  end
+  cfg[CFG_Footer] = footer;
+
   if (config.backend >= 1) and (config.backend <= 4) then
     cfg[CFG_Backend] = config.backend;
   else  
@@ -446,6 +459,7 @@ local function initConfigBW(config, modifyModel)
           cfg[CFG_SafeMode_Timeout] = config.safeMode.timeOut * 100;
           cfg[CFG_SafeMode_LinkDropoutMax] = config.safeMode.linkDropoutMax * 100;
           cfg[CFG_SafeMode_LsNumber] = fmLsNumber;
+          TRACE("safeMode fmLsNumber", cfg[CFG_SafeMode_LsNumber]);
         end 
       end 
     end 
@@ -546,6 +560,7 @@ local function initConfigColor(config, modifyModel)
     end
   end
 
+  --[[ to initConfigBW
   local footer = "Vers: " .. VERSION;
   if (cfg[CFG_Encoding] == 0) then
     footer = footer .. " Mod: xjt";
@@ -559,6 +574,7 @@ local function initConfigColor(config, modifyModel)
   if (config.title) then
     footer = footer .. " Conf: " .. config.title;
   end
+  --]]
 
   if (modifyModel) and (config.removeTrimsFromFlightModes) then
     TRACE("initConfigColor remove filghtmodes");
