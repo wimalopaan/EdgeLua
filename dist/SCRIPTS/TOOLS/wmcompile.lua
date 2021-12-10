@@ -40,12 +40,15 @@ local fileIter = 1;
 local filenames = {};
 
 local dirs = {
+
   "/EDGELUA/ANIMS",
+
   "/EDGELUA/COMMON",
   "/EDGELUA/LIB",
   "/EDGELUA/MODELS",
   "/EDGELUA/RADIO",
   "/SCRIPTS/TELEMETRY",
+
   "/WIDGETS/ELUAAD",
   "/WIDGETS/ELUAAN",
   "/WIDGETS/ELUACO",
@@ -53,11 +56,12 @@ local dirs = {
   "/WIDGETS/ELUAWI",
   "/WIDGETS/ELUAIC",
   "/WIDGETS/ELUATS",
+
 };
 
 local function run()
 -- lcd.clear();
-  lcd.drawText(0, 0, "Compiling ..." .. "2.10", TEXT_COLOR);
+  lcd.drawText(0, 0, "Compiling ..." .. "2.12", TEXT_COLOR);
   local t = getTime();
   local dir = nil;
   if ((t - lastTime) > 50) then

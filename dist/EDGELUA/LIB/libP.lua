@@ -309,12 +309,15 @@ local function sbusSwitchFSM(config, menu, queue, state, encoder, exportValues)
     else
       local page = menu[state[3]];
       item = page[state[4]];
+
       if (item[7]) then -- virtuals are not cyclic pushed
         item = nil;
       end
+
       nextItem(menu, state);
     end
     if (item) then
+
       if (item[7]) then
         for i, virt in ipairs(item[7]) do
           local push = {[1] = virt, [2] = virt[3]};
@@ -328,6 +331,7 @@ local function sbusSwitchFSM(config, menu, queue, state, encoder, exportValues)
           model.setGlobalVariable(item[6], 0, expValue);
         end
       end
+
       state[1] = t;
     end
   end

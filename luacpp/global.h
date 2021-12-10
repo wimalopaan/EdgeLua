@@ -2,11 +2,24 @@
 
 //#define DEBUG 
 
-// #define TEST1
+//#define SELECT_TINY
+
+#ifdef SELECT_TINY 
+#define USE_BACKEND_BUS
+#define INCLUDE_SAFEMODE
+#else
+#define INCLUDE_ANIMATIONS
+#define INCLUDE_COLOR_FUNCTIONS
+#define INCLUDE_SAFEMODE
+#define INCLUDE_VIRTUAL_SWITCHES
+#define USE_BACKEND_BUS
+#define USE_BACKEND_SPORT
+#define USE_BACKEND_TIPTIP
+#define USE_BACKEND_SOLEXPERT
+#define USE_VALUE_STORAGE
+#endif
 
 #define USE_DEPRECATED
-
-#define USE_VALUE_STORAGE
 
 // can query "t5u", ..., "sl1".."sl62" as switch-source
 //#define USE_TRIM_NAMES // only for color/edgetx (own patch)
@@ -20,10 +33,6 @@
 
 #define USE_FALLBACK_IDS
 
-#define USE_BACKEND_BUS
-#define USE_BACKEND_SPORT
-#define USE_BACKEND_TIPTIP
-#define USE_BACKEND_SOLEXPERT
 
 // fallback IDs for functions
 #define LSFUNC_A_EQ_X 1

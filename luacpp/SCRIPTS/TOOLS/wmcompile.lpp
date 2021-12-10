@@ -42,12 +42,15 @@ local fileIter = 1;
 local filenames = {};
 
 local dirs = {
+  #ifdef INCLUDE_ANIMATIONS
   "/EDGELUA/ANIMS",
+  #endif
   "/EDGELUA/COMMON",
   "/EDGELUA/LIB",
   "/EDGELUA/MODELS",
   "/EDGELUA/RADIO",
   "/SCRIPTS/TELEMETRY",
+  #ifndef SELECT_TINY
   "/WIDGETS/ELUAAD",
   "/WIDGETS/ELUAAN",
   "/WIDGETS/ELUACO",
@@ -55,6 +58,7 @@ local dirs = {
   "/WIDGETS/ELUAWI",
   "/WIDGETS/ELUAIC",
   "/WIDGETS/ELUATS",
+  #endif
 };
 
 local function run() 

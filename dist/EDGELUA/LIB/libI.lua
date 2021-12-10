@@ -335,7 +335,7 @@ local function initConfigBW(config, modifyModel)
     cfg[9] = 2; --sbus
   end
 
-  local footer = "Vers: " .. "2.10";
+  local footer = "Vers: " .. "2.12";
   if (cfg[9] == 0) then
     footer = footer .. " Mod: xjt";
   elseif (cfg[9] == 1) then
@@ -506,7 +506,7 @@ local function initConfigColor(config, modifyModel)
   end
 
   --[[ to initConfigBW
-  local footer = "Vers: " .. "2.10";
+  local footer = "Vers: " .. "2.12";
   if (cfg[9] == 0) then
     footer = footer .. " Mod: xjt";
   elseif (cfg[9] == 1) then
@@ -795,6 +795,7 @@ local function initMenuBW(menu)
       if (item.export) then
         citem[6] = item.export;
       end
+
       if (item.virtual) then
         citem[7] = {};
         for i, v in ipairs(item.virtual) do

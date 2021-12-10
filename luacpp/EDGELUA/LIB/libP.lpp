@@ -315,12 +315,15 @@ local function sbusSwitchFSM(config, menu, queue, state, encoder, exportValues)
     else
       local page = menu[state[FSMSWITCH_CyclePage]]; 
       item = page[state[FSMSWITCH_CycleRow]]; 
+      #ifdef INCLUDE_VIRTUAL_SWITCHES
       if (item[ITEM_Virtual]) then -- virtuals are not cyclic pushed
         item = nil;
       end 
+      #endif 
       nextItem(menu, state);
     end
     if (item) then
+      #ifdef INCLUDE_VIRTUAL_SWITCHES
       if (item[ITEM_Virtual]) then
         for i, virt in ipairs(item[ITEM_Virtual]) do
           local push = {[PUSHED_ITEM_Item] = virt, [PUSHED_ITEM_BeforeState] = virt[ITEM_State]};
@@ -334,6 +337,13 @@ local function sbusSwitchFSM(config, menu, queue, state, encoder, exportValues)
           model.setGlobalVariable(item[ITEM_Export], 0, expValue);
         end
       end
+      #else
+        encoder(bendCfg[BEND_BUS_MixerGlobalVariable], item);
+        if (item[ITEM_Export]) then -- export
+          local expValue = exportValues[ item[ITEM_State] ] * 1024 / 100;
+          model.setGlobalVariable(item[ITEM_Export], 0, expValue);
+        end
+      #endif
       state[FSMSWITCH_LastTime] = t;
     end 
   end

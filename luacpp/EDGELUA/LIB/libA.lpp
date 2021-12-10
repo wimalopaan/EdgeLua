@@ -12,6 +12,8 @@
 
 #include "../../global.h"
 
+#ifdef INCLUDE_ANIMATIONS
+
 local function isEdgeTx()
   local ver, radio, maj, minor, rev, osname = getVersion();
   return osname ~= nil;
@@ -445,3 +447,4 @@ else
   end
 end
 
+#endif 

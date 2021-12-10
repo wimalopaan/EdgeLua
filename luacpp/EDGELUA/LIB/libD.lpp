@@ -144,6 +144,7 @@ local function displayParamMenuBW(config, widget, pmenu, pheaders, state, paramS
   return pvalue;
 end
 
+#ifdef INCLUDE_COLOR_FUNCTIONS
 local function displayParamMenuColorNoTheme(config, widget, pmenu, pheaders, state, paramScaler, event, help)
   lcd.clear()
   local activePageIndex = state[MENUSTATE_Page];
@@ -234,8 +235,9 @@ local function displayParamMenuColorNoTheme(config, widget, pmenu, pheaders, sta
   end   
   return pvalue;
 end
+#endif
 
-
+#ifdef INCLUDE_COLOR_FUNCTIONS
 local function displayParamMenuColor(config, widget, pmenu, pheaders, state, paramScaler, event, help)
   lcd.clear()
   if (config[CFG_Backend] == CFG_BEND_TipTip) or (config[CFG_Backend] == CFG_BEND_SolExpert) then
@@ -335,7 +337,7 @@ local function displayParamMenuColor(config, widget, pmenu, pheaders, state, par
   end   
   return pvalue;
 end
-
+#endif 
 
 local function displayMenuBW(config, widget, menu, overlays, state, pagetitles)
   lcd.clear()
@@ -389,6 +391,7 @@ local function displayMenuBW(config, widget, menu, overlays, state, pagetitles)
   end
 end
 
+#ifdef INCLUDE_COLOR_FUNCTIONS
 local function displayMenuColor(config, widget, menu, overlays, state, event, remote, 
                                 warning1, warning2, pagetitles, menudata, fsmState)
   lcd.clear()
@@ -485,7 +488,9 @@ local function displayMenuColor(config, widget, menu, overlays, state, event, re
     end
   end
 end
+#endif 
 
+#ifdef INCLUDE_COLOR_FUNCTIONS 
 local function displayMenuColorNoTheme(config, widget, menu, overlays, state, event, remote, warning1, warning2, pagetitles, menudata)
 --  lcd.clear()
 --  TRACE("displayMenuColorNoTheme", widget[W_X], widget[W_Y], widget[W_Width], widget[W_Height]);
@@ -555,6 +560,7 @@ local function displayMenuColorNoTheme(config, widget, menu, overlays, state, ev
     end
   end
 end
+#endif 
 
 local function prevPage(menu, menuState)
   if (menuState[MENUSTATE_Page] == 1) then
@@ -703,6 +709,7 @@ local function processEventsBWKeys(config, menu, menuState, event, queue, callba
   TRACE3("processEventsBWKeys E");
 end
 
+#ifdef INCLUDE_COLOR_FUNCTIONS
 local function processEventsColor(config, menu, menuState, event, queue, callback)
   if (event == EVT_VIRTUAL_ENTER) then
     callback(menu, menuState, queue);
@@ -733,6 +740,7 @@ local function processEventsColor(config, menu, menuState, event, queue, callbac
     end
   end
 end
+#endif 
 
 local function getSwitchValue(id, lsmode)
   local value = getValue(id);
@@ -1057,6 +1065,7 @@ local function displayAddressConfigBW(config, widget, encoder, pScaler, state, e
   end
 end
 
+#ifdef INCLUDE_COLOR_FUNCTIONS
 local function displayAddressConfigColor(config, widget, encoder, pScaler, state, event, touch, buttonState)
   lcd.clear();
 
@@ -1110,7 +1119,9 @@ local function displayAddressConfigColor(config, widget, encoder, pScaler, state
   else
   end
 end
+#endif 
 
+#ifdef INCLUDE_COLOR_FUNCTIONS
 local function displayAddressConfigColorNoTheme(config, widget, encoder, pScaler, state, event, touch, buttonState)
   lcd.clear();
 
@@ -1164,6 +1175,7 @@ local function displayAddressConfigColorNoTheme(config, widget, encoder, pScaler
   else
   end
 end
+#endif 
 
 local function processEventsBW()
 end 

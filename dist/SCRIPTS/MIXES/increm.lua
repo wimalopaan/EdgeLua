@@ -13,7 +13,7 @@ local input = {
  };
 
 local output = {
-   "Incr"
+   "Incremental"
 };
 
 local value = 0;

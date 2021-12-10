@@ -31,6 +31,8 @@ local function initWidgetBW()
   return widget;
 end
 
+#ifdef INCLUDE_COLOR_FUNCTIONS
+
 local function initWidgetColor(zone, options)
   local widget = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
   widget[W_X] = zone.x;
@@ -57,6 +59,7 @@ local function initWidgetColor(zone, options)
   end
   return widget;
 end
+#endif
 
 local function getLogicalSwitchFor(id)
   local max = getFieldInfo("max");
@@ -399,6 +402,8 @@ local function initConfigBW(config, modifyModel)
 
 --  model.deleteMixes();
 
+  #ifdef INCLUDE_SAFEMODE
+
   if (modifyModel) and (config.safeMode) then
     if (config.safeMode.flightMode > 0) then
       if (config.safeMode.timeOut > 0) and (config.safeMode.linkDropoutMax > 0) then
@@ -464,9 +469,12 @@ local function initConfigBW(config, modifyModel)
       end 
     end 
   end
+  #endif
 
   return cfg;
 end
+
+#ifdef INCLUDE_COLOR_FUNCTIONS 
 
 local function initConfigColor(config, modifyModel)
   TRACE("initConfigColor");
@@ -602,6 +610,7 @@ local function initConfigColor(config, modifyModel)
   TRACE("initConfigColor E");
   return cfg;
 end
+#endif 
 
 local function findItem(cmenu, fn, module) -- compressed-menu
   for ip, page in ipairs(cmenu) do
@@ -797,6 +806,7 @@ local function initParamMenuBW(cfg, menu, map, modInfos)
   return initParamMenu(cfg, menu, map, modInfos, false);
 end
 
+#ifdef INCLUDE_COLOR_FUNCTIONS 
 local function initParamMenuColor(cfg, menu, map, modInfos, filename)
   if not(menu) or not(map) or not(modInfos) then
     return;
@@ -811,6 +821,7 @@ local function initParamMenuColor(cfg, menu, map, modInfos, filename)
   end
   return headers, cmenu, help, valuesFileName;
 end
+#endif 
 
 local function initMenuBW(menu)
   if not menu then
@@ -852,6 +863,7 @@ local function initMenuBW(menu)
       if (item.export) then
         citem[ITEM_Export] = item.export;
       end
+      #ifdef INCLUDE_VIRTUAL_SWITCHES 
       if (item.virtual) then
         citem[ITEM_Virtual] = {};
         for i, v in ipairs(item.virtual) do
@@ -862,6 +874,7 @@ local function initMenuBW(menu)
         end
         TRACE("virts4:", citem[ITEM_Name], citem[ITEM_Virtual]);
       end
+      #endif 
 
       -- validity check
       if (citem[ITEM_Name]) and
@@ -885,6 +898,7 @@ local function initMenuBW(menu)
     end
   end
 
+  #ifdef INCLUDE_VIRTUAL_SWITCHES
   -- resolve virtuals
   for ip, page in ipairs(cmenu) do
     for i, item in ipairs(page) do
@@ -902,7 +916,8 @@ local function initMenuBW(menu)
       end
     end
   end
-
+  #endif 
+  
   for switchid, uses in pairs(switchUse) do
     if (#uses > 1) then
       for iu, use in ipairs(uses) do
@@ -928,6 +943,8 @@ local function initMenuBW(menu)
   return cmenu, shortCuts, overlays, pagetitles;
 end
 
+#ifdef INCLUDE_COLOR_FUNCTIONS
+
 local function initMenuColor(cfg, menu, filename)
   if not menu then
     return;
@@ -949,7 +966,7 @@ local function initMenuColor(cfg, menu, filename)
   end
   return cmenu, shortCuts, overlays, pagetitles, menudata;
 end
-
+#endif 
 
 local function initFSM(state)
   if not(state[FSMSWITCH_LastTime]) then
