@@ -10,7 +10,7 @@
 -- Please note that the above license also covers the transfer protocol used and the encoding scheme and 
 -- all further principals of tranferring state and other information.
 
-#include "../../global.h"
+#include "../../mixer.lh"
 
 local output = { 
    "sw_var",
@@ -20,29 +20,31 @@ local output = {
    #endif 
 };
 
-local errorCode = 0;
 local gvar = 0;
 
 local function initGV()
-   if not(__WmSw2Config) then
-      local basedir = BASE_DIR .. "/LIB/";
-      if not __libI then
-        __libI = loadScript(basedir .. "libI.lua")();
-        if not __libI then
-          errorCode = 1;
-        else   
-         local config = __libI.loadConfig();
+   TRACE("sgvar: init: ", __WmMixerConfig);
+   if not(__WmMixerConfig) then
+      if not __libM then
+        loadLibM();
+        TRACE("vmap: libM: ", __libM);
+        if __libM then
+         local config = __libM.loadConfig();
+         TRACE("vmap: config: ", config);
          if not(config) then
             errorCode = 4;
             return;
          end
-         __WmSw2Config = __libI.initConfig(config, false); -- not modify model
+         __WmMixerConfig = __libM.initConfig(config); -- not modify model
+         TRACE("vmap initConfig", __WmMixerConfig);
          collectgarbage();
         end
       end
    end
+   local backend = __WmMixerConfig[MIXCFG_Backend];   
+   local bendcfg = __WmMixerConfig[MIXCFG_Backend_Data][backend];
+
    #ifdef USE_BACKEND_BUS
-   local bendcfg = __WmSw2Config[CFG_Backend_Data][CFG_BEND_Bus];
    gvar = bendcfg[BEND_BUS_MixerGlobalVariable];
    TRACE("sgvar: gvar: ", gvar);
    #endif

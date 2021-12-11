@@ -10,44 +10,50 @@
 -- Please note that the above license also covers the transfer protocol used and the encoding scheme and 
 -- all further principals of tranferring state and other information.
 
-#include "../../global.h"
+#include "../../mixer.lh"
 
 local output = { 
-   "module1",
-   "module2",
-   "module3",
-   "module4",
-   "module5"
+   "mod1",
+   "mod2",
+   "mod3",
+   "mod4",
+   "mod5"
 };
 
-local errorCode = 0;
 local gvar = 0;
 local values = {};
 
 local function initConfig()
-   if not(__WmSw2Config) then
-      local basedir = BASE_DIR .. "/LIB/";
-      if not __libI then
-        __libI = loadScript(basedir .. "libI.lua")();
-        if not __libI then
-          errorCode = 1;
-        else   
-         local config = __libI.loadConfig();
+   TRACE("vmap: init: ", __WmMixerConfig);
+   if not(__WmMixerConfig) then
+      if not __libM then
+        loadLibM();
+        TRACE("vmap: libM: ", __libM);
+        if __libM then
+         local config = __libM.loadConfig();
+         TRACE("vmap: config: ", config);
          if not(config) then
             errorCode = 4;
             return;
          end
-         __WmSw2Config = __libI.initConfig(config, false); -- not modify
+         __WmMixerConfig = __libM.initConfig(config); -- not modify model
+         TRACE("vmap initConfig", __WmMixerConfig);
          collectgarbage();
         end
       end
    end
-   #ifdef USE_BACKEND_TIPTIP
-   local bendcfg = __WmSw2Config[CFG_Backend_Data][CFG_BEND_TipTip];
-   gvar = bendcfg[BEND_TIPTIP_MixerGlobalVariable];
-   values = bendcfg[BEND_TIPTIP_Values];
-   TRACE("vmap: gvar: ", gvar, values);
-   #endif
+
+   local backend = __WmMixerConfig[MIXCFG_Backend];   
+   local bendcfg = __WmMixerConfig[MIXCFG_Backend_Data][backend];
+
+   if (backend == CFG_BEND_Bus) then
+      
+   end
+   if (backend == CFG_BEND_TipTip) then
+      gvar = bendcfg[BEND_TIPTIP_MixerGlobalVariable];
+      values = bendcfg[BEND_TIPTIP_Values];
+      TRACE("vmap: gvar: ", gvar, values);         
+   end
 end
 
 if (LCD_W <= 212) then

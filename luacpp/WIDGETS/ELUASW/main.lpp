@@ -87,12 +87,12 @@ local function background(widget)
   if (errorCode == 0) then
     __libD.processShortCuts(shortCuts, queue);
     __libD.processRemoteInput(__WmSw2Config, menu, queue, remoteInput);
-    if (lastForeignInput ~= __WmSw2ForeignInput) then
+    if (__WmSw2ForeignInput) and (lastForeignInput ~= __WmSw2ForeignInput) then
       TRACE("foreignInput", __WmSw2ForeignInput);
       __libD.processForeignInput(__WmSw2Config, __WmSw2ForeignInput, menu, queue);
       lastForeignInput = __WmSw2ForeignInput;
     end
-    if (__stopWmSw2 == 0) then
+    if (__stopWmSw2) and (__stopWmSw2 == 0) then
       switchFSM(__WmSw2Config, menu, queue, fsmState, encoder, exportValues);
     end
 

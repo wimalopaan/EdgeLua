@@ -10,34 +10,61 @@
 -- Please note that the above license also covers the transfer protocol used and the encoding scheme and
 -- all further principals of tranferring state and other information.
 
+local function loadLib(filename)
+                               ;
+    local basedir = "/EDGELUA" .. "/LIB/";
+    local chunk = loadScript(basedir .. filename);
+    local lib = nil;
+    if (chunk) then
+                                       ;
+      lib = chunk();
+    end
+    collectgarbage();
+    return lib;
+  end
+
+local errorCode = 0;
+
+__WmMixerConfig = nil;
+
+local function loadLibM()
+  if not __libM then
+    __libM = loadLib("libM.lua");
+    if not __libM then
+      errorCode = 1;
+    end
+  end
+end
+
 local output = {
    "sw_var",
 
 };
 
-local errorCode = 0;
 local gvar = 0;
 
 local function initGV()
-   if not(__WmSw2Config) then
-      local basedir = "/EDGELUA" .. "/LIB/";
-      if not __libI then
-        __libI = loadScript(basedir .. "libI.lua")();
-        if not __libI then
-          errorCode = 1;
-        else
-         local config = __libI.loadConfig();
+                                          ;
+   if not(__WmMixerConfig) then
+      if not __libM then
+        loadLibM();
+                                     ;
+        if __libM then
+         local config = __libM.loadConfig();
+                                        ;
          if not(config) then
             errorCode = 4;
             return;
          end
-         __WmSw2Config = __libI.initConfig(config, false); -- not modify model
+         __WmMixerConfig = __libM.initConfig(config); -- not modify model
+                                                  ;
          collectgarbage();
         end
       end
    end
+   local backend = __WmMixerConfig[1];
+   local bendcfg = __WmMixerConfig[2][backend];
 
-   local bendcfg = __WmSw2Config[20][1];
    gvar = bendcfg[2];
                                ;
 

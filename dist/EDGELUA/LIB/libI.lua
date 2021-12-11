@@ -10,6 +10,98 @@
 -- Please note that the above license also covers the transfer protocol used and the encoding scheme and
 -- all further principals of tranferring state and other information.
 
+local function loadFile(baseDir)
+    local content = nil;
+    local filename = nil;
+    if (#model.getInfo().name > 0) then
+      filename = model.getInfo().name .. ".lua";
+                                            ;
+      content = loadScript(baseDir .. filename);
+    end
+    if not content then
+      if (LCD_W <= 128) then
+        filename = "tiny.lua";
+                                              ;
+        content = loadScript(baseDir .. filename);
+      elseif (LCD_W <= 212) then
+        filename = "medium.lua";
+                                              ;
+        content = loadScript(baseDir .. filename);
+      else
+        filename = "large.lua";
+                                              ;
+        content = loadScript(baseDir .. filename);
+      end
+    end
+    return content, filename;
+end
+
+local function loadConfig()
+    local baseDir = "/EDGELUA" .. "/RADIO/";
+    local cfg = loadFile(baseDir);
+                            ;
+    if (cfg) then
+      return cfg();
+    end
+    return nil;
+  end
+
+local function initBackendBus(config)
+                         ;
+  local data = {};
+  if (config.backends.bus.stateTimeout) then
+    data[1] = config.backends.bus.stateTimeout;
+  else
+    data[1] = 20;
+  end
+  if (config.backends.bus.mixerGlobalVariable >= 1) then
+    data[2] = config.backends.bus.mixerGlobalVariable;
+  else
+    data[2] = 5;
+  end
+  return data;
+end
+
+local function initBackendSPort(config)
+  local data = {};
+  return data;
+end
+
+local function initBackendTipTip(config)
+                            ;
+  local data = {};
+  if (config.backends.tiptip.shortTimeout) then
+    data[1] = config.backends.tiptip.shortTimeout;
+  else
+    data[1] = 30;
+  end
+  if (config.backends.tiptip.longTimeout) then
+    data[2] = config.backends.tiptip.longTimeout;
+  else
+    data[2] = 90;
+  end
+  if (config.backends.tiptip.mixerGlobalVariable) then
+    data[3] = config.backends.tiptip.mixerGlobalVariable;
+  else
+    data[3] = 7;
+  end
+  if (config.backends.tiptip.values) then
+                                                                                                     ;
+    data[4] = config.backends.tiptip.values;
+  else
+    data[4] = {0, 100, -100};
+  end
+
+                                                                                                    ;
+
+  return data;
+end
+
+local function initBackendSolExpert(config)
+  local data = {};
+  return data;
+end
+
 local function isEdgeTx()
   local ver, radio, maj, minor, rev, osname = getVersion();
   return osname ~= nil;
@@ -170,31 +262,31 @@ local function insertSettableSwitch(number)
   return -1;
 end
 
-local function loadFile(baseDir)
-  local content = nil;
-  local filename = nil;
-  if (#model.getInfo().name > 0) then
-    filename = model.getInfo().name .. ".lua";
-                                          ;
-    content = loadScript(baseDir .. filename);
-  end
-  if not content then
-    if (LCD_W <= 128) then
-      filename = "tiny.lua";
-                                            ;
-      content = loadScript(baseDir .. filename);
-    elseif (LCD_W <= 212) then
-      filename = "medium.lua";
-                                            ;
-      content = loadScript(baseDir .. filename);
-    else
-      filename = "large.lua";
-                                            ;
-      content = loadScript(baseDir .. filename);
-    end
-  end
-  return content, filename;
-end
+-- local function loadFile(baseDir)
+-- local content = nil;
+-- local filename = nil;
+-- if (#model.getInfo().name > 0) then
+-- filename = model.getInfo().name .. ".lua";
+-- ;
+-- content = loadScript(baseDir .. filename);
+-- end
+-- if not content then
+-- if (LCD_W <= 128) then
+-- filename = "tiny.lua";
+-- ;
+-- content = loadScript(baseDir .. filename);
+-- elseif (LCD_W <= 212) then
+-- filename = "medium.lua";
+-- ;
+-- content = loadScript(baseDir .. filename);
+-- else
+-- filename = "large.lua";
+-- ;
+-- content = loadScript(baseDir .. filename);
+-- end
+-- end
+-- return content, filename;
+-- end
 
 local function loadMenu()
   local baseDir = "/EDGELUA" .. "/MODELS/";
@@ -213,15 +305,17 @@ local function loadMenu()
   return nil;
 end
 
-local function loadConfig()
-  local baseDir = "/EDGELUA" .. "/RADIO/";
-  local cfg = loadFile(baseDir);
-                          ;
-  if (cfg) then
-    return cfg();
-  end
-  return nil;
-end
+-- local function loadConfig()
+-- local baseDir = "/EDGELUA" .. "/RADIO/";
+-- local cfg = loadFile(baseDir);
+-- ;
+-- if (cfg) then
+-- return cfg();
+-- end
+-- return nil;
+-- end
+
+--[[
 
 local function initBackendBus(config)
                          ;
@@ -279,6 +373,8 @@ local function initBackendSolExpert(config)
   return data;
 end
 
+--]]
+
 local function initConfigBW(config, modifyModel)
                        ;
   local cfg = {};
@@ -335,7 +431,7 @@ local function initConfigBW(config, modifyModel)
     cfg[9] = 2; --sbus
   end
 
-  local footer = "Vers: " .. "2.12";
+  local footer = "Vers: " .. "2.13";
   if (cfg[9] == 0) then
     footer = footer .. " Mod: xjt";
   elseif (cfg[9] == 1) then
@@ -506,7 +602,7 @@ local function initConfigColor(config, modifyModel)
   end
 
   --[[ to initConfigBW
-  local footer = "Vers: " .. "2.12";
+  local footer = "Vers: " .. "2.13";
   if (cfg[9] == 0) then
     footer = footer .. " Mod: xjt";
   elseif (cfg[9] == 1) then

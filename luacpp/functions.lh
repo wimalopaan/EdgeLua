@@ -1,42 +1,66 @@
 #pragma once
 
-#include "global.h"
+#include "common.lh"
 
 local errorCode = 0;
 
-__WmSw2Config = nil;
 __stopWmSw2 = 0;
+__WmSw2Config = nil;
 __WmSw2ForeignInput = 0;
 __WmSw2Warning1 = nil;
 __WmSw2Warning2 = nil;
 
-local function load()
-  local basedir = BASE_DIR .. "/LIB/";
+-- local function initGlobals()
+--   if not(__stopWmSw2) then
+--     TRACE("initGlobals");
+--     __stopWmSw2 = 0;
+--     __WmSw2ForeignInput = 0;
+--   end
+-- end
+
+-- local function loadLib(filename)
+--   TRACE("loadLib:", filename);
+--   local basedir = BASE_DIR .. "/LIB/";
+--   local chunk = loadScript(basedir .. filename);
+--   local lib = nil;
+--   if (chunk) then
+--     TRACE("loadLib chunk:", filename);
+--     lib = chunk();      
+--   end
+--   collectgarbage();
+--   return lib;
+-- end
+
+local function loadLibI()
   if not __libI then
-    local chunk = loadScript(basedir .. "libI.lua");
-    if (chunk) then
-      __libI = chunk();      
-    end
+    __libI = loadLib("libI.lua");
     if not __libI then
       errorCode = 1;
     end
   end
-  collectgarbage();
-  if not __libD then
-    local chunk = loadScript(basedir .. "libD.lua");
-    if (chunk) then
-      __libD = chunk();  
+end
+
+local function loadLibM()
+  if not __libM then
+    __libM = loadLib("libM.lua");
+    if not __libM then
+      errorCode = 1;
     end
+  end
+end
+
+local function loadLibD()
+  if not __libD then
+    __libD = loadLib("libD.lua");
     if not __libD then
       errorCode = 2;
     end
   end
-  collectgarbage();
+end
+
+local function loadLibP()
   if not __libP then
-    local chunk = loadScript(basedir .. "libP.lua");
-    if (chunk) then
-      __libP = chunk();
-    end
+    __libP = loadLib("libP.lua");
     if not __libP then
       errorCode = 3;
     end
@@ -44,14 +68,15 @@ local function load()
   collectgarbage();
 end
 
+local function load()
+  loadLibI();
+  loadLibD();
+  loadLibP();
+end
+
 local function loadLibA()
-  local basedir = BASE_DIR .. "/LIB/";
   if not __libA then
-    TRACE("LOAD_A", basedir);
-    local chunk = loadScript(basedir .. "libA.lua");
-    if (chunk) then
-      __libA = chunk();        
-    end
+    __libA = loadLib("libA.lua");
     if not __libA then
       errorCode = 3.1;
     end
@@ -60,13 +85,8 @@ local function loadLibA()
 end
 
 local function loadLibU()
-  local basedir = BASE_DIR .. "/LIB/";
   if not __libU then
-    TRACE("LOAD_U", basedir);
-    local chunk = loadScript(basedir .. "libU.lua");
-    if (chunk) then
-      __libU = chunk();
-    end
+    __libU = loadLib("libU.lua");
     if not __libU then
       errorCode = 3.2;
     end

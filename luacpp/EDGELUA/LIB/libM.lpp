@@ -1,0 +1,33 @@
+#include "libconfig.lh"
+
+local function initConfigMixer(config)
+    TRACE("initConfigMixer");
+    local cfg = {};
+    cfg[MIXCFG_Backend_Data] = {};
+  
+    #ifdef USE_BACKEND_BUS
+    cfg[MIXCFG_Backend_Data][CFG_BEND_Bus] = initBackendBus(config);
+    #endif
+    #ifdef USE_BACKEND_SPORT
+    cfg[MIXCFG_Backend_Data][CFG_BEND_SPort] = initBackendSPort(config);
+    #endif
+    #ifdef USE_BACKEND_TIPTIP
+    cfg[MIXCFG_Backend_Data][CFG_BEND_TipTip] = initBackendTipTip(config);
+    #endif
+    #ifdef USE_BACKEND_SOLEXPERT
+    cfg[MIXCFG_Backend_Data][CFG_BEND_SolExpert] = initBackendSolExpert(config);
+    #endif
+
+    if (config.backend >= 1) and (config.backend <= 4) then
+        cfg[MIXCFG_Backend] = config.backend;
+    else  
+        cfg[MIXCFG_Backend] = 1;
+    end
+    
+    return cfg;
+end  
+
+return {
+    loadConfig = loadConfig,
+    initConfig = initConfigMixer,
+};

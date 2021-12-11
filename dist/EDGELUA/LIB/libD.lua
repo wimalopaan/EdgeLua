@@ -994,7 +994,7 @@ end
 local function displayFmRssiWarningColor(config, widget, state)
   local fm = getFlightMode();
   if (fm == config[15]) then
-                     ;
+                      ;
   end
 end
 

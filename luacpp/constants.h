@@ -49,6 +49,9 @@
 #define CFG_Footer 19
 #define CFG_Backend_Data 20
 
+#define MIXCFG_Backend 1
+#define MIXCFG_Backend_Data 2
+
 #define CFG_BEND_Bus 1
 #define CFG_BEND_SPort 2
 #define CFG_BEND_TipTip 3

@@ -1,0 +1,101 @@
+#include "../../global.h"
+
+local function loadFile(baseDir)
+    local content = nil;
+    local filename = nil;
+    if (#model.getInfo().name > 0) then
+      filename = model.getInfo().name .. ".lua";
+      TRACE("loadFile", baseDir .. filename);
+      content = loadScript(baseDir .. filename);      
+    end
+    if not content then
+      if (LCD_W <= 128) then
+        filename = "tiny.lua";
+        TRACE("loadFile", baseDir .. filename);
+        content = loadScript(baseDir .. filename);
+      elseif (LCD_W <= 212) then
+        filename = "medium.lua";
+        TRACE("loadFile", baseDir .. filename);
+        content = loadScript(baseDir .. filename);
+      else
+        filename = "large.lua";
+        TRACE("loadFile", baseDir .. filename);
+        content = loadScript(baseDir .. filename);
+      end
+    end
+    return content, filename;
+end
+  
+local function loadConfig()
+    local baseDir = BASE_DIR .. "/RADIO/";
+    local cfg = loadFile(baseDir);
+    TRACE("loadCOnfig", cfg);
+    if (cfg) then
+      return cfg();
+    end
+    return nil;
+  end
+  
+#ifdef USE_BACKEND_BUS
+local function initBackendBus(config)
+  TRACE("initBackendBus");
+  local data = {};
+  if (config.backends.bus.stateTimeout) then
+    data[BEND_BUS_StateTimeout] = config.backends.bus.stateTimeout;
+  else
+    data[BEND_BUS_StateTimeout] = BEND_BUS_DEFAULT_StateTimeout;
+  end
+  if (config.backends.bus.mixerGlobalVariable >= 1) then
+    data[BEND_BUS_MixerGlobalVariable] = config.backends.bus.mixerGlobalVariable;
+  else
+    data[BEND_BUS_MixerGlobalVariable] = BEND_BUS_DEFAULT_MixerGlobalVariable;
+  end
+  return data;
+end
+#endif
+
+#ifdef USE_BACKEND_SPORT
+local function initBackendSPort(config)
+  local data = {};
+  return data;
+end
+#endif
+
+#ifdef USE_BACKEND_TIPTIP
+local function initBackendTipTip(config)
+  TRACE("initBackendTipTip");
+  local data = {};
+  if (config.backends.tiptip.shortTimeout) then
+    data[BEND_TIPTIP_ShortTimeout] = config.backends.tiptip.shortTimeout;
+  else
+    data[BEND_TIPTIP_ShortTimeout] = BEND_TIPTIP_DEFAULT_ShortTimeout;
+  end
+  if (config.backends.tiptip.longTimeout) then
+    data[BEND_TIPTIP_LongTimeout] = config.backends.tiptip.longTimeout;
+  else
+    data[BEND_TIPTIP_LongTimeout] = BEND_TIPTIP_DEFAULT_LongTimeout;
+  end
+  if (config.backends.tiptip.mixerGlobalVariable) then
+    data[BEND_TIPTIP_MixerGlobalVariable] = config.backends.tiptip.mixerGlobalVariable;
+  else
+    data[BEND_TIPTIP_MixerGlobalVariable] = BEND_TIPTIP_DEFAULT_MixerGlobalVariable;
+  end
+  if (config.backends.tiptip.values) then
+    TRACE("initBackendTipTip values:", config.backends.tiptip.values, #config.backends.tiptip.values);
+    data[BEND_TIPTIP_Values] = config.backends.tiptip.values;
+  else
+    data[BEND_TIPTIP_Values] = {0, 100, -100};
+  end
+
+  TRACE("initBackendTipTip VALUES: ", data[BEND_TIPTIP_LongTimeout], data[BEND_TIPTIP_ShortTimeout]);
+
+  return data;
+end
+#endif
+
+#ifdef USE_BACKEND_SOLEXPERT
+local function initBackendSolExpert(config)
+  local data = {};
+  return data;
+end
+#endif

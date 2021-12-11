@@ -1,0 +1,18 @@
+#pragma once
+
+#include "global.h"
+
+local function loadLib(filename)
+    TRACE("loadLib:", filename);
+    local basedir = BASE_DIR .. "/LIB/";
+    local chunk = loadScript(basedir .. filename);
+    local lib = nil;
+    if (chunk) then
+      TRACE("loadLib chunk:", filename);
+      lib = chunk();      
+    end
+    collectgarbage();
+    return lib;
+  end
+
+  

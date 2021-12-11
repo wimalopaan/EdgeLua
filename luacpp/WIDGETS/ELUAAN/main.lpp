@@ -82,7 +82,7 @@ end
 
 local function background(widget)
   if (errorCode == 0) then
-    if (__stopWmSw2 == 0) then
+    if (__stopWmSw2) and (__stopWmSw2 == 0) then
       currentAnimation = __libA.runAnimation(currentAnimation, fsmState);
     end
   end

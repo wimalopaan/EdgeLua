@@ -1,0 +1,17 @@
+#pragma once
+
+#include "common.lh"
+
+local errorCode = 0;
+
+__WmMixerConfig = nil;
+
+local function loadLibM()
+  if not __libM then
+    __libM = loadLib("libM.lua");
+    if not __libM then
+      errorCode = 1;
+    end
+  end
+end
+  

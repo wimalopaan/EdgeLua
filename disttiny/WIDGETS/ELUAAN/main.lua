@@ -10,41 +10,78 @@
 -- Please note that the above license also covers the transfer protocol used and the encoding scheme and
 -- all further principals of tranferring state and other information.
 
+local function loadLib(filename)
+                               ;
+    local basedir = "/EDGELUA" .. "/LIB/";
+    local chunk = loadScript(basedir .. filename);
+    local lib = nil;
+    if (chunk) then
+                                       ;
+      lib = chunk();
+    end
+    collectgarbage();
+    return lib;
+  end
+
 local errorCode = 0;
 
-__WmSw2Config = nil;
 __stopWmSw2 = 0;
+__WmSw2Config = nil;
 __WmSw2ForeignInput = 0;
 __WmSw2Warning1 = nil;
 __WmSw2Warning2 = nil;
 
-local function load()
-  local basedir = "/EDGELUA" .. "/LIB/";
+-- local function initGlobals()
+-- if not(__stopWmSw2) then
+-- ;
+-- __stopWmSw2 = 0;
+-- __WmSw2ForeignInput = 0;
+-- end
+-- end
+
+-- local function loadLib(filename)
+-- ;
+-- local basedir = "/EDGELUA" .. "/LIB/";
+-- local chunk = loadScript(basedir .. filename);
+-- local lib = nil;
+-- if (chunk) then
+-- ;
+-- lib = chunk();
+-- end
+-- collectgarbage();
+-- return lib;
+-- end
+
+local function loadLibI()
   if not __libI then
-    local chunk = loadScript(basedir .. "libI.lua");
-    if (chunk) then
-      __libI = chunk();
-    end
+    __libI = loadLib("libI.lua");
     if not __libI then
       errorCode = 1;
     end
   end
-  collectgarbage();
-  if not __libD then
-    local chunk = loadScript(basedir .. "libD.lua");
-    if (chunk) then
-      __libD = chunk();
+end
+
+local function loadLibM()
+  if not __libM then
+    __libM = loadLib("libM.lua");
+    if not __libM then
+      errorCode = 1;
     end
+  end
+end
+
+local function loadLibD()
+  if not __libD then
+    __libD = loadLib("libD.lua");
     if not __libD then
       errorCode = 2;
     end
   end
-  collectgarbage();
+end
+
+local function loadLibP()
   if not __libP then
-    local chunk = loadScript(basedir .. "libP.lua");
-    if (chunk) then
-      __libP = chunk();
-    end
+    __libP = loadLib("libP.lua");
     if not __libP then
       errorCode = 3;
     end
@@ -52,14 +89,15 @@ local function load()
   collectgarbage();
 end
 
+local function load()
+  loadLibI();
+  loadLibD();
+  loadLibP();
+end
+
 local function loadLibA()
-  local basedir = "/EDGELUA" .. "/LIB/";
   if not __libA then
-                            ;
-    local chunk = loadScript(basedir .. "libA.lua");
-    if (chunk) then
-      __libA = chunk();
-    end
+    __libA = loadLib("libA.lua");
     if not __libA then
       errorCode = 3.1;
     end
@@ -68,13 +106,8 @@ local function loadLibA()
 end
 
 local function loadLibU()
-  local basedir = "/EDGELUA" .. "/LIB/";
   if not __libU then
-                            ;
-    local chunk = loadScript(basedir .. "libU.lua");
-    if (chunk) then
-      __libU = chunk();
-    end
+    __libU = loadLib("libU.lua");
     if not __libU then
       errorCode = 3.2;
     end
@@ -152,7 +185,7 @@ end
 
 local function background(widget)
   if (errorCode == 0) then
-    if (__stopWmSw2 == 0) then
+    if (__stopWmSw2) and (__stopWmSw2 == 0) then
       currentAnimation = __libA.runAnimation(currentAnimation, fsmState);
     end
   end

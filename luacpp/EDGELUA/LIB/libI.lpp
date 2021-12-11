@@ -10,7 +10,7 @@
 -- Please note that the above license also covers the transfer protocol used and the encoding scheme and 
 -- all further principals of tranferring state and other information.
 
-#include "../../global.h"
+#include "libconfig.lh"
 
 local function isEdgeTx()
   local ver, radio, maj, minor, rev, osname = getVersion();
@@ -202,31 +202,31 @@ local function insertSettableSwitch(number)
   return -1;
 end
 
-local function loadFile(baseDir)
-  local content = nil;
-  local filename = nil;
-  if (#model.getInfo().name > 0) then
-    filename = model.getInfo().name .. ".lua";
-    TRACE("loadFile", baseDir .. filename);
-    content = loadScript(baseDir .. filename);      
-  end
-  if not content then
-    if (LCD_W <= 128) then
-      filename = "tiny.lua";
-      TRACE("loadFile", baseDir .. filename);
-      content = loadScript(baseDir .. filename);
-    elseif (LCD_W <= 212) then
-      filename = "medium.lua";
-      TRACE("loadFile", baseDir .. filename);
-      content = loadScript(baseDir .. filename);
-    else
-      filename = "large.lua";
-      TRACE("loadFile", baseDir .. filename);
-      content = loadScript(baseDir .. filename);
-    end
-  end
-  return content, filename;
-end
+-- local function loadFile(baseDir)
+--   local content = nil;
+--   local filename = nil;
+--   if (#model.getInfo().name > 0) then
+--     filename = model.getInfo().name .. ".lua";
+--     TRACE("loadFile", baseDir .. filename);
+--     content = loadScript(baseDir .. filename);      
+--   end
+--   if not content then
+--     if (LCD_W <= 128) then
+--       filename = "tiny.lua";
+--       TRACE("loadFile", baseDir .. filename);
+--       content = loadScript(baseDir .. filename);
+--     elseif (LCD_W <= 212) then
+--       filename = "medium.lua";
+--       TRACE("loadFile", baseDir .. filename);
+--       content = loadScript(baseDir .. filename);
+--     else
+--       filename = "large.lua";
+--       TRACE("loadFile", baseDir .. filename);
+--       content = loadScript(baseDir .. filename);
+--     end
+--   end
+--   return content, filename;
+-- end
 
 local function loadMenu()
   local baseDir = BASE_DIR .. "/MODELS/";
@@ -245,16 +245,17 @@ local function loadMenu()
   return nil;
 end
 
-local function loadConfig()
-  local baseDir = BASE_DIR .. "/RADIO/";
-  local cfg = loadFile(baseDir);
-  TRACE("loadCOnfig", cfg);
-  if (cfg) then
-    return cfg();
-  end
-  return nil;
-end
+-- local function loadConfig()
+--   local baseDir = BASE_DIR .. "/RADIO/";
+--   local cfg = loadFile(baseDir);
+--   TRACE("loadCOnfig", cfg);
+--   if (cfg) then
+--     return cfg();
+--   end
+--   return nil;
+-- end
 
+--[[
 #ifdef USE_BACKEND_BUS
 local function initBackendBus(config)
   TRACE("initBackendBus");
@@ -308,7 +309,6 @@ local function initBackendTipTip(config)
 
   TRACE("initBackendTipTip VALUES: ", data[BEND_TIPTIP_LongTimeout], data[BEND_TIPTIP_ShortTimeout]);
 
-
   return data;
 end
 #endif
@@ -319,6 +319,7 @@ local function initBackendSolExpert(config)
   return data;
 end
 #endif
+--]]
 
 local function initConfigBW(config, modifyModel)
   TRACE("initConfigBW");

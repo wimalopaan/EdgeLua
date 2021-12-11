@@ -1,8 +1,10 @@
 #pragma once
 
-//#define DEBUG 
+// activates TRACE macros: set via make
+// #define DEBUG 
 
-//#define SELECT_TINY
+// inactivates soem extra feature for small radios (T12): set via make
+// #define SELECT_TINY
 
 #ifdef SELECT_TINY 
 #define USE_BACKEND_BUS

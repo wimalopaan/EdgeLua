@@ -103,12 +103,12 @@ end
 local function background_telemetry()
   if (errorCode == 0) then
     __libD.processShortCuts(shortCuts, queue);
-    if (lastForeignInput ~= __WmSw2ForeignInput) then
+    if (__WmSw2ForeignInput) and (lastForeignInput ~= __WmSw2ForeignInput) then
       __libD.processForeignInput(__WmSw2Config, __WmSw2ForeignInput, menu, queue);
       lastForeignInput = __WmSw2ForeignInput;
     end
     TRACE3("background_telemetry sw", __stopWmSw2);
-    if (__stopWmSw2 == 0) then
+    if (__stopWmSw2) and (__stopWmSw2 == 0) then
       switchFSM(__WmSw2Config, menu, queue, fsmState, encoder, exportValues);
     end    
     __libP.rssiState(__WmSw2Config, rssiState);
