@@ -314,9 +314,11 @@ local function sbusSwitchFSM(config, menu, queue, state, encoder, exportValues)
     end
     if (item) then
         encoder(bendCfg[2], item);
-        if (item[6]) then -- export
-          local expValue = exportValues[ item[3] ] * 1024 / 100;
-          model.setGlobalVariable(item[6], 0, expValue);
+        if (exportValues) then
+          if (item[6]) then -- export
+            local expValue = exportValues[ item[3] ] * 1024 / 100;
+            model.setGlobalVariable(item[6], 0, expValue);
+          end
         end
 
       state[1] = t;

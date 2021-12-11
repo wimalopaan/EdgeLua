@@ -332,16 +332,20 @@ local function sbusSwitchFSM(config, menu, queue, state, encoder, exportValues)
         end
       else
         encoder(bendCfg[BEND_BUS_MixerGlobalVariable], item);
-        if (item[ITEM_Export]) then -- export
-          local expValue = exportValues[ item[ITEM_State] ] * 1024 / 100;
-          model.setGlobalVariable(item[ITEM_Export], 0, expValue);
+        if (exportValues) then
+          if (item[ITEM_Export]) then -- export
+            local expValue = exportValues[ item[ITEM_State] ] * 1024 / 100;
+            model.setGlobalVariable(item[ITEM_Export], 0, expValue);
+          end            
         end
       end
       #else
         encoder(bendCfg[BEND_BUS_MixerGlobalVariable], item);
-        if (item[ITEM_Export]) then -- export
-          local expValue = exportValues[ item[ITEM_State] ] * 1024 / 100;
-          model.setGlobalVariable(item[ITEM_Export], 0, expValue);
+        if (exportValues) then
+          if (item[ITEM_Export]) then -- export
+            local expValue = exportValues[ item[ITEM_State] ] * 1024 / 100;
+            model.setGlobalVariable(item[ITEM_Export], 0, expValue);
+          end            
         end
       #endif
       state[FSMSWITCH_LastTime] = t;

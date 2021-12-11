@@ -37,8 +37,8 @@ local menu = {
         {"M1H", states = gstates1, state = 1, switch = nil, fn = 8, module = 1},
     },
     { -- template for export function (via global variable) and virtual functions
-        {"Wnd", states = gstates2, state = 1, switch = "sa", fn = 1, module = 8, export = 0}, --<> Diese Funktion wird _zusätzlich_ über die _globale Variable_ `GV1` exportiert
-        {"Ank", states = gstates2, state = 1, switch = "sb", fn = 2, module = 8, export = 1}, --<> Export über die `GV2`
+        {"Wnd", states = gstates2, state = 1, switch = "sa", fn = 1, module = 8, export = 1}, --
+        {"Ank", states = gstates2, state = 1, switch = "sb", fn = 2, module = 8, export = 2}, --
         {"Li1", states = gstates1, state = 1, switch = nil, fn = 5, module = 8},
         {"Li2", states = gstates1, state = 1, switch = nil, fn = 6, module = 8},
         {"LAll", states = gstates1, state = 1, switch = "sg", fn = 0, module = 0, virtual = {{fn = 5, module = 8}, {fn = 6, module = 8}, {fn = 1, module = 2}} }, --<> _Virtuelle_ Schaltfunktion mit mehreren _physichen_ Funktionen und dem Schalter `sg`
@@ -58,7 +58,8 @@ local menu = {
 }
 --}
 --{ export
-local exportValues = {0, -50, 50, 100}; --<> Diese Werte werden den Zuständen 1, 2, 3, 4 zugeordnet
+-- deprecated
+--local exportValues = {0, -50, 50, 100}; --<> Diese Werte werden den Zuständen 1, 2, 3, 4 zugeordnet
 --}
 --{ map
 local map = {

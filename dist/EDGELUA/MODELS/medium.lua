@@ -31,8 +31,8 @@ local menu = {
         {"M1H", states = gstates1, state = 1, switch = nil, fn = 8, module = 1},
     },
     { -- template for export function (via global variable) and virtual functions
-        {"Winde", states = gstates1, state = 1, switch = "sa", fn = 1, module = 8, export = 0}, --export
-        {"Anker", states = gstates1, state = 1, switch = "sb", fn = 2, module = 8, export = 1},
+        {"Winde", states = gstates1, state = 1, switch = "sa", fn = 1, module = 8, export = 1}, --export
+        {"Anker", states = gstates1, state = 1, switch = "sb", fn = 2, module = 8, export = 2},
         {"Licht1", states = gstates1, state = 1, switch = nil, fn = 5, module = 8},
         {"Licht2", states = gstates1, state = 1, switch = nil, fn = 6, module = 8},
         {"L-Alle", states = gstates1, state = 1, switch = "sg", fn = 0, module = 0, virtual = {{fn = 5, module = 8}, {fn = 6, module = 8}, {fn = 1, module = 2}} }, -- virtual
@@ -49,7 +49,8 @@ local menu = {
     },
 }
 
-local exportValues = {0, -50, 50, 100}; -- values for states
+-- deprecated
+-- local exportValues = {0, -50, 50, 100}; -- values for states
 
 local map = {
    {module = 1, type = 1},

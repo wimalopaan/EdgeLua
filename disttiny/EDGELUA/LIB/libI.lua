@@ -229,7 +229,7 @@ local function loadMenu()
     if (modchunk) then
       local modules = modchunk();
       if (modules) then
-        local m, map, exportValues = menu();
+        local m, map, exportValues = menu(); -- todo: remove exportvalues
         return m, exportValues, filename, map, modules;
       end
     end

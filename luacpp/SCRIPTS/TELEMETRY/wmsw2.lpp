@@ -73,7 +73,7 @@ local function init_telemetry()
   local filename = {};
   local map = {};
   local modules = {};
-  menu, exportValues, filename, map, modules = __libI.loadMenu();
+  menu, exportValues, filename, map, modules = __libI.loadMenu(); -- todo: remove exportvalues
   filename = nil;
   map = nil;
   modules = nil;
