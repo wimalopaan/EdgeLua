@@ -10,6 +10,28 @@
 -- Please note that the above license also covers the transfer protocol used and the encoding scheme and
 -- all further principals of tranferring state and other information.
 
+local function sort(table, key) -- sort up
+  for i = 1, (#table - 1) do
+    if (table[i][key] > table[i + 1][key]) then
+      local tmp = table[i];
+      table[i] = transition[i + 1];
+      table[i + 1] = tmp;
+      i = 1;
+    end
+  end
+end
+
+local function sortDown(table, key)
+    for i = 1, (#table - 1) do
+      if (table[i][key] < table[i + 1][key]) then
+        local tmp = table[i];
+        table[i] = transition[i + 1];
+        table[i + 1] = tmp;
+        i = 1;
+      end
+    end
+  end
+
 local Class = {};
 
 function Class.new(prototype)
@@ -299,22 +321,45 @@ local function solExportSwitchFSM()
                               ;
 end
 
-local function sbusSwitchFSM(config, menu, queue, state, encoder, exportValues)
+local function sbusSwitchFSM(config, menu, queue, state, encoder, exportValues, autoResets)
   local t = getTime();
   local bendCfg = config[20][1];
   if ((t - state[1]) > bendCfg[1]) then
     local item = nil;
     if (queue:size() > 0) then
       item = queue:pop()[1];
-    else
-      local page = menu[state[3]];
-      item = page[state[4]];
 
-      if (item[7]) then -- virtuals are not cyclic pushed
-        item = nil;
+                                                                                                                         ;
+        if (item[9]) and (item[10] == 0) and (item[3] > 1) then
+          item[10] = t + item[9];
+          autoResets[#autoResets + 1] = item;
+          sortDown(autoResets, 10);
+                                                       ;
+        end
+
+    else
+
+      if (autoResets) and (#autoResets >= 1) then
+        local first = autoResets[#autoResets];
+        if (t > first[10]) then
+          first[10] = 0;
+          first[3] = 1; --reset
+          autoResets[#autoResets] = nil; -- remove last
+          item = first;
+                                                         ;
+        end
       end
 
-      nextItem(menu, state);
+      if not(item) then
+        local page = menu[state[3]];
+        item = page[state[4]];
+
+        if (item[7]) then -- virtuals are not cyclic pushed
+          item = nil;
+        end
+
+        nextItem(menu, state);
+        end
     end
     if (item) then
 

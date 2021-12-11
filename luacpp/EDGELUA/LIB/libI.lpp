@@ -861,9 +861,17 @@ local function initMenuBW(menu)
       -- all components mus be set
       -- todo: remove nil
       local citem = {item[ITEM_Name], item.states, item.state, item.fn, item.module, nil, nil, nil};
+      #ifdef INCLUDE_EXPORT
       if (item.export) then
         citem[ITEM_Export] = item.export;
       end
+      #endif
+      #ifdef INCLUDE_AUTORESET
+      if (item.autoreset) then
+        citem[ITEM_AutoReset] = item.autoreset;
+        citem[ITEM_AutoResetTime] = 0;
+      end
+      #endif
       #ifdef INCLUDE_VIRTUAL_SWITCHES 
       if (item.virtual) then
         citem[ITEM_Virtual] = {};

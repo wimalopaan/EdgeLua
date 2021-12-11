@@ -122,6 +122,7 @@ local shortCuts = {};
 local overlays = {};
 local pagetitles = {};
 local queue = nil;
+local autoResets = {};
 local fsmState = {};
 local switchFSM = {};
 local encoder = nil;
@@ -208,7 +209,7 @@ local function background_telemetry()
     end
                                                   ;
     if (__stopWmSw2) and (__stopWmSw2 == 0) then
-      switchFSM(__WmSw2Config, menu, queue, fsmState, encoder, exportValues);
+      switchFSM(__WmSw2Config, menu, queue, fsmState, encoder, exportValues, autoResets);
     end
     __libP.rssiState(__WmSw2Config, rssiState);
                                                                    ;

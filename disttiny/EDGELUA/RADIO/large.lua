@@ -91,10 +91,4 @@ safeMode = {
     linkDropoutMax = 20, --[s], after this time without link switch to safeMode again (e.g. turning off the rx).
   },
 
-export = {
-  mixerGlobalVariable = 7, -- mixer script vmap.lua maps modules 1-5 to script output, only if SHM is not supported
-  [1] = {values = {0, -50, 50, 100}},
-  [2] = {values = {-100, 0, 100}},
-  [3] = {values = {-75, -25, 25, 75}},
-  },
- };
+};

@@ -59,6 +59,9 @@
 
 #define BEND_BUS_StateTimeout 1
 #define BEND_BUS_MixerGlobalVariable 2
+#define BEND_BUS_ExportValues 3
+#define BEND_BUS_ExportMixerGlobalVariable 4
+
 #define BEND_BUS_DEFAULT_MixerGlobalVariable 5
 #define BEND_BUS_DEFAULT_StateTimeout 20
 
@@ -101,6 +104,8 @@
 #define ITEM_Export 6
 #define ITEM_Virtual 7
 #define ITEM_Rects 8
+#define ITEM_AutoReset 9
+#define ITEM_AutoResetTime 10
 
 #define PUSHED_ITEM_Item 1
 #define PUSHED_ITEM_BeforeState 2

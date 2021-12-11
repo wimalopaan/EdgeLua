@@ -1,3 +1,5 @@
+#pragma once
+
 #include "../../global.h"
 
 local function loadFile(baseDir)
@@ -50,6 +52,15 @@ local function initBackendBus(config)
   else
     data[BEND_BUS_MixerGlobalVariable] = BEND_BUS_DEFAULT_MixerGlobalVariable;
   end
+
+  #ifdef INCLUDE_EXPORT
+  if (config.export) then
+    data[BEND_BUS_ExportMixerGlobalVariable] = config.export.mixerGlobalVariable;
+    data[BEND_BUS_ExportValues] = config.export.values;
+    TRACE("export: gv:", data[BEND_BUS_ExportMixerGlobalVariable], data[BEND_BUS_ExportValues], #data[BEND_BUS_ExportValues]);
+  end
+  #endif
+
   return data;
 end
 #endif

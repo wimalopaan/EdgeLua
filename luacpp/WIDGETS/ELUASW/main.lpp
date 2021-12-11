@@ -22,6 +22,7 @@ local overlays = {};
 local pagetitles = {};
 local menudata = {};
 local queue = nil;
+local autoResets = {};
 local fsmState = {};
 local switchFSM = nil;
 local encoder = nil;
@@ -93,7 +94,7 @@ local function background(widget)
       lastForeignInput = __WmSw2ForeignInput;
     end
     if (__stopWmSw2) and (__stopWmSw2 == 0) then
-      switchFSM(__WmSw2Config, menu, queue, fsmState, encoder, exportValues);
+      switchFSM(__WmSw2Config, menu, queue, fsmState, encoder, exportValues, autoResets);
     end
 
     __libP.rssiState(__WmSw2Config, rssiState);

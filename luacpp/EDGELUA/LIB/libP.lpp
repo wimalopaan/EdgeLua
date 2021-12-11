@@ -10,7 +10,7 @@
 -- Please note that the above license also covers the transfer protocol used and the encoding scheme and 
 -- all further principals of tranferring state and other information.
 
-#include "../../global.h"
+#include "sort.lh"
 
 local Class = {};
 
@@ -305,22 +305,45 @@ local function solExportSwitchFSM()
   TRACE3("solExportSwitchFSM");
 end
 
-local function sbusSwitchFSM(config, menu, queue, state, encoder, exportValues)
+local function sbusSwitchFSM(config, menu, queue, state, encoder, exportValues, autoResets)
   local t = getTime();
   local bendCfg = config[CFG_Backend_Data][CFG_BEND_Bus];
   if ((t - state[FSMSWITCH_LastTime]) > bendCfg[BEND_BUS_StateTimeout]) then
     local item = nil;
     if (queue:size() > 0) then
       item = queue:pop()[PUSHED_ITEM_Item];
+      #ifdef INCLUDE_AUTORESET
+        TRACE("autoReset check item:", item[ITEM_Name], item[ITEM_AutoReset], item[ITEM_AutoResetTime], item[ITEM_State]);
+        if (item[ITEM_AutoReset]) and (item[ITEM_AutoResetTime] == 0) and (item[ITEM_State] > 1) then
+          item[ITEM_AutoResetTime] = t + item[ITEM_AutoReset];
+          ADD(autoResets, item);
+          sortDown(autoResets, ITEM_AutoResetTime);
+          TRACE("autoReset add item:", item[ITEM_Name]);
+        end
+      #endif
     else
-      local page = menu[state[FSMSWITCH_CyclePage]]; 
-      item = page[state[FSMSWITCH_CycleRow]]; 
-      #ifdef INCLUDE_VIRTUAL_SWITCHES
-      if (item[ITEM_Virtual]) then -- virtuals are not cyclic pushed
-        item = nil;
-      end 
-      #endif 
-      nextItem(menu, state);
+      #ifdef INCLUDE_AUTORESET
+      if (autoResets) and (#autoResets >= 1) then
+        local first = autoResets[#autoResets];
+        if (t > first[ITEM_AutoResetTime]) then
+          first[ITEM_AutoResetTime] = 0;
+          first[ITEM_State] = 1; --reset
+          autoResets[#autoResets] = nil; -- remove last
+          item = first;
+          TRACE("autoReset reset item:", item[ITEM_Name]);
+        end
+      end
+      #endif
+      if not(item) then
+        local page = menu[state[FSMSWITCH_CyclePage]]; 
+        item = page[state[FSMSWITCH_CycleRow]]; 
+        #ifdef INCLUDE_VIRTUAL_SWITCHES
+        if (item[ITEM_Virtual]) then -- virtuals are not cyclic pushed
+          item = nil;
+        end 
+        #endif 
+        nextItem(menu, state);
+        end
     end
     if (item) then
       #ifdef INCLUDE_VIRTUAL_SWITCHES

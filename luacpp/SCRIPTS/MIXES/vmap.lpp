@@ -21,7 +21,7 @@ local output = {
 };
 
 local gvar = 0;
-local values = {};
+local values = nil;
 
 local function initConfig()
    TRACE("vmap: init: ", __WmMixerConfig);
@@ -63,23 +63,23 @@ end
 local lastValue = 0;
 
 local function demux(value)
+   local chValues = {0, 0, 0, 0, 0};
    if (value ~= lastValue) then
       TRACE3("vmap value:", value);
       lastValue = value;
    end
-
-
-    local chValue = math.min(value % 10, #values);
-    value = math.floor(value / 10);
-
-    local chValues = {0, 0, 0, 0, 0};
-    local channel = math.min(value % 10, #chValues);
-
-    chValues[channel] = values[chValue] * 10.24;
-
-    TRACE3("vmap: chValue:", chValue, "chan:", channel, "chValues:", chValues[channel]);
-
-    return chValues[1], chValues[2], chValues[3], chValues[4], chValues[5];    
+   if (values) then
+      local chValue = math.min(value % 10, #values);
+      value = math.floor(value / 10);
+  
+      local channel = math.min(value % 10, #chValues);
+  
+      chValues[channel] = values[chValue] * 10.24;       
+  
+      TRACE3("vmap: chValue:", chValue, "chan:", channel, "chValues:", chValues[channel]);
+  
+   end   
+   return chValues[1], chValues[2], chValues[3], chValues[4], chValues[5];    
 end
 
 local function transportGlobalLua()

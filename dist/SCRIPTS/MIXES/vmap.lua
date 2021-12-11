@@ -45,7 +45,7 @@ local output = {
 };
 
 local gvar = 0;
-local values = {};
+local values = nil;
 
 local function initConfig()
                                          ;
@@ -87,22 +87,23 @@ end
 local lastValue = 0;
 
 local function demux(value)
+   local chValues = {0, 0, 0, 0, 0};
    if (value ~= lastValue) then
                                   ;
       lastValue = value;
    end
+   if (values) then
+      local chValue = math.min(value % 10, #values);
+      value = math.floor(value / 10);
 
-    local chValue = math.min(value % 10, #values);
-    value = math.floor(value / 10);
+      local channel = math.min(value % 10, #chValues);
 
-    local chValues = {0, 0, 0, 0, 0};
-    local channel = math.min(value % 10, #chValues);
+      chValues[channel] = values[chValue] * 10.24;
 
-    chValues[channel] = values[chValue] * 10.24;
+                                                                                         ;
 
-                                                                                       ;
-
-    return chValues[1], chValues[2], chValues[3], chValues[4], chValues[5];
+   end
+   return chValues[1], chValues[2], chValues[3], chValues[4], chValues[5];
 end
 
 local function transportGlobalLua()

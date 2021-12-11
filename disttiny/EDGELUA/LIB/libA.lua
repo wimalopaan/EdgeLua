@@ -10,3 +10,25 @@
 -- Please note that the above license also covers the transfer protocol used and the encoding scheme and
 -- all further principals of tranferring state and other information.
 
+local function sort(table, key) -- sort up
+  for i = 1, (#table - 1) do
+    if (table[i][key] > table[i + 1][key]) then
+      local tmp = table[i];
+      table[i] = transition[i + 1];
+      table[i + 1] = tmp;
+      i = 1;
+    end
+  end
+end
+
+local function sortDown(table, key)
+    for i = 1, (#table - 1) do
+      if (table[i][key] < table[i + 1][key]) then
+        local tmp = table[i];
+        table[i] = transition[i + 1];
+        table[i + 1] = tmp;
+        i = 1;
+      end
+    end
+  end
+

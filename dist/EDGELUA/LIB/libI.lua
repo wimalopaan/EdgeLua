@@ -59,6 +59,13 @@ local function initBackendBus(config)
   else
     data[2] = 5;
   end
+
+  if (config.export) then
+    data[4] = config.export.mixerGlobalVariable;
+    data[3] = config.export.values;
+                                                                                                                             ;
+  end
+
   return data;
 end
 
@@ -431,7 +438,7 @@ local function initConfigBW(config, modifyModel)
     cfg[9] = 2; --sbus
   end
 
-  local footer = "Vers: " .. "2.13";
+  local footer = "Vers: " .. "2.14";
   if (cfg[9] == 0) then
     footer = footer .. " Mod: xjt";
   elseif (cfg[9] == 1) then
@@ -602,7 +609,7 @@ local function initConfigColor(config, modifyModel)
   end
 
   --[[ to initConfigBW
-  local footer = "Vers: " .. "2.13";
+  local footer = "Vers: " .. "2.14";
   if (cfg[9] == 0) then
     footer = footer .. " Mod: xjt";
   elseif (cfg[9] == 1) then
@@ -888,8 +895,14 @@ local function initMenuBW(menu)
       -- all components mus be set
       -- todo: remove nil
       local citem = {item[1], item.states, item.state, item.fn, item.module, nil, nil, nil};
+
       if (item.export) then
         citem[6] = item.export;
+      end
+
+      if (item.autoreset) then
+        citem[9] = item.autoreset;
+        citem[10] = 0;
       end
 
       if (item.virtual) then
