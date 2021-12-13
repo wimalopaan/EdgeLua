@@ -1055,6 +1055,7 @@ local function displayAddressConfigBW(config, widget, encoder, pScaler, state, e
     #ifdef USE_BACKEND_BUS
 
     local bendcfg = config[CFG_Backend_Data][CFG_BEND_Bus];
+    TRACE("Address: ", adr );
     encoder(bendcfg[BEND_BUS_MixerGlobalVariable], 14, adr); -- learn code
     #endif
 
@@ -1109,6 +1110,7 @@ local function displayAddressConfigColor(config, widget, encoder, pScaler, state
     lcd.drawText(rect.xmin + 5, rect.ymin + 5, "Switch on RX and device", MIDSIZE + COLOR_THEME_PRIMARY2);
 
     #ifdef USE_BACKEND_BUS
+    TRACE("Address: ", adr);
     local bendcfg = config[CFG_Backend_Data][CFG_BEND_Bus];
     encoder(bendcfg[BEND_BUS_MixerGlobalVariable], 14, adr);
     #endif

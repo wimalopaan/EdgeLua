@@ -185,7 +185,10 @@ local function create(zone, options)
 
    if (valuesFileName) then
 
-    __libU.initValues(menu, valuesFileName);
+    local ok = __libU.initValues(menu, valuesFileName);
+    if not(ok) then
+      errorCode = 10;
+    end
   end
 
                        ;

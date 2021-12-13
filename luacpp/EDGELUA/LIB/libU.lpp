@@ -41,21 +41,21 @@ local function optionString(option)
   return s
 end
 
+-- local function serialize(table, filename) 
+--     if type(table) == "table" then
+--         io.write("{\n")
+--         for k,v in pairs(o) do
+--           io.write("  ", k, " = ")
+--           serialize(v)
+--           io.write(",\n")
+--         end
+--         io.write("}\n")
+--       else
+--         error("cannot serialize a " .. type(o))
+--       end
+-- end
 
-local function serialize(table, filename) 
-    if type(table) == "table" then
-        io.write("{\n")
-        for k,v in pairs(o) do
-          io.write("  ", k, " = ")
-          serialize(v)
-          io.write(",\n")
-        end
-        io.write("}\n")
-      else
-        error("cannot serialize a " .. type(o))
-      end
-end
-
+#ifdef USE_VALUE_STORAGE
 local function appendToFile(file, values) 
   TRACE("appendToFile", file);
   io.write(file, "\t{");
@@ -100,18 +100,25 @@ local function initValues(menu, filename)
       for ip, page in ipairs(menu) do
         for il, pline in ipairs(page) do
           local pitem = pline[PLINE_Item];
-          if (#table[lineNumber] == #pline[PLINE_Values]) then
-            TRACE("initValues assign", pitem[PITEM_Name]);
-            pline[PLINE_Values] = table[lineNumber];
+          if not(table[lineNumber]) then
+            TRACE("wrong number of lines in value table");
+            return false;
           else
-            TRACE("initValues no match", pitem[PITEM_Name]);
+            if (#table[lineNumber] == #pline[PLINE_Values]) then
+              TRACE("initValues assign", pitem[PITEM_Name]);
+              pline[PLINE_Values] = table[lineNumber];
+            else
+              TRACE("initValues no match", pitem[PITEM_Name]);
+            end          
           end
           lineNumber = lineNumber + 1;
         end
       end        
     end
   end
+  return true;
 end
+#endif 
 
 local debugText = {};
 
@@ -138,7 +145,7 @@ local function initDebugTextColor()
   debugText[DEBUG_TEXT_StickySwitch] = "SetStickySw:";
   debugText[DEBUG_TEXT_TrimSwitchId] = "TrimSwitch:";
   debugText[DEBUG_TEXT_ValueStorage] = "ValueStorage:";
-  debugText[DEBUG_TEXT_Filename] = "ModelFName:";
+  debugText[DEBUG_TEXT_Filename] = "ModelFileName:";
   debugText[DEBUG_TEXT_StringOption] = "StringOption:";
   debugText[DEBUG_TEXT_FuncNames] = "FunctionNames:";
 end

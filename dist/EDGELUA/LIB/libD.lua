@@ -1028,6 +1028,7 @@ local function displayAddressConfigBW(config, widget, encoder, pScaler, state, e
     lcd.drawText(widget[1], widget[2] + 3 * widget[9], "Switch on RX and device", MIDSIZE);
 
     local bendcfg = config[20][1];
+                            ;
     encoder(bendcfg[2], 14, adr); -- learn code
 
     if (event == EVT_VIRTUAL_ENTER) then
@@ -1079,6 +1080,7 @@ local function displayAddressConfigColor(config, widget, encoder, pScaler, state
     lcd.drawFilledRectangle(rect.xmin, rect.ymin, rect.xmax - rect.xmin + 1, rect.ymax - rect.ymin + 1, COLOR_THEME_ACTIVE);
     lcd.drawText(rect.xmin + 5, rect.ymin + 5, "Switch on RX and device", MIDSIZE + COLOR_THEME_PRIMARY2);
 
+                           ;
     local bendcfg = config[20][1];
     encoder(bendcfg[2], 14, adr);
 

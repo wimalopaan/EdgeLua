@@ -4,6 +4,7 @@
 #define SHM_VAR 1
 #define SHM_VMAP_VAR 2
 #define GLOBAL_LUA_MIX_VAR   __Sw2MixerValue
+#define GLOBAL_LUA_MIX_VMAP_VAR   __Sw2MixerValueVmap
 #define GLOABL_LUA_CONFIG    __WmSw2Config
 #define GLOBAL_LUA_STOP_MASK __stopWmSw2
 #define GLOBAL_LUA_FOREIGN   __WmSw2ForeignInput

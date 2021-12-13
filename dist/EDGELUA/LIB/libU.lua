@@ -39,19 +39,19 @@ local function optionString(option)
   return s
 end
 
-local function serialize(table, filename)
-    if type(table) == "table" then
-        io.write("{\n")
-        for k,v in pairs(o) do
-          io.write("  ", k, " = ")
-          serialize(v)
-          io.write(",\n")
-        end
-        io.write("}\n")
-      else
-        error("cannot serialize a " .. type(o))
-      end
-end
+-- local function serialize(table, filename)
+-- if type(table) == "table" then
+-- io.write("{\n")
+-- for k,v in pairs(o) do
+-- io.write("  ", k, " = ")
+-- serialize(v)
+-- io.write(",\n")
+-- end
+-- io.write("}\n")
+-- else
+-- error("cannot serialize a " .. type(o))
+-- end
+-- end
 
 local function appendToFile(file, values)
                              ;
@@ -97,17 +97,23 @@ local function initValues(menu, filename)
       for ip, page in ipairs(menu) do
         for il, pline in ipairs(page) do
           local pitem = pline[1];
-          if (#table[lineNumber] == #pline[2]) then
+          if not(table[lineNumber]) then
                                                          ;
-            pline[2] = table[lineNumber];
+            return false;
           else
+            if (#table[lineNumber] == #pline[2]) then
                                                            ;
+              pline[2] = table[lineNumber];
+            else
+                                                             ;
+            end
           end
           lineNumber = lineNumber + 1;
         end
       end
     end
   end
+  return true;
 end
 
 local debugText = {};
@@ -135,7 +141,7 @@ local function initDebugTextColor()
   debugText[6] = "SetStickySw:";
   debugText[2] = "TrimSwitch:";
   debugText[8] = "ValueStorage:";
-  debugText[9] = "ModelFName:";
+  debugText[9] = "ModelFileName:";
   debugText[10] = "StringOption:";
   debugText[11] = "FunctionNames:";
 end
@@ -147,7 +153,7 @@ local function displayDebugBW(widget)
   local x3 = x1 + widget[3] / 2;
   local x4 = x1 + 3 * widget[3] / 4;
 
-      lcd.drawText(x1, y, debugText[7] .. "2.14", SMLSIZE);
+      lcd.drawText(x1, y, debugText[7] .. "2.16", SMLSIZE);
 
   y = y + widget[8];
   lcd.drawText(x1, y, debugText[1] , SMLSIZE);

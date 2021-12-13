@@ -166,6 +166,9 @@ local function transportToMixer(gv, value)
   -- dummy: function is set to real transport function based on radio and capabilities
 end
 
+local function transportToVmap(gv, value)
+end
+
 local function sportConfigFSM()
 end
 
@@ -233,7 +236,7 @@ local function tiptipEncode(config, state, on)
     encoded = 1 + 10 * state[4];
   end
 
-  transportToMixer(bendCfg[3], encoded);
+  transportToVmap(bendCfg[3], encoded);
 end
 
 local function tiptipSwitchFSM(config, menu, queue, state)
@@ -320,7 +323,6 @@ end
 local function solExportSwitchFSM()
                               ;
 end
-
 local function sbusSwitchFSM(config, menu, queue, state, encoder, exportValues, autoResets)
   local t = getTime();
   local bendCfg = config[20][1];
@@ -338,12 +340,13 @@ local function sbusSwitchFSM(config, menu, queue, state, encoder, exportValues, 
     end
     if (item) then
         encoder(bendCfg[2], item);
-        if (exportValues) then
-          if (item[6]) then -- export
-            local expValue = exportValues[ item[3] ] * 1024 / 100;
-            model.setGlobalVariable(item[6], 0, expValue);
-          end
-        end
+
+        -- if (exportValues) then
+        -- if (item[6]) then -- export
+        -- local expValue = exportValues[ item[3] ] * 1024 / 100;
+        -- model.setGlobalVariable(item[6], 0, expValue);
+        -- end
+        -- end
 
       state[1] = t;
     end
@@ -360,9 +363,19 @@ local function transportShm(gv, value)
                                ;
 end
 
+local function transportShmVmap(gv, value)
+  setShmVar(2, value)
+                                   ;
+end
+
 local function transportGlobalLua(gv, value)
   __Sw2MixerValue = value;
                                   ;
+end
+
+local function transportGlobalLuaVmap(gv, value)
+  __Sw2MixerValue = value;
+                                      ;
 end
 
 local function scaleXJT(sbusValue)
@@ -443,6 +456,7 @@ end
 
 local function encodeParamIBus(gv, paramNumber, paramValue)
   local ibusValue = parameterToValueIBus(paramNumber, paramValue);
+                                                              ;
   setIBus(gv, ibusValue);
 end
 
@@ -564,6 +578,7 @@ if (LCD_W <= 212) then -- BW radio
                                        ;
   __Sw2MixerValue = 0;
   transportToMixer = transportGlobalLua;
+  transportToVmap = transporGlobalLuaVmap;
   return {
     Class = Class,
     getSwitchFSM = getSwitchFSM,
@@ -576,9 +591,11 @@ else -- color radio
   if (getShmVar) then
                                    ;
     transportToMixer = transportShm;
+    transportToVmap = transportShmVmap;
   else
                                   ;
     transportToMixer = transportGV;
+    transportToVmap = transportGV;
   end
 
   return {

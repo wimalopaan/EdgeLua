@@ -204,7 +204,10 @@ local function init_telemetry()
       loadLibU();
 
       if (__libU) then
-        __libU.initValues(menu, valuesFileName);
+        local ok = __libU.initValues(menu, valuesFileName);
+        if not(ok) then
+          errorCode = 10;
+        end
       end
     end
 

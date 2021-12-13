@@ -84,7 +84,10 @@ local function create(zone, options)
 TRACE("valuesFilename:", valuesFileName)
    if (valuesFileName) then
     TRACE("valuesFilename:", valuesFileName)
-    __libU.initValues(menu, valuesFileName);
+    local ok = __libU.initValues(menu, valuesFileName);
+    if not(ok) then
+      errorCode = 10;
+    end
   end
 #endif
 

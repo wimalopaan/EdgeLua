@@ -632,6 +632,7 @@ local function displayAddressConfigBW(config, widget, encoder, pScaler, state, e
     lcd.drawText(widget[1], widget[2] + 3 * widget[9], "Switch on RX and device", MIDSIZE);
 
     local bendcfg = config[20][1];
+                            ;
     encoder(bendcfg[2], 14, adr); -- learn code
 
     if (event == EVT_VIRTUAL_ENTER) then

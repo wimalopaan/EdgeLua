@@ -150,6 +150,9 @@ local function transportToMixer(gv, value)
   -- dummy: function is set to real transport function based on radio and capabilities
 end
 
+local function transportToVmap(gv, value)
+end
+
 local function sportConfigFSM()
 end
 
@@ -217,7 +220,7 @@ local function tiptipEncode(config, state, on)
     encoded = 1 + 10 * state[FSMTIP_ActualChannel];    
   end
   TRACE("tiptipEncode:", bendCfg[BEND_TIPTIP_MixerGlobalVariable], encoded)
-  transportToMixer(bendCfg[BEND_TIPTIP_MixerGlobalVariable], encoded);
+  transportToVmap(bendCfg[BEND_TIPTIP_MixerGlobalVariable], encoded);
 end
 
 local function tiptipSwitchFSM(config, menu, queue, state)
@@ -305,6 +308,24 @@ local function solExportSwitchFSM()
   TRACE3("solExportSwitchFSM");
 end
 
+#ifdef INCLUDE_EXPORT
+local function exportBus(bcfg, item) 
+  TRACE3("exportBus", item[ITEM_Name]);
+  local exportValues = bcfg[BEND_BUS_ExportValues];
+  if (item[ITEM_Export]) and (item[ITEM_Export] <= #exportValues) then
+    TRACE("exportBus Exp:", item[ITEM_Export]);
+    local stateValues = exportValues[item[ITEM_Export]];
+    if (item[ITEM_State] <= #stateValues) then
+      local expValue = stateValues[ item[ITEM_State] ] * 10.24;
+      if (bcfg[BEND_BUS_ExportMixerGlobalVariable]) then
+        TRACE("exportBus gv:", bcfg[BEND_BUS_ExportMixerGlobalVariable], expValue);
+        model.setGlobalVariable(bcfg[BEND_BUS_ExportMixerGlobalVariable], 0, expValue);
+      end
+    end
+  end
+end
+#endif 
+
 local function sbusSwitchFSM(config, menu, queue, state, encoder, exportValues, autoResets)
   local t = getTime();
   local bendCfg = config[CFG_Backend_Data][CFG_BEND_Bus];
@@ -355,21 +376,27 @@ local function sbusSwitchFSM(config, menu, queue, state, encoder, exportValues, 
         end
       else
         encoder(bendCfg[BEND_BUS_MixerGlobalVariable], item);
-        if (exportValues) then
-          if (item[ITEM_Export]) then -- export
-            local expValue = exportValues[ item[ITEM_State] ] * 1024 / 100;
-            model.setGlobalVariable(item[ITEM_Export], 0, expValue);
-          end            
-        end
+        #ifdef INCLUDE_EXPORT
+        exportBus(bendCfg, item);
+        #endif
+        -- if (exportValues) then
+        --   if (item[ITEM_Export]) then -- export
+        --     local expValue = exportValues[ item[ITEM_State] ] * 1024 / 100;
+        --     model.setGlobalVariable(item[ITEM_Export], 0, expValue);
+        --   end            
+        -- end
       end
       #else
         encoder(bendCfg[BEND_BUS_MixerGlobalVariable], item);
-        if (exportValues) then
-          if (item[ITEM_Export]) then -- export
-            local expValue = exportValues[ item[ITEM_State] ] * 1024 / 100;
-            model.setGlobalVariable(item[ITEM_Export], 0, expValue);
-          end            
-        end
+        #ifdef INCLUDE_EXPORT
+        exportBus(bendCfg, item);
+        #endif
+        -- if (exportValues) then
+        --   if (item[ITEM_Export]) then -- export
+        --     local expValue = exportValues[ item[ITEM_State] ] * 1024 / 100;
+        --     model.setGlobalVariable(item[ITEM_Export], 0, expValue);
+        --   end 
+        -- end
       #endif
       state[FSMSWITCH_LastTime] = t;
     end 
@@ -386,9 +413,19 @@ local function transportShm(gv, value)
   TRACE3("transportShm", value);
 end
 
+local function transportShmVmap(gv, value)
+  setShmVar(SHM_VMAP_VAR, value)
+  TRACE3("transportShmVMap", value);
+end
+
 local function transportGlobalLua(gv, value)
   GLOBAL_LUA_MIX_VAR = value;
   TRACE3("transportGlobal", value);
+end
+
+local function transportGlobalLuaVmap(gv, value)
+  GLOBAL_LUA_MIX_VAR = value;
+  TRACE3("transportGlobalVmap", value);
 end
 
 local function scaleXJT(sbusValue)
@@ -475,6 +512,7 @@ end
 
 local function encodeParamIBus(gv, paramNumber, paramValue)
   local ibusValue = parameterToValueIBus(paramNumber, paramValue);
+  TRACE("encodeParamIBus", ibusValue, paramNumber, paramValue);
   setIBus(gv, ibusValue);
 end 
 
@@ -601,6 +639,7 @@ if (LCD_W <= 212) then -- BW radio
   TRACE("libP: use transportGlobalLua");
   GLOBAL_LUA_MIX_VAR = 0;
   transportToMixer = transportGlobalLua;
+  transportToVmap = transporGlobalLuaVmap;  
   return {
     Class = Class,
     getSwitchFSM = getSwitchFSM,
@@ -613,13 +652,16 @@ else -- color radio
   if (getShmVar) then
     TRACE("libP: use transportShm");
     transportToMixer = transportShm;
+    transportToVmap = transportShmVmap;  
   else
     TRACE("libP: use transportGV");
     transportToMixer = transportGV;
+    transportToVmap = transportGV;  
   end
   #else
     TRACE("libP: use transportGV");
     transportToMixer = transportGV;
+    transportToVmap = transportGV;  
   #endif
   return {
     Class = Class,
