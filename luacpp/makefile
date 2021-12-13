@@ -4,8 +4,11 @@
 debug: MAKEVARS="DEBUG=-DDEBUG"
 debug: all filelist.txt copy clean
 
-tiny: MAKEVARS="DEBUG=-DSELECT_TINY"
+tiny: MAKEVARS="SELECT_TINY=-DSELECT_TINY"
 tiny: all filelist.txt copytiny clean
+
+tinydebug: MAKEVARS="SELECT_TINY=-DSELECT_TINY" "DEBUG=-DDEBUG"
+tinydebug: all filelist.txt copytiny clean
 
 dist: all filelist.txt copy clean 
 

@@ -14,7 +14,7 @@ all: subdirs  $(targets)
 
 #DEBUG = -DDEBUG
 
-CPPFLAGS = -std=c++20 $(DEBUG)
+CPPFLAGS = -std=c++20 $(DEBUG) $(SELECT_TINY)
 
 %.lua: %.lpp
 	clang $(CPPFLAGS) -E -P -xc++ $< | cat -s  > $@
