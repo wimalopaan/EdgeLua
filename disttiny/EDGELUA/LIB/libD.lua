@@ -324,21 +324,28 @@ end
 local function getSwitchValue(id, lsmode)
   local value = getValue(id);
   if (lsmode == 0) then
-    if (value == 0) then
-      return 1;
-    elseif (value > 0) then
+    if (value > 680) then
       return 2;
-    else
+    elseif (value < -680) then
       return 3;
+    else
+      return 1;
     end
+    -- if (value == 0) then
+    -- return 1;
+    -- elseif (value > 0) then
+    -- return 2;
+    -- else
+    -- return 3;
+    -- end
   elseif (lsmode == 1) then
-    if (value < 0) then
+    if (value < -680) then
       return 1;
     else
       return 2;
     end
   else
-    if (value < 0) then
+    if (value < -680) then
       return 1;
     else
       return 3;

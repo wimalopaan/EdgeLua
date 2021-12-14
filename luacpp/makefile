@@ -15,6 +15,7 @@ dist: all filelist.txt copy clean
 filelist.txt:
 	find . -name "*.lua" > $@
 	find . -name "*.png" >> $@
+	find . -name "*.yml" >> $@
 
 copy: filelist.txt
 	tar cf - -T filelist.txt | (mkdir -p ../dist; cd ../dist; tar xvf -)
