@@ -111,16 +111,18 @@
 #define PUSHED_ITEM_Item 1
 #define PUSHED_ITEM_BeforeState 2
 
-
 #define OVERLAY_SwitchID 1
 #define OVERLAY_Item 2
 #define OVERLAY_LSMode 3
-#define OVERLAY_LastValue 4
+// #define OVERLAY_LastValue 4
 
-#define SHORTCUT_SwitchID 1
-#define SHORTCUT_Item 2
-#define SHORTCUT_LSMode 3
-#define SHORTCUT_LastValue 4
+#define SHORTCUT_SwitchID OVERLAY_SwitchID
+#define SHORTCUT_Item OVERLAY_Item
+#define SHORTCUT_LSMode OVERLAY_LSMode
+// #define SHORTCUT_LastValue OVERLAY_LastValue
+
+#define SWITCHES_LastValue 1
+
 
 #define PHEADER_Title 1
 #define PHEADER_Module 2

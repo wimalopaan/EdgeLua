@@ -124,6 +124,7 @@ local shortCuts = {};
 local overlays = {};
 local pagetitles = {};
 local menudata = {};
+local switches = {};
 local queue = nil;
 local autoResets = {};
 local fsmState = {};
@@ -171,7 +172,7 @@ local function create(zone, options)
   encoder = __libP.getEncoder(__WmSw2Config);
   switchFSM = __libP.getSwitchFSM(__WmSw2Config);
 
-  menu, shortCuts, overlays, pagetitles, menudata = __libI.initMenu(__WmSw2Config, menu, filename);
+  menu, shortCuts, overlays, pagetitles, menudata, switches = __libI.initMenu(__WmSw2Config, menu, filename);
   __libI.initFSM(fsmState);
 
   __libI = nil; -- free memory
@@ -189,7 +190,7 @@ end
 
 local function background(widget)
   if (errorCode == 0) then
-    __libD.processShortCuts(shortCuts, queue);
+    __libD.processShortCuts(shortCuts, queue, switches);
     __libD.processRemoteInput(__WmSw2Config, menu, queue, remoteInput);
     if (__WmSw2ForeignInput) and (lastForeignInput ~= __WmSw2ForeignInput) then
                                                 ;
@@ -211,7 +212,7 @@ local function refresh(widget, event, touch)
     __libD.processEvents(__WmSw2Config, menu, menuState, event, queue, __libD.selectItem);
     __libD.processTouch(menu, menuState, event, touch);
     __libD.processButtons(__WmSw2Config, menu, menuState, buttonState, queue, __libD.selectItem);
-    __libD.processOverlays(overlays, menuState, queue);
+    __libD.processOverlays(overlays, menuState, queue, switches);
     __libD.displayMenu(__WmSw2Config, widget, menu, overlays, menuState, event, remoteInput,
                        __WmSw2Warning1, __WmSw2Warning2, pagetitles, menudata, fsmState);
 

@@ -767,24 +767,26 @@ local function getSwitchValue(id, lsmode)
   end
 end
 
-local function processShortCuts(shortCuts, queue)
+local function processShortCuts(shortCuts, queue, switches)
+  TRACE3("processShortCuts", switches);
   for i, sc in ipairs(shortCuts) do
     local v = getSwitchValue(sc[SHORTCUT_SwitchID], sc[SHORTCUT_LSMode]);
-    if not (v == sc[SHORTCUT_LastValue]) then
-      sc[SHORTCUT_LastValue] = v;
+    if not (v == switches[sc[SHORTCUT_SwitchID]][SWITCHES_LastValue]) then
+      switches[sc[SHORTCUT_SwitchID]][SWITCHES_LastValue] = v;
       local item = sc[SHORTCUT_Item];
-      setAndPushItem(queue, item, v);
-      -- local push = {[PUSHED_ITEM_Item] = item, [PUSHED_ITEM_BeforeState] = item[ITEM_State]};
-      -- item[ITEM_State] = v;
-      -- queue:push(push);
+      if not(item[ITEM_State] == v) then
+        setAndPushItem(queue, item, v);
+        TRACE("processShortCuts:", item[ITEM_Name], item[ITEM_State]);
+      end
     end
   end
 end
 
-local function processOverlays(overlays, menuState, queue)
+local function processOverlays(overlays, menuState, queue, switches)
+  TRACE3("processOverlays", switches);
   local activePageIndex = menuState[MENUSTATE_Page];
   local overlay = overlays[activePageIndex];
-  processShortCuts(overlay, queue);
+  processShortCuts(overlay, queue, switches);
 end
 
 local function processTrimsSelect(config, buttonState, callback)

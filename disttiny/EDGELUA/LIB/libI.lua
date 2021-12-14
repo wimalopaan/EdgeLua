@@ -315,7 +315,7 @@ local function initConfigBW(config, modifyModel)
     cfg[9] = 2; --sbus
   end
 
-  local footer = "Vers: " .. "2.16";
+  local footer = "Vers: " .. "2.17";
   if (cfg[9] == 0) then
     footer = footer .. " Mod: xjt";
   elseif (cfg[9] == 1) then
@@ -618,7 +618,7 @@ local function initMenuBW(menu)
         cmenu[i][k] = citem;
         if (switchId) then
           citem[1] = citem[1] .. "/" .. item.switch;
-          local use = {citem, lsmode};
+          local use = {citem, lsmode, i};
           if not switchUse[switchId] then
             switchUse[switchId] = {use};
           else
@@ -629,29 +629,36 @@ local function initMenuBW(menu)
       end
     end
   end
+  local switchStates = {};
+
   for switchid, uses in pairs(switchUse) do
+    switchStates[switchid] = {
+      [1] = 0;
+    };
     if (#uses > 1) then
       for iu, use in ipairs(uses) do
         local swItem = use[1];
         local lsmode = use[2];
-        for ip, page in ipairs(cmenu) do
-          for i, item in ipairs(page) do
-            if (item == swItem) then
-              overlays[ip][#overlays[ip] + 1] = {switchid, item, lsmode};
-            end
-          end
-        end
+        local ip = use[3];
+                                                           ;
+        overlays[ip][#overlays[ip] + 1] = {
+          [1] = switchid,
+          [2] = swItem,
+          [3] = lsmode};
       end
     else
-      local item = uses[1][1];
+      local switem = uses[1][1];
       local lsmode = uses[1][2];
-      shortCuts[#shortCuts + 1] = {switchid, item, lsmode};
+      shortCuts[#shortCuts + 1] = {
+        [1] = switchid,
+        [2] = switem,
+        [3] = lsmode};
     end
   end
   menu = nil;
   switchUse = nil;
   collectgarbage();
-  return cmenu, shortCuts, overlays, pagetitles;
+  return cmenu, shortCuts, overlays, pagetitles, switchStates;
 end
 local function initFSM(state)
   if not(state[1]) then

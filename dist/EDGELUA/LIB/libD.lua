@@ -742,24 +742,26 @@ local function getSwitchValue(id, lsmode)
   end
 end
 
-local function processShortCuts(shortCuts, queue)
+local function processShortCuts(shortCuts, queue, switches)
+                                      ;
   for i, sc in ipairs(shortCuts) do
     local v = getSwitchValue(sc[1], sc[3]);
-    if not (v == sc[4]) then
-      sc[4] = v;
+    if not (v == switches[sc[1]][1]) then
+      switches[sc[1]][1] = v;
       local item = sc[2];
-      setAndPushItem(queue, item, v);
-      -- local push = {[1] = item, [2] = item[3]};
-      -- item[3] = v;
-      -- queue:push(push);
+      if not(item[3] == v) then
+        setAndPushItem(queue, item, v);
+                                                                     ;
+      end
     end
   end
 end
 
-local function processOverlays(overlays, menuState, queue)
+local function processOverlays(overlays, menuState, queue, switches)
+                                     ;
   local activePageIndex = menuState[3];
   local overlay = overlays[activePageIndex];
-  processShortCuts(overlay, queue);
+  processShortCuts(overlay, queue, switches);
 end
 
 local function processTrimsSelect(config, buttonState, callback)

@@ -121,6 +121,7 @@ local menu = {};
 local shortCuts = {};
 local overlays = {};
 local pagetitles = {};
+local switches = {};
 local queue = nil;
 local autoResets = {};
 local fsmState = {};
@@ -134,7 +135,7 @@ local function run_telemetry(event)
 
     if (errorCode == 0) then
       __libD.processEvents(__WmSw2Config, menu, menuState, event, queue, __libD.selectItem);
-      __libD.processOverlays(overlays, menuState, queue);
+      __libD.processOverlays(overlays, menuState, queue, switches);
       __libD.displayMenu(__WmSw2Config, widget, menu, overlays, menuState, pagetitles);
     else
       lcd.clear();
@@ -187,7 +188,7 @@ local function init_telemetry()
     return;
   end
 
-  menu, shortCuts, overlays, pagetitles = __libI.initMenu(menu)
+  menu, shortCuts, overlays, pagetitles, switches = __libI.initMenu(menu)
   collectgarbage();
 
   __libI.initFSM(fsmState);
@@ -202,7 +203,7 @@ end
 
 local function background_telemetry()
   if (errorCode == 0) then
-    __libD.processShortCuts(shortCuts, queue);
+    __libD.processShortCuts(shortCuts, queue, switches);
     if (__WmSw2ForeignInput) and (lastForeignInput ~= __WmSw2ForeignInput) then
       __libD.processForeignInput(__WmSw2Config, __WmSw2ForeignInput, menu, queue);
       lastForeignInput = __WmSw2ForeignInput;
