@@ -315,7 +315,7 @@ local function initConfigBW(config, modifyModel)
     cfg[9] = 2; --sbus
   end
 
-  local footer = "Vers: " .. "2.18";
+  local footer = "Vers: " .. "2.19";
   if (cfg[9] == 0) then
     footer = footer .. " Mod: xjt";
   elseif (cfg[9] == 1) then
@@ -601,9 +601,12 @@ local function initMenuBW(menu)
         if (s) then
           switchId = s.id;
         end
-        if (string.find(item.switch, "ls")) then
-          lsmode = item.lsmode;
+        if (item.lsmode) and (item.lsmode >= 1) and (item.lsmode <= 2) then
+            lsmode = item.lsmode;
         end
+-- if (string.find(item.switch, "ls")) then
+-- lsmode = item.lsmode;
+-- end
       end
       -- all components mus be set
       -- todo: remove nil

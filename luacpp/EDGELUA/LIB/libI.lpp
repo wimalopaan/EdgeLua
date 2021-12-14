@@ -854,9 +854,12 @@ local function initMenuBW(menu)
         if (s) then
           switchId = s.id;
         end
-        if (string.find(item.switch, "ls")) then
-          lsmode = item.lsmode;
+        if (item.lsmode) and (item.lsmode >= 1) and (item.lsmode <= 2) then
+            lsmode = item.lsmode;
         end
+--        if (string.find(item.switch, "ls")) then
+--            lsmode = item.lsmode;
+--        end
       end
       -- all components mus be set
       -- todo: remove nil
