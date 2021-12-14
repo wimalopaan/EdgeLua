@@ -649,9 +649,6 @@ local function selectItem(menu, menuState, queue)
   local page = menu[menuState[MENUSTATE_Page]];
   local item = page[menuState[MENUSTATE_Row]];
   setAndPushItem(queue, item, menuState[MENUSTATE_Col]);
-  -- local push = {[PUSHED_ITEM_Item] = item, [PUSHED_ITEM_BeforeState] = item[ITEM_State]};
-  -- item[ITEM_State] = menuState[MENUSTATE_Col];
-  -- queue:push(push);
 end
 
 #ifdef DEBUG
@@ -752,13 +749,6 @@ local function getSwitchValue(id, lsmode)
     else
       return 1;
     end
-    -- if (value == 0) then
-    --   return 1;
-    -- elseif (value > 0) then
-    --   return 2;
-    -- else
-    --   return 3;
-    -- end
   elseif (lsmode == 1) then
     if (value < SWITCH_ThreshNeg) then
       return 1;
@@ -836,50 +826,16 @@ local function processTrims(config, menu, menuState, buttonState, queue, callbac
     menuDeselect(menuState);
   end
   processTrimsPrevious(config, buttonState, prevCB);
-  --[[
-  if (config[CFG_PreviousLsId]) then
-    local value = getValue(config[CFG_PreviousLsId]);
-    TRACE3("processTrims prev", config[CFG_PreviousLsId], value);
-    if (value > buttonState[BUTTONS_PREV]) then
-      prevCol(menu, menuState);
-      menuDeselect(menuState);
-    end
-    buttonState[BUTTONS_PREV] = value;
-  end
-  --]]
   local nextCB = function()
     nextCol(menu, menuState);
     menuDeselect(menuState);
   end
   processTrimsNext(config, buttonState, nextCB);
-  --[[
-  if (config[CFG_NextLsId]) then
-    local value = getValue(config[CFG_NextLsId]);
---    TRACE("processTrims next", config[CFG_NextLsId], value);
-    if (value > buttonState[BUTTONS_NEXT]) then
-      nextCol(menu, menuState);
-      menuDeselect(menuState);
-    end
-    buttonState[BUTTONS_NEXT] = value;
-  end
-  --]]
-
   local selectCB = function()
     TRACE("selectCB");
     callback(menu, menuState, queue);
   end
   processTrimsSelect(config, buttonState, selectCB);
-
-  --[[
-  if (config[CFG_SelectLsId]) then
-    local value = getValue(config[CFG_SelectLsId]);
---    TRACE("processTrims select", config[CFG_SelectLsId], value);
-    if (value > buttonState[BUTTONS_SELECT]) then
-      callback(menu, menuState, queue);
-    end
-    buttonState[BUTTONS_SELECT] = value;
-  end
-  --]]
 end
 
 local function processPots(config, menu, menuState, buttonState)
@@ -916,7 +872,7 @@ local function processMenuSwitch(config, menu, menuState, buttonState)
     if (math.abs(ms - buttonState[BUTTONS_MENUSELECT]) > 10) then
       local s = 1;
       for i = 0,5 do
-        if (ms <= (-1024 + (2 * i  + 1) * (2048 / 6))) then
+        if (ms <= (-1024 + (2 * i  + 1) * (2048 / 10))) then
           s = i + 1;
           break;
         end

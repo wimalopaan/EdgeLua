@@ -639,9 +639,6 @@ local function selectItem(menu, menuState, queue)
   local page = menu[menuState[3]];
   local item = page[menuState[1]];
   setAndPushItem(queue, item, menuState[2]);
-  -- local push = {[1] = item, [2] = item[3]};
-  -- item[3] = menuState[2];
-  -- queue:push(push);
 end
 
 local function processEventsBWScroll(config, menu, menuState, event, queue, callback)
@@ -727,13 +724,6 @@ local function getSwitchValue(id, lsmode)
     else
       return 1;
     end
-    -- if (value == 0) then
-    -- return 1;
-    -- elseif (value > 0) then
-    -- return 2;
-    -- else
-    -- return 3;
-    -- end
   elseif (lsmode == 1) then
     if (value < -680) then
       return 1;
@@ -811,50 +801,16 @@ local function processTrims(config, menu, menuState, buttonState, queue, callbac
     menuDeselect(menuState);
   end
   processTrimsPrevious(config, buttonState, prevCB);
-  --[[
-  if (config[11]) then
-    local value = getValue(config[11]);
-                                                                ;
-    if (value > buttonState[1]) then
-      prevCol(menu, menuState);
-      menuDeselect(menuState);
-    end
-    buttonState[1] = value;
-  end
-  --]]
   local nextCB = function()
     nextCol(menu, menuState);
     menuDeselect(menuState);
   end
   processTrimsNext(config, buttonState, nextCB);
-  --[[
-  if (config[12]) then
-    local value = getValue(config[12]);
--- ;
-    if (value > buttonState[2]) then
-      nextCol(menu, menuState);
-      menuDeselect(menuState);
-    end
-    buttonState[2] = value;
-  end
-  --]]
-
   local selectCB = function()
                      ;
     callback(menu, menuState, queue);
   end
   processTrimsSelect(config, buttonState, selectCB);
-
-  --[[
-  if (config[13]) then
-    local value = getValue(config[13]);
--- ;
-    if (value > buttonState[3]) then
-      callback(menu, menuState, queue);
-    end
-    buttonState[3] = value;
-  end
-  --]]
 end
 
 local function processPots(config, menu, menuState, buttonState)
@@ -891,7 +847,7 @@ local function processMenuSwitch(config, menu, menuState, buttonState)
     if (math.abs(ms - buttonState[4]) > 10) then
       local s = 1;
       for i = 0,5 do
-        if (ms <= (-1024 + (2 * i + 1) * (2048 / 6))) then
+        if (ms <= (-1024 + (2 * i + 1) * (2048 / 10))) then
           s = i + 1;
           break;
         end
