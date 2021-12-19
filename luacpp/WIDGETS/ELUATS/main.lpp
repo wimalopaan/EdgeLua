@@ -12,6 +12,8 @@
 
 #include "../../widget.h"
 
+local bmpExpandSmall = nil;
+
 local name = "EL_Test";
 local options = {
   {"Test", STRING}
@@ -58,6 +60,8 @@ local function create(zone, options)
     end   
   end
 
+  bmpExpandSmall = Bitmap.open(BASE_DIR .. "/ICONS/48px/expand.png");
+
   return widget;
 end
 
@@ -73,9 +77,14 @@ end
 local function refresh(widget, event, touch)
   __libD.updateWidgetDimensions(widget, event);
   if (errorCode == 0) then
-    __libU.displayDebug(widget);
-
-
+    if (widget[W_Width] <= (LCD_W / 2)) then
+      if (bmpExpandSmall) then
+        lcd.drawBitmap(bmpExpandSmall, widget[W_X], widget[W_Y]);        
+      end
+      lcd.drawText(widget[W_X] + 60, widget[W_Y], "Sys-Infos", MIDSIZE);
+    else
+      __libU.displayDebug(widget);
+    end
   else
     lcd.drawText(widget[W_X], widget[W_Y], "Error: " .. errorCode, DBLSIZE);
   end

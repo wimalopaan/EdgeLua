@@ -121,6 +121,8 @@ local animations = nil;
 local fsmState = {};
 local currentAnimation = nil;
 
+local bmpExpandSmall = nil;
+
 local function create(zone, options)
   load();
   loadLibA();
@@ -176,6 +178,8 @@ local function create(zone, options)
 
   collectgarbage();
 
+  bmpExpandSmall = Bitmap.open("/EDGELUA" .. "/ICONS/48px/expand.png");
+
   return widget;
 end
 
@@ -195,7 +199,10 @@ local function refresh(widget, event, touch)
   __libD.updateWidgetDimensions(widget, event);
   if (errorCode == 0) then
     if (widget[3] <= (LCD_W / 2)) then
-      lcd.drawText(widget[1], widget[2], "Animationen", MIDSIZE);
+      if (bmpExpandSmall) then
+        lcd.drawBitmap(bmpExpandSmall, widget[1], widget[2]);
+      end
+      lcd.drawText(widget[1] + 60, widget[2], "Animationen", MIDSIZE);
     else
       currentAnimation = __libA.chooseAnimation(__WmSw2Config, widget, animations, fsmState, event, touch);
     end

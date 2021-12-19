@@ -22,6 +22,8 @@ local bmpPauseSmall = nil;
 local bmpPreviousSmall = nil;
 local bmpNextSmall = nil;
 
+local bmpExpandSmall = nil;
+
 local bmpUpLarge = nil;
 local bmpDownLarge = nil;
 local bmpLeftLarge = nil;
@@ -70,6 +72,7 @@ local function create(zone, options)
   bmpPreviousSmall = Bitmap.open(BASE_DIR .. "/ICONS/48px/previous.png");
   bmpNextSmall = Bitmap.open(BASE_DIR .. "/ICONS/48px/next.png");
   bmpPauseSmall = Bitmap.open(BASE_DIR .. "/ICONS/48px/round.png");
+  bmpExpandSmall = Bitmap.open(BASE_DIR .. "/ICONS/48px/expand.png");
 
   bmpUpLarge = Bitmap.open(BASE_DIR .. "/ICONS/72px/up.png");
   bmpDownLarge = Bitmap.open(BASE_DIR .. "/ICONS/72px/down.png");
@@ -164,7 +167,10 @@ local function refresh(widget, event, touch)
   if (errorCode == 0) then
     if (widget[W_Width] <= (LCD_W / 2)) then
       #ifdef USE_NEW_STRING_OPTION
-      lcd.drawText(widget[W_X], widget[W_Y], widget[W_Options].Name, MIDSIZE);
+      if (bmpExpandSmall) then
+        lcd.drawBitmap(bmpExpandSmall, widget[W_X], widget[W_Y]);        
+      end
+      lcd.drawText(widget[W_X] + 60, widget[W_Y], widget[W_Options].Name, MIDSIZE);
       #else
       if (type(widget[W_Options].Name) == "string") then
         lcd.drawText(widget[W_X], widget[W_Y], widget[W_Options].Name, MIDSIZE);

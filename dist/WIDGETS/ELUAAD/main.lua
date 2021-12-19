@@ -122,6 +122,8 @@ local paramScaler = nil;
 local menuState = {};
 local buttonState = {0, 0, 0, 0, 0, 0};
 
+local bmpExpandSmall = nil;
+
 local lastRun = 0;
 
 local function create(zone, options)
@@ -157,6 +159,8 @@ local function create(zone, options)
 
   collectgarbage();
 
+  bmpExpandSmall = Bitmap.open("/EDGELUA" .. "/ICONS/48px/expand.png");
+
   return widget;
 end
 
@@ -179,7 +183,10 @@ local function refresh(widget, event, touch)
     __stopWmSw2 = bit32.bor(__stopWmSw2, 2);
     lastRun = getTime();
     if (widget[3] <= (LCD_W / 2)) then
-      lcd.drawText(widget[1], widget[2], "Adresse\nkonfigurieren", MIDSIZE);
+      if (bmpExpandSmall) then
+        lcd.drawBitmap(bmpExpandSmall, widget[1], widget[2]);
+      end
+      lcd.drawText(widget[1] + 60, widget[2], "Adresse\nkonfigurieren", MIDSIZE);
     else
       __libD.displayAddressConfig(__WmSw2Config, widget, paramEncoder, paramScaler, menuState, event, touch, buttonState);
     end
