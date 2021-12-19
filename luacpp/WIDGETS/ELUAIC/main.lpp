@@ -162,11 +162,24 @@ end
 local function refresh(widget, event, touch)
   __libD.updateWidgetDimensions(widget, event);
   if (errorCode == 0) then
-    updateFields(widget, event);
-    if (event) then
-      displayFields(widget, bmpLarge);
+    if (widget[W_Width] <= (LCD_W / 2)) then
+      #ifdef USE_NEW_STRING_OPTION
+      lcd.drawText(widget[W_X], widget[W_Y], widget[W_Options].Name, MIDSIZE);
+      #else
+      if (type(widget[W_Options].Name) == "string") then
+        lcd.drawText(widget[W_X], widget[W_Y], widget[W_Options].Name, MIDSIZE);
+      else
+        local n = __libU.optionString(widget[W_Options].Name);
+        lcd.drawText(widget[W_X], widget[W_Y], n, MIDSIZE);
+      end      
+      #endif
     else
-      displayFields(widget, bmpSmall);
+      updateFields(widget, event);
+      if (event) then
+        displayFields(widget, bmpLarge);
+      else
+        displayFields(widget, bmpSmall);
+      end
     end
 
 --    displayButtons(fields);

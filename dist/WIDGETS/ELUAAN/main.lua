@@ -194,7 +194,11 @@ end
 local function refresh(widget, event, touch)
   __libD.updateWidgetDimensions(widget, event);
   if (errorCode == 0) then
-    currentAnimation = __libA.chooseAnimation(__WmSw2Config, widget, animations, fsmState, event, touch);
+    if (widget[3] <= (LCD_W / 2)) then
+      lcd.drawText(widget[1], widget[2], "Animationen", MIDSIZE);
+    else
+      currentAnimation = __libA.chooseAnimation(__WmSw2Config, widget, animations, fsmState, event, touch);
+    end
     background();
   else
     lcd.drawText(widget[1], widget[2], "Error: " .. errorCode, DBLSIZE);

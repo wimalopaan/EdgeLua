@@ -265,11 +265,16 @@ end
 local function refresh(widget, event, touch)
   __libD.updateWidgetDimensions(widget, event);
   if (errorCode == 0) then
-    updateFields(widget, event);
-    if (event) then
-      displayFields(widget, bmpLarge);
+    if (widget[3] <= (LCD_W / 2)) then
+
+      lcd.drawText(widget[1], widget[2], widget[11].Name, MIDSIZE);
     else
-      displayFields(widget, bmpSmall);
+      updateFields(widget, event);
+      if (event) then
+        displayFields(widget, bmpLarge);
+      else
+        displayFields(widget, bmpSmall);
+      end
     end
 
 -- displayButtons(fields);

@@ -10,35 +10,6 @@
 -- Please note that the above license also covers the transfer protocol used and the encoding scheme and
 -- all further principals of tranferring state and other information.
 
-local function isDigit(v)
-  return (v >= string.byte("0")) and (v <= string.byte("9"));
-end
-
-local function isLetter(v)
-  return (v >= string.byte("A") and (v <= string.byte("Z"))) or (v >= string.byte("a") and (v <= string.byte("z")));
-end
-
-local function nthChar(n, v)
-  local c = bit32.extract(v, n * 8, 8);
-  if (isDigit(c) or isLetter(c)) then
-    return string.char(c);
-  end
-  return nil;
-end
-
-local function optionString(option)
-  local s = "";
-  for i = 0,3 do
-    local c = nthChar(i, option);
-    if (c) then
-      s = s .. c;
-    else
-      return s;
-    end;
-  end
-  return s
-end
-
 -- local function serialize(table, filename)
 -- if type(table) == "table" then
 -- io.write("{\n")
@@ -153,7 +124,7 @@ local function displayDebugBW(widget)
   local x3 = x1 + widget[3] / 2;
   local x4 = x1 + 3 * widget[3] / 4;
 
-      lcd.drawText(x1, y, debugText[7] .. "2.19", SMLSIZE);
+      lcd.drawText(x1, y, debugText[7] .. "2.20", SMLSIZE);
 
   y = y + widget[8];
   lcd.drawText(x1, y, debugText[1] , SMLSIZE);

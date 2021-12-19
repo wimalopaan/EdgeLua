@@ -12,6 +12,7 @@
 
 #include "../../global.h"
 
+#ifndef USE_NEW_STRING_OPTION
 local function isDigit(v)
   return (v >= string.byte("0")) and (v <= string.byte("9"));
 end
@@ -40,6 +41,7 @@ local function optionString(option)
   end
   return s
 end
+#endif
 
 -- local function serialize(table, filename) 
 --     if type(table) == "table" then
