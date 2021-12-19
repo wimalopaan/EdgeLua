@@ -43,6 +43,7 @@ backends = {
     bus = {
       stateTimeout = 10, -- unit: 10ms
       mixerGlobalVariable = 6, -- only if SHM is not supported (OpenTx)
+      mixer = 14, -- todo
     },
 
     sport = {
@@ -58,12 +59,14 @@ backends = {
       longTimeout = 60, -- unit: 10ms
       mixerGlobalVariable = 6, -- mixer script vmap.lua maps modules 1-5 to script output, only if SHM is not supported
       values = {0, 100, -100},
+      mixer = 14, -- todo
     },
 
     solexpert = {
       shortTimeout = 50, -- unit: 10ms
       longTimeout = 90, -- unit: 10ms
       mixerGlobalVariable = 6, -- mixer script vmap.lua maps modules 1-5 to script output, only if SHM is not supported
+      mixer = 14, -- todo
       map = {
         {module = 1, values = {0, -75, -25, 25, 75}}, -- Selektor 8
         {module = 2, values = {0, -100, 100}},

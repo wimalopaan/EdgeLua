@@ -59,9 +59,9 @@ end
 if (LCD_W <= 212) then
    GLOBAL_LUA_MIX_VAR = 0;
 end
-
+ 
 local lastValue = 0;
-
+ 
 local function demux(value)
    local chValues = {0, 0, 0, 0, 0};
    if (value ~= lastValue) then

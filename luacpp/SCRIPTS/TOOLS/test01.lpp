@@ -1,5 +1,5 @@
---#include "../../global.h"
-
+#include "../../global.h"
+ 
 local function run(event)
   lcd.clear();
   local x = 20;
@@ -17,3 +17,4 @@ end
 return {
   run = run
 };
+ 

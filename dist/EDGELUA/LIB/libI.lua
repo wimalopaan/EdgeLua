@@ -888,14 +888,11 @@ local function initMenuBW(menu)
         if (s) then
           switchId = s.id;
         end
+        -- all switches can get lsmode
         if (item.lsmode) and (item.lsmode >= 1) and (item.lsmode <= 2) then
             lsmode = item.lsmode;
         end
--- if (string.find(item.switch, "ls")) then
--- lsmode = item.lsmode;
--- end
       end
-      -- all components mus be set
       -- todo: remove nil
       local citem = {item[1], item.states, item.state, item.fn, item.module, nil, nil, nil};
 

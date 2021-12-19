@@ -1,4 +1,3 @@
---#include "../../global.h"
 
 local function run(event)
   lcd.clear();
