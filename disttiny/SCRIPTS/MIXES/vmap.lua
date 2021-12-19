@@ -36,6 +36,10 @@ local function loadLibM()
   end
 end
 
+local function clamp(value)
+  return math.max(math.min(value, 1024), -1024);
+end
+
 local output = {
    "mod1",
    "mod2",
