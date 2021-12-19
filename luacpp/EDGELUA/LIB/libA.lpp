@@ -347,7 +347,7 @@ local function chooseAnimationNoTheme(config, widget, anims, state, event, touch
   return nil;
 end
 
-local function chooseAnimation(config, widget, anims, state, event, touch)
+local function chooseAnimation(config, widget, anims, state, event, touch, png)
   lcd.clear();
   local rects = {};
   local bh = 1.5 * widget[W_FontHLarge];
@@ -356,6 +356,15 @@ local function chooseAnimation(config, widget, anims, state, event, touch)
   local vs = 5;
 
   TRACE3("chooseAnimation", config, widget, anims, state, event, touch);
+
+  if (widget[W_Width] <= (LCD_W / 2)) then
+    if (png) then
+      lcd.drawBitmap(png, widget[W_X], widget[W_Y]);        
+    end
+    lcd.drawText(widget[W_X] + 60, widget[W_Y], "Animationen", MIDSIZE);
+    return;
+  end
+
 
   if not(anims) then
     return;

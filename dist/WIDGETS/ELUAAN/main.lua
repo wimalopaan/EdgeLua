@@ -198,14 +198,7 @@ end
 local function refresh(widget, event, touch)
   __libD.updateWidgetDimensions(widget, event);
   if (errorCode == 0) then
-    if (widget[3] <= (LCD_W / 2)) then
-      if (bmpExpandSmall) then
-        lcd.drawBitmap(bmpExpandSmall, widget[1], widget[2]);
-      end
-      lcd.drawText(widget[1] + 60, widget[2], "Animationen", MIDSIZE);
-    else
-      currentAnimation = __libA.chooseAnimation(__WmSw2Config, widget, animations, fsmState, event, touch);
-    end
+    currentAnimation = __libA.chooseAnimation(__WmSw2Config, widget, animations, fsmState, event, touch, bmpExpandSmall);
     background();
   else
     lcd.drawText(widget[1], widget[2], "Error: " .. errorCode, DBLSIZE);

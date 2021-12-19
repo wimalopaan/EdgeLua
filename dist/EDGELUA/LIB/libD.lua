@@ -1003,11 +1003,20 @@ local function displayAddressConfigBW(config, widget, encoder, pScaler, state, e
   end
 end
 
-local function displayAddressConfigColor(config, widget, encoder, pScaler, state, event, touch, buttonState)
+local function displayAddressConfigColor(config, widget, encoder, pScaler, state, event, touch, buttonState, png)
   lcd.clear();
 
   if (config[14] == 3) or (config[14] == 4) then
     lcd.drawText(widget[1], widget[2], "Not usable with backend: " .. config[14], MIDSIZE + COLOR_THEME_WARNING);
+    return;
+  end
+
+  if (widget[3] <= (LCD_W / 2)) then
+    if (png) then
+      lcd.drawBitmap(png, widget[1], widget[2]);
+    end
+    lcd.drawText(widget[1] + 60, widget[2], "Adresse\nkonfigurieren", MIDSIZE);
+
     return;
   end
 

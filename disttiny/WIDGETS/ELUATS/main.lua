@@ -115,6 +115,8 @@ local function loadLibU()
   collectgarbage();
 end
 
+local bmpExpandSmall = nil;
+
 local name = "EL_Test";
 local options = {
   {"Test", STRING}
@@ -161,6 +163,8 @@ local function create(zone, options)
     end
   end
 
+  bmpExpandSmall = Bitmap.open("/EDGELUA" .. "/ICONS/48px/expand.png");
+
   return widget;
 end
 
@@ -176,8 +180,14 @@ end
 local function refresh(widget, event, touch)
   __libD.updateWidgetDimensions(widget, event);
   if (errorCode == 0) then
-    __libU.displayDebug(widget);
-
+    if (widget[3] <= (LCD_W / 2)) then
+      if (bmpExpandSmall) then
+        lcd.drawBitmap(bmpExpandSmall, widget[1], widget[2]);
+      end
+      lcd.drawText(widget[1] + 60, widget[2], "Sys-Infos", MIDSIZE);
+    else
+      __libU.displayDebug(widget);
+    end
   else
     lcd.drawText(widget[1], widget[2], "Error: " .. errorCode, DBLSIZE);
   end

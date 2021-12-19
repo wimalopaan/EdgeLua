@@ -364,7 +364,7 @@ local function chooseAnimationNoTheme(config, widget, anims, state, event, touch
   return nil;
 end
 
-local function chooseAnimation(config, widget, anims, state, event, touch)
+local function chooseAnimation(config, widget, anims, state, event, touch, png)
   lcd.clear();
   local rects = {};
   local bh = 1.5 * widget[9];
@@ -373,6 +373,14 @@ local function chooseAnimation(config, widget, anims, state, event, touch)
   local vs = 5;
 
                                                                        ;
+
+  if (widget[3] <= (LCD_W / 2)) then
+    if (png) then
+      lcd.drawBitmap(png, widget[1], widget[2]);
+    end
+    lcd.drawText(widget[1] + 60, widget[2], "Animationen", MIDSIZE);
+    return;
+  end
 
   if not(anims) then
     return;

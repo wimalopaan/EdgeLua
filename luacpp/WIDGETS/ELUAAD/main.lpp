@@ -79,14 +79,7 @@ local function refresh(widget, event, touch)
   if (errorCode == 0) then
     __stopWmSw2 = bit32.bor(__stopWmSw2, STOPMASK_ADRESS);
     lastRun = getTime();
-    if (widget[W_Width] <= (LCD_W / 2)) then
-      if (bmpExpandSmall) then
-        lcd.drawBitmap(bmpExpandSmall, widget[W_X], widget[W_Y]);        
-      end
-      lcd.drawText(widget[W_X] + 60, widget[W_Y], "Adresse\nkonfigurieren", MIDSIZE);
-    else
-      __libD.displayAddressConfig(__WmSw2Config, widget, paramEncoder, paramScaler, menuState, event, touch, buttonState);      
-    end
+    __libD.displayAddressConfig(__WmSw2Config, widget, paramEncoder, paramScaler, menuState, event, touch, buttonState, bmpExpandSmall);      
     background();
   else
     lcd.drawText(widget[W_X], widget[W_Y], "Error: " .. errorCode, DBLSIZE);

@@ -1032,13 +1032,23 @@ local function displayAddressConfigBW(config, widget, encoder, pScaler, state, e
 end
 
 #ifdef INCLUDE_COLOR_FUNCTIONS
-local function displayAddressConfigColor(config, widget, encoder, pScaler, state, event, touch, buttonState)
+local function displayAddressConfigColor(config, widget, encoder, pScaler, state, event, touch, buttonState, png)
   lcd.clear();
 
   if (config[CFG_Backend] == CFG_BEND_TipTip) or (config[CFG_Backend] == CFG_BEND_SolExpert) then
     lcd.drawText(widget[W_X], widget[W_Y], "Not usable with backend: " .. config[CFG_Backend], MIDSIZE + COLOR_THEME_WARNING);
     return;
   end
+
+  if (widget[W_Width] <= (LCD_W / 2)) then
+    if (png) then
+      lcd.drawBitmap(png, widget[W_X], widget[W_Y]);        
+    end
+    lcd.drawText(widget[W_X] + 60, widget[W_Y], "Adresse\nkonfigurieren", MIDSIZE);
+
+    return;
+  end
+
 
   processTrimsSelect(config, buttonState, function()
     TRACE("selectCB");

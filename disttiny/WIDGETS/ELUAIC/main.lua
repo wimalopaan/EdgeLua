@@ -125,6 +125,8 @@ local bmpPauseSmall = nil;
 local bmpPreviousSmall = nil;
 local bmpNextSmall = nil;
 
+local bmpExpandSmall = nil;
+
 local bmpUpLarge = nil;
 local bmpDownLarge = nil;
 local bmpLeftLarge = nil;
@@ -173,6 +175,7 @@ local function create(zone, options)
   bmpPreviousSmall = Bitmap.open("/EDGELUA" .. "/ICONS/48px/previous.png");
   bmpNextSmall = Bitmap.open("/EDGELUA" .. "/ICONS/48px/next.png");
   bmpPauseSmall = Bitmap.open("/EDGELUA" .. "/ICONS/48px/round.png");
+  bmpExpandSmall = Bitmap.open("/EDGELUA" .. "/ICONS/48px/expand.png");
 
   bmpUpLarge = Bitmap.open("/EDGELUA" .. "/ICONS/72px/up.png");
   bmpDownLarge = Bitmap.open("/EDGELUA" .. "/ICONS/72px/down.png");
@@ -267,7 +270,10 @@ local function refresh(widget, event, touch)
   if (errorCode == 0) then
     if (widget[3] <= (LCD_W / 2)) then
 
-      lcd.drawText(widget[1], widget[2], widget[11].Name, MIDSIZE);
+      if (bmpExpandSmall) then
+        lcd.drawBitmap(bmpExpandSmall, widget[1], widget[2]);
+      end
+      lcd.drawText(widget[1] + 60, widget[2], widget[11].Name, MIDSIZE);
     else
       updateFields(widget, event);
       if (event) then
