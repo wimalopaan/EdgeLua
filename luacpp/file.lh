@@ -1,0 +1,42 @@
+#pragma once
+
+local function loadFile(baseDir)
+    local content = nil;
+    local filename = nil;
+    if (#model.getInfo().name > 0) then
+    filename = model.getInfo().name .. ".lua";
+    TRACE("loadFile", baseDir .. filename);
+    content = loadScript(baseDir .. filename);      
+    end
+    if not content then
+    if (LCD_W <= 128) then
+        filename = "tiny.lua";
+        TRACE("loadFile", baseDir .. filename);
+        content = loadScript(baseDir .. filename);
+    elseif (LCD_W <= 212) then
+        filename = "medium.lua";
+        TRACE("loadFile", baseDir .. filename);
+        content = loadScript(baseDir .. filename);
+    else
+        filename = "large.lua";
+        TRACE("loadFile", baseDir .. filename);
+        content = loadScript(baseDir .. filename);
+    end
+    end
+    if not content then
+    filename = "default.lua";
+    TRACE("loadFile", baseDir .. filename);
+    content = loadScript(baseDir .. filename);    
+    end
+    return content, filename;
+end
+  
+local function loadConfig()
+    local baseDir = BASE_DIR .. "/RADIO/";
+    local cfg = loadFile(baseDir);
+    TRACE("loadConfig", cfg);
+    if (cfg) then
+        return cfg();
+    end
+    return nil;
+end

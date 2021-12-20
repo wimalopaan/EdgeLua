@@ -7,17 +7,17 @@
 -- or send a letter to Creative Commons, PO Box 1866, Mountain View, CA 94042, USA.
 
 local function loadLib(filename)
-                               ;
-    local basedir = "/EDGELUA" .. "/LIB/";
-    local chunk = loadScript(basedir .. filename);
-    local lib = nil;
-    if (chunk) then
-                                       ;
-      lib = chunk();
-    end
-    collectgarbage();
-    return lib;
+                             ;
+  local basedir = "/EDGELUA" .. "/LIB/";
+  local chunk = loadScript(basedir .. filename);
+  local lib = nil;
+  if (chunk) then
+                                     ;
+    lib = chunk();
   end
+  collectgarbage();
+  return lib;
+end
 
 local errorCode = 0;
 

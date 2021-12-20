@@ -1,0 +1,68 @@
+--
+-- EdgeLUA - EdgeTx / OpenTx Extensions 
+-- Copyright (C) 2021 Wilhelm Meier <wilhelm.wm.meier@googlemail.com>
+--
+-- This work is licensed under the Creative Commons Attribution-NonCommercial-NoDerivatives 4.0 International License. 
+-- To view a copy of this license, visit http://creativecommons.org/licenses/by-nc-nd/4.0/ 
+-- or send a letter to Creative Commons, PO Box 1866, Mountain View, CA 94042, USA.
+
+-- IMPORTANT
+-- Please note that the above license also covers the transfer protocol used and the encoding scheme and 
+-- all further principals of tranferring state and other information.
+
+#include "../../widget.h"
+
+local name = "EL_But";
+local options = {};
+local menuState = {};
+local buttonState = {0, 0, 0, 0, 0, 0};
+
+local bmpExpandSmall = nil;
+
+local lastRun = 0;
+
+local function create(zone, options)
+  load();
+  loadLibU();
+
+  if (errorCode > 0) then
+    return {};
+  end
+
+  local widget = __libI.initWidget(zone, options);
+  collectgarbage();
+
+  bmpExpandSmall = Bitmap.open(BASE_DIR .. "/ICONS/48px/expand.png");
+
+  __libI = nil;
+  collectgarbage();
+
+  return widget;
+end
+
+local function update(widget, options)
+  widget[W_Options] = options;
+end
+
+local function background(widget)
+  if (errorCode == 0) then
+  end
+end
+
+local function refresh(widget, event, touch)
+  __libD.updateWidgetDimensions(widget, event);
+  if (errorCode == 0) then
+  else
+    lcd.drawText(widget[W_X], widget[W_Y], "Error: " .. errorCode, DBLSIZE);
+  end
+end
+
+return { 
+  name=name,
+  options=options,
+  create=create,
+  update=update,
+  refresh=refresh,
+  background=background
+};
+

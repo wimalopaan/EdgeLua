@@ -3,24 +3,29 @@ local function loadFile(baseDir)
     local content = nil;
     local filename = nil;
     if (#model.getInfo().name > 0) then
-      filename = model.getInfo().name .. ".lua";
-                                            ;
-      content = loadScript(baseDir .. filename);
+    filename = model.getInfo().name .. ".lua";
+                                          ;
+    content = loadScript(baseDir .. filename);
     end
     if not content then
-      if (LCD_W <= 128) then
+    if (LCD_W <= 128) then
         filename = "tiny.lua";
                                               ;
         content = loadScript(baseDir .. filename);
-      elseif (LCD_W <= 212) then
+    elseif (LCD_W <= 212) then
         filename = "medium.lua";
                                               ;
         content = loadScript(baseDir .. filename);
-      else
+    else
         filename = "large.lua";
                                               ;
         content = loadScript(baseDir .. filename);
-      end
+    end
+    end
+    if not content then
+    filename = "default.lua";
+                                          ;
+    content = loadScript(baseDir .. filename);
     end
     return content, filename;
 end
@@ -30,10 +35,51 @@ local function loadConfig()
     local cfg = loadFile(baseDir);
                             ;
     if (cfg) then
-      return cfg();
+        return cfg();
     end
     return nil;
-  end
+end
+
+-- local function loadFile(baseDir)
+-- local content = nil;
+-- local filename = nil;
+-- if (#model.getInfo().name > 0) then
+-- filename = model.getInfo().name .. ".lua";
+-- ;
+-- content = loadScript(baseDir .. filename);
+-- end
+-- if not content then
+-- if (LCD_W <= 128) then
+-- filename = "tiny.lua";
+-- ;
+-- content = loadScript(baseDir .. filename);
+-- elseif (LCD_W <= 212) then
+-- filename = "medium.lua";
+-- ;
+-- content = loadScript(baseDir .. filename);
+-- else
+-- filename = "large.lua";
+-- ;
+-- content = loadScript(baseDir .. filename);
+-- end
+-- end
+-- if not content then
+-- filename = "default.lua";
+-- ;
+-- content = loadScript(baseDir .. filename);
+-- end
+-- return content, filename;
+-- end
+
+-- local function loadConfig()
+-- local baseDir = "/EDGELUA" .. "/RADIO/";
+-- local cfg = loadFile(baseDir);
+-- ;
+-- if (cfg) then
+-- return cfg();
+-- end
+-- return nil;
+-- end
 
 local function initBackendBus(config)
                          ;

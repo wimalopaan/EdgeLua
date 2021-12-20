@@ -11,17 +11,17 @@
 -- all further principals of tranferring state and other information.
 
 local function loadLib(filename)
-                               ;
-    local basedir = "/EDGELUA" .. "/LIB/";
-    local chunk = loadScript(basedir .. filename);
-    local lib = nil;
-    if (chunk) then
-                                       ;
-      lib = chunk();
-    end
-    collectgarbage();
-    return lib;
+                             ;
+  local basedir = "/EDGELUA" .. "/LIB/";
+  local chunk = loadScript(basedir .. filename);
+  local lib = nil;
+  if (chunk) then
+                                     ;
+    lib = chunk();
   end
+  collectgarbage();
+  return lib;
+end
 
 local errorCode = 0;
 

@@ -11,17 +11,17 @@
 -- all further principals of tranferring state and other information.
 
 local function loadLib(filename)
-                               ;
-    local basedir = "/EDGELUA" .. "/LIB/";
-    local chunk = loadScript(basedir .. filename);
-    local lib = nil;
-    if (chunk) then
-                                       ;
-      lib = chunk();
-    end
-    collectgarbage();
-    return lib;
+                             ;
+  local basedir = "/EDGELUA" .. "/LIB/";
+  local chunk = loadScript(basedir .. filename);
+  local lib = nil;
+  if (chunk) then
+                                     ;
+    lib = chunk();
   end
+  collectgarbage();
+  return lib;
+end
 
 local errorCode = 0;
 
@@ -30,27 +30,6 @@ __WmSw2Config = nil;
 __WmSw2ForeignInput = 0;
 __WmSw2Warning1 = nil;
 __WmSw2Warning2 = nil;
-
--- local function initGlobals()
--- if not(__stopWmSw2) then
--- ;
--- __stopWmSw2 = 0;
--- __WmSw2ForeignInput = 0;
--- end
--- end
-
--- local function loadLib(filename)
--- ;
--- local basedir = "/EDGELUA" .. "/LIB/";
--- local chunk = loadScript(basedir .. filename);
--- local lib = nil;
--- if (chunk) then
--- ;
--- lib = chunk();
--- end
--- collectgarbage();
--- return lib;
--- end
 
 local function loadLibI()
   if not __libI then
