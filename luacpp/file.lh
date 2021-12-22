@@ -1,5 +1,7 @@
 #pragma once
 
+#include "global.h"
+
 local function loadFile(baseDir)
     local content = nil;
     local filename = nil;
@@ -24,9 +26,9 @@ local function loadFile(baseDir)
     end
     end
     if not content then
-    filename = "default.lua";
-    TRACE("loadFile", baseDir .. filename);
-    content = loadScript(baseDir .. filename);    
+        filename = "default.lua";
+        TRACE("loadFile", baseDir .. filename);
+        content = loadScript(baseDir .. filename);    
     end
     return content, filename;
 end

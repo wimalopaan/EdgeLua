@@ -39,17 +39,6 @@ local function loadAnimations(config)
   return anims;
 end
 
--- local function sort(table, key)
---   for i = 1, (#table - 1) do
---     if (table[i][key] > table[i + 1][key]) then
---       local tmp = table[i];
---       table[i] = transition[i + 1];
---       table[i + 1] = tmp;
---       i = 1;
---     end
---   end
--- end
-
 local function initAnimations(anims)
   local canims = {};
   for ia, anim in ipairs(anims) do

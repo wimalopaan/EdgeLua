@@ -10,9 +10,10 @@
 -- Please note that the above license also covers the transfer protocol used and the encoding scheme and 
 -- all further principals of tranferring state and other information.
 
-#include "../../global.h"
+#include "../../../global.h"
 
 return {
+    name = "2x2",
     layout = {rows = 2, cols = 2},
     buttons = {
         {name = "Licht1", ls = 10},

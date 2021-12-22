@@ -23,9 +23,9 @@ local function loadFile(baseDir)
     end
     end
     if not content then
-    filename = "default.lua";
-                                          ;
-    content = loadScript(baseDir .. filename);
+        filename = "default.lua";
+                                              ;
+        content = loadScript(baseDir .. filename);
     end
     return content, filename;
 end

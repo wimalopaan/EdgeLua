@@ -34,9 +34,9 @@ local function loadFile(baseDir)
     end
     end
     if not content then
-    filename = "default.lua";
-                                          ;
-    content = loadScript(baseDir .. filename);
+        filename = "default.lua";
+                                              ;
+        content = loadScript(baseDir .. filename);
     end
     return content, filename;
 end
@@ -361,7 +361,7 @@ local function initConfigBW(config, modifyModel)
     cfg[9] = 2; --sbus
   end
 
-  local footer = "Vers: " .. "2.22";
+  local footer = "Vers: " .. "2.24";
   if (cfg[9] == 0) then
     footer = footer .. " Mod: xjt";
   elseif (cfg[9] == 1) then

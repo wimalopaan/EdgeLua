@@ -11,28 +11,72 @@
 -- all further principals of tranferring state and other information.
 
 #include "../../widget.h"
+#include "../../file.lh"
 
 local name = "EL_But";
 local options = {};
+local config = nil;
 local menuState = {};
 local buttonState = {0, 0, 0, 0, 0, 0};
 
 local bmpExpandSmall = nil;
+local bmpRoundSmall = nil;
 
-local lastRun = 0;
+local function insertSRFFs(config)
+  if not (config.buttons) then 
+    return 1;
+  end
+
+  for i, b in ipairs(config.buttons) do  
+    if (b.ls > 0) then
+      local lsNumber = b.ls - 1;
+      TRACE("insertSRFFs: ", b.name, b.ls);
+      local ls = model.getLogicalSwitch(lsNumber);
+      if (ls) then
+        if (ls.func == 0) then 
+          TRACE("insertSRFFs: insert", b.name);
+          model.setLogicalSwitch(lsNumber, {func = LS_FUNC_STICKY});
+          setStickySwitch(lsNumber, false);
+        elseif (ls.func == LS_FUNC_STICKY) then 
+          TRACE("insertSRFFs: found", b.name);
+          setStickySwitch(lsNumber, false);
+        else  
+          TRACE("insertSRFFs: occupied", b.name);
+          return 2;
+        end        
+      end        
+    end
+  end
+  return 0;
+end
 
 local function create(zone, options)
   load();
+  if (errorCode > 0) then
+    return {};
+  end
+
   loadLibU();
+  if (errorCode > 0) then
+    return {};
+  end
+
+  config = loadFile(BASE_DIR .. "/MODELS/LSBUT/");
+  if (config) then
+    config = config();
+  end
 
   if (errorCode > 0) then
     return {};
   end
 
+  insertSRFFs(config);
+
   local widget = __libI.initWidget(zone, options);
   collectgarbage();
 
   bmpExpandSmall = Bitmap.open(BASE_DIR .. "/ICONS/48px/expand.png");
+  bmpRoundSmall = Bitmap.open(BASE_DIR .. "/ICONS/48px/round.png");
 
   __libI = nil;
   collectgarbage();
@@ -49,9 +93,83 @@ local function background(widget)
   end
 end
 
+local function covers(touch, item) 
+  if ((touch.x >= item.xmin) and (touch.x <= item.xmax)
+    and (touch.y >= item.ymin) and (touch.y <= item.ymax)) then
+    return true;
+  end
+  return false;
+end
+
+local function displayButtons(config, widget, event, touch)
+  if not (config.layout) then 
+    return 1;
+  end
+  if not (config.buttons) then
+    return 2;
+  end
+  if ((config.layout.rows * config.layout.cols) ~= #config.buttons) then
+    return 3;
+  end
+
+  local fw = widget[W_Width] / config.layout.cols;
+  local fh = widget[W_Height] / config.layout.rows;
+  local border = 6;
+  local bw = fw - 2 * border;
+  local bh = fh - 2 * border;
+  local rects = {};
+  local idx = 1;
+  for row = 1, config.layout.rows, 1 do 
+    local y = widget[W_Y] + (row - 1) * fh + border;
+    for col = 1, config.layout.cols, 1 do 
+      local x = widget[W_X] + (col - 1) * fw + border;
+      local lsNumber = config.buttons[idx].ls - 1;
+      if (getLogicalSwitchValue(lsNumber)) then
+        lcd.drawRectangle(x, y, bw, bh, COLOR_THEME_WARNING, 3);
+      else
+        lcd.drawRectangle(x, y, bw, bh, COLOR_THEME_PRIMARY2);
+      end
+      lcd.drawText(x + border, y + border, config.buttons[idx].name, COLOR_THEME_PRIMARY1);
+
+      lcd.drawBitmap(bmpRoundSmall, x + fw / 2 - 24, y + fh / 2 - 24);
+
+      local rect = {xmin = x, xmax = x + bw, ymin = y, ymax = y + bh};
+      rects[idx] = rect;
+      idx = idx + 1;
+    end
+  end
+
+  if ((touch) and (event == EVT_TOUCH_TAP)) then
+    for i, rect in ipairs(rects) do 
+      if (covers(touch, rect)) then
+        TRACE("touch: ", config.buttons[i].name);
+        local lsNumber = config.buttons[i].ls - 1;
+        if (getLogicalSwitchValue(lsNumber)) then
+          setStickySwitch(config.buttons[i].ls - 1, false);
+        else  
+          setStickySwitch(config.buttons[i].ls - 1, true);
+        end
+      end
+    end      
+  end
+
+  return 0;
+end
+
 local function refresh(widget, event, touch)
   __libD.updateWidgetDimensions(widget, event);
-  if (errorCode == 0) then
+  if (errorCode == 0) and (config) then
+    if (widget[W_Width] <= (LCD_W / 2)) then
+      if (bmpExpandSmall) then
+        lcd.drawBitmap(bmpExpandSmall, widget[W_X], widget[W_Y]);        
+      end
+      lcd.drawText(widget[W_X] + 60, widget[W_Y], config.name, DBLSIZE);
+    else
+      local error = displayButtons(config, widget, event, touch);
+      if (error > 0) then
+        lcd.drawText(widget[W_X], widget[W_Y], "Error: " .. error, DBLSIZE);        
+      end
+    end
   else
     lcd.drawText(widget[W_X], widget[W_Y], "Error: " .. errorCode, DBLSIZE);
   end
