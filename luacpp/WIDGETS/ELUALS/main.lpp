@@ -21,6 +21,7 @@ local buttonState = {0, 0, 0, 0, 0, 0};
 
 local bmpExpandSmall = nil;
 local bmpRoundSmall = nil;
+local bmpRoundLarge = nil;
 
 local function insertSRFFs(config)
   if not (config.buttons) then 
@@ -64,6 +65,11 @@ local function create(zone, options)
   config = loadFile(BASE_DIR .. "/MODELS/LSBUT/");
   if (config) then
     config = config();
+
+    if not (config.name) then
+      config.name = "unnamed";
+    end
+
   end
 
   if (errorCode > 0) then
@@ -77,6 +83,7 @@ local function create(zone, options)
 
   bmpExpandSmall = Bitmap.open(BASE_DIR .. "/ICONS/48px/expand.png");
   bmpRoundSmall = Bitmap.open(BASE_DIR .. "/ICONS/48px/round.png");
+  bmpRoundLarge = Bitmap.open(BASE_DIR .. "/ICONS/72px/round.png");
 
   __libI = nil;
   collectgarbage();
@@ -108,7 +115,7 @@ local function displayButtons(config, widget, event, touch)
   if not (config.buttons) then
     return 2;
   end
-  if ((config.layout.rows * config.layout.cols) ~= #config.buttons) then
+  if ((config.layout.rows * config.layout.cols) > #config.buttons) then
     return 3;
   end
 
@@ -124,14 +131,24 @@ local function displayButtons(config, widget, event, touch)
     for col = 1, config.layout.cols, 1 do 
       local x = widget[W_X] + (col - 1) * fw + border;
       local lsNumber = config.buttons[idx].ls - 1;
+      lcd.drawFilledRectangle(x, y, bw, bh, COLOR_THEME_SECONDARY1);
       if (getLogicalSwitchValue(lsNumber)) then
-        lcd.drawRectangle(x, y, bw, bh, COLOR_THEME_WARNING, 3);
+        lcd.drawRectangle(x, y, bw, bh, COLOR_THEME_WARNING, border);
       else
         lcd.drawRectangle(x, y, bw, bh, COLOR_THEME_PRIMARY2);
       end
-      lcd.drawText(x + border, y + border, config.buttons[idx].name, COLOR_THEME_PRIMARY1);
 
-      lcd.drawBitmap(bmpRoundSmall, x + fw / 2 - 24, y + fh / 2 - 24);
+      if (#config.buttons <= 4) then
+        lcd.drawBitmap(bmpRoundLarge, x + fw / 2 - 36, y + fh / 2 - 36);
+        if (config.buttons[idx].name) then
+          lcd.drawText(x + 2 * border, y + 2 * border, config.buttons[idx].name, MIDSIZE + COLOR_THEME_PRIMARY1);          
+        end
+      else
+        lcd.drawBitmap(bmpRoundSmall, x + fw / 2 - 24, y + fh / 2 - 24);
+        if (config.buttons[idx].name) then
+          lcd.drawText(x + 2 * border, y + 2 * border, config.buttons[idx].name, SMLSIZE + COLOR_THEME_PRIMARY1);
+        end
+      end
 
       local rect = {xmin = x, xmax = x + bw, ymin = y, ymax = y + bh};
       rects[idx] = rect;
@@ -161,9 +178,9 @@ local function refresh(widget, event, touch)
   if (errorCode == 0) and (config) then
     if (widget[W_Width] <= (LCD_W / 2)) then
       if (bmpExpandSmall) then
-        lcd.drawBitmap(bmpExpandSmall, widget[W_X], widget[W_Y]);        
+        lcd.drawBitmap(bmpExpandSmall, widget[W_X], widget[W_Y] + widget[W_Height] / 2 - 24);        
       end
-      lcd.drawText(widget[W_X] + 60, widget[W_Y], config.name, DBLSIZE);
+      lcd.drawText(widget[W_X] + 60, widget[W_Y] + widget[W_Height] / 2 - widget[W_FontHLarge], config.name, MIDSIZE);
     else
       local error = displayButtons(config, widget, event, touch);
       if (error > 0) then
