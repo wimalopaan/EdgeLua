@@ -369,6 +369,8 @@ local function initConfigBW(config, modifyModel)
     local subproto = module.subProtocol;
     if (type == 2) then -- xjt
       cfg[CFG_Encoding] = 0; -- xjt
+    elseif (type == 3) then -- isrm
+      cfg[CFG_Encoding] = 3; -- isrm
     elseif (type == 6) then -- mpm
       if (proto == 28) then -- AFHDS2A
         cfg[CFG_Encoding] = 1; -- ibus
@@ -387,6 +389,8 @@ local function initConfigBW(config, modifyModel)
     footer = footer .. " Mod: xjt";
   elseif (cfg[CFG_Encoding] == 1) then
     footer = footer .. " Mod: ibus";
+  elseif (cfg[CFG_Encoding] == 3) then
+    footer = footer .. " Mod: isrm";
   else
     footer = footer .. " Mod: sbus";
   end
@@ -569,22 +573,6 @@ local function initConfigColor(config, modifyModel)
     end
   end
 
-  --[[ to initConfigBW
-  local footer = "Vers: " .. VERSION;
-  if (cfg[CFG_Encoding] == 0) then
-    footer = footer .. " Mod: xjt";
-  elseif (cfg[CFG_Encoding] == 1) then
-    footer = footer .. " Mod: ibus";
-  else
-    footer = footer .. " Mod: sbus";
-  end
-  cfg[CFG_Footer] = footer;
-
-  if (config.title) then
-    footer = footer .. " Conf: " .. config.title;
-  end
-  --]]
-
   if (modifyModel) and (config.removeTrimsFromFlightModes) then
     TRACE("initConfigColor remove filghtmodes");
     for mi, modeline in ipairs(config.removeTrimsFromFlightModes) do
@@ -702,7 +690,7 @@ local function initParamMenu(cfg, menu, map, modInfos, mode)
 
   for _, imodule in ipairs(getModules(map)) do
     local items = miTable[imodule];
-    if (#items > 0) then
+    if (items) and (#items > 0) then
       local modInfo = findModuleInfo(imodule, map, modInfos); -- full module info table 
       if (modInfo) then
         local header = {nil, nil, nil}; -- header[1] = title, header[2] =  moduleNumber

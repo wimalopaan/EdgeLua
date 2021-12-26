@@ -584,7 +584,7 @@ local function getEncoder(cfg)
   if not(cfg[CFG_Backend]) or (cfg[CFG_Backend] <= 1) then 
     #ifdef USE_BACKEND_BUS
     local type = cfg[CFG_Encoding];
-    if (type == 0) then
+    if (type == 0) or (type == 3) then
       return encodeXJT, parameterValueSbus, encodeParamXJT;
     elseif (type == 1) then
       return encodeIBus, parameterValueIbus, encodeParamIBus;

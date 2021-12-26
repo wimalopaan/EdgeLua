@@ -580,7 +580,7 @@ local function getEncoder(cfg)
   if not(cfg[14]) or (cfg[14] <= 1) then
 
     local type = cfg[9];
-    if (type == 0) then
+    if (type == 0) or (type == 3) then
       return encodeXJT, parameterValueSbus, encodeParamXJT;
     elseif (type == 1) then
       return encodeIBus, parameterValueIbus, encodeParamIBus;
