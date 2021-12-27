@@ -163,6 +163,10 @@ local function displayMenuBW(config, widget, menu, overlays, state, pagetitles)
       label = label .. "#";
     end
 
+    if (item[9]) then
+      label = label .. "~";
+    end
+
     for io, o in ipairs(overlay) do
       if (o[2] == item) then
         label = label .. "*";

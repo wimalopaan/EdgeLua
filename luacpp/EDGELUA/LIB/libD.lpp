@@ -361,6 +361,10 @@ local function displayMenuBW(config, widget, menu, overlays, state, pagetitles)
       label = label .. "#";
     end
 
+    if (item[ITEM_AutoReset]) then
+      label = label .. "~";      
+    end
+
     for io, o in ipairs(overlay) do
       if (o[OVERLAY_Item] == item) then
         label = label .. "*";
@@ -448,6 +452,10 @@ local function displayMenuColor(config, widget, menu, overlays, state, event, re
       label = label .. "#";
     end
 
+    if (item[ITEM_AutoReset]) then
+      label = label .. "~";      
+    end
+
     for io, o in ipairs(overlay) do
       if (o[OVERLAY_Item] == item) then
         label = label .. "*";
@@ -527,6 +535,10 @@ local function displayMenuColorNoTheme(config, widget, menu, overlays, state, ev
     local label = item[ITEM_Name];
     if (item[ITEM_Virtual]) then
       label = label .. "#";
+    end
+
+    if (item[ITEM_AutoReset]) then
+      label = label .. "~";      
     end
 
     for io, o in ipairs(overlay) do

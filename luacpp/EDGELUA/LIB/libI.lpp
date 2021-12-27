@@ -469,7 +469,7 @@ local function initConfigBW(config, modifyModel)
           cfg[CFG_SafeMode_Timeout] = config.safeMode.timeOut * 100;
           cfg[CFG_SafeMode_LinkDropoutMax] = config.safeMode.linkDropoutMax * 100;
           cfg[CFG_SafeMode_LsNumber] = fmLsNumber;
-          TRACE("safeMode fmLsNumber", cfg[CFG_SafeMode_LsNumber]);
+          TRACE("safeMode fmLsNumber", cfg[CFG_SafeMode_LsNumber], CFG_SafeMode_LsNumber);
         end 
       end 
     end 

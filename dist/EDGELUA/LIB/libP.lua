@@ -327,14 +327,16 @@ end
 local function exportBus(bcfg, item)
                                       ;
   local exportValues = bcfg[3];
-  if (item[6]) and (item[6] <= #exportValues) then
-                                              ;
-    local stateValues = exportValues[item[6]];
-    if (item[3] <= #stateValues) then
-      local expValue = stateValues[ item[3] ] * 10.24;
-      if (bcfg[4]) then
-                                                                                  ;
-        model.setGlobalVariable(bcfg[4], 0, expValue);
+  if (exportValues) then
+    if (item[6]) and (item[6] <= #exportValues) then
+                                                ;
+      local stateValues = exportValues[item[6]];
+      if (item[3] <= #stateValues) then
+        local expValue = stateValues[ item[3] ] * 10.24;
+        if (bcfg[4]) then
+                                                                                    ;
+          model.setGlobalVariable(bcfg[4], 0, expValue);
+        end
       end
     end
   end
@@ -351,9 +353,11 @@ local function sbusSwitchFSM(config, menu, queue, state, encoder, exportValues, 
                                                                                                                          ;
         if (item[9]) and (item[10] == 0) and (item[3] > 1) then
           item[10] = t + item[9];
-          autoResets[#autoResets + 1] = item;
-          sortDown(autoResets, 10);
-                                                       ;
+          if (autoResets) then
+            autoResets[#autoResets + 1] = item;
+            sortDown(autoResets, 10);
+                                                         ;
+          end
         end
 
     else

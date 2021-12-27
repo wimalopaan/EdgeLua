@@ -355,6 +355,10 @@ local function displayMenuBW(config, widget, menu, overlays, state, pagetitles)
       label = label .. "#";
     end
 
+    if (item[9]) then
+      label = label .. "~";
+    end
+
     for io, o in ipairs(overlay) do
       if (o[2] == item) then
         label = label .. "*";
@@ -441,6 +445,10 @@ local function displayMenuColor(config, widget, menu, overlays, state, event, re
       label = label .. "#";
     end
 
+    if (item[9]) then
+      label = label .. "~";
+    end
+
     for io, o in ipairs(overlay) do
       if (o[2] == item) then
         label = label .. "*";
@@ -518,6 +526,10 @@ local function displayMenuColorNoTheme(config, widget, menu, overlays, state, ev
     local label = item[1];
     if (item[7]) then
       label = label .. "#";
+    end
+
+    if (item[9]) then
+      label = label .. "~";
     end
 
     for io, o in ipairs(overlay) do
