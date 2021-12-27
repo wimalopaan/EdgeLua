@@ -331,11 +331,13 @@ local function exportBus(bcfg, item)
     if (item[6]) and (item[6] <= #exportValues) then
                                                 ;
       local stateValues = exportValues[item[6]];
-      if (item[3] <= #stateValues) then
-        local expValue = stateValues[ item[3] ] * 10.24;
-        if (bcfg[4]) then
-                                                                                    ;
-          model.setGlobalVariable(bcfg[4], 0, expValue);
+      if (stateValues) then
+        if (item[3] <= #stateValues) then
+          local expValue = stateValues[ item[3] ] * 10.24;
+          if (bcfg[4]) then
+                                                                                      ;
+            model.setGlobalVariable(bcfg[4], 0, expValue);
+          end
         end
       end
     end

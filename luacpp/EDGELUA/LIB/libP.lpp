@@ -316,12 +316,14 @@ local function exportBus(bcfg, item)
     if (item[ITEM_Export]) and (item[ITEM_Export] <= #exportValues) then
       TRACE("exportBus Exp:", item[ITEM_Export]);
       local stateValues = exportValues[item[ITEM_Export]];
-      if (item[ITEM_State] <= #stateValues) then
-        local expValue = stateValues[ item[ITEM_State] ] * 10.24;
-        if (bcfg[BEND_BUS_ExportMixerGlobalVariable]) then
-          TRACE("exportBus gv:", bcfg[BEND_BUS_ExportMixerGlobalVariable], expValue);
-          model.setGlobalVariable(bcfg[BEND_BUS_ExportMixerGlobalVariable], 0, expValue);
-        end
+      if (stateValues) then
+        if (item[ITEM_State] <= #stateValues) then
+          local expValue = stateValues[ item[ITEM_State] ] * 10.24;
+          if (bcfg[BEND_BUS_ExportMixerGlobalVariable]) then
+            TRACE("exportBus gv:", bcfg[BEND_BUS_ExportMixerGlobalVariable], expValue);
+            model.setGlobalVariable(bcfg[BEND_BUS_ExportMixerGlobalVariable], 0, expValue);
+          end
+        end          
       end
     end      
   end
