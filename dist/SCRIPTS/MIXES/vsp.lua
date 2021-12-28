@@ -1,22 +1,59 @@
---
--- WM OTXE - OpenTX Extensions
--- Copyright (C) 2020, 2021 Wilhelm Meier <wilhelm.wm.meier@googlemail.com>
+---
+-- EdgeLUA - EdgeTx / OpenTx Extensions
+-- Copyright (C) 2021 Wilhelm Meier <wilhelm.wm.meier@googlemail.com>
 --
 -- This work is licensed under the Creative Commons Attribution-NonCommercial-NoDerivatives 4.0 International License.
 -- To view a copy of this license, visit http:
 -- or send a letter to Creative Commons, PO Box 1866, Mountain View, CA 94042, USA.
+
+-- IMPORTANT
+-- Please note that the above license also covers the transfer protocol used and the encoding scheme and
+-- all further principals of tranferring state and other information.
+
+local function loadLib(filename)
+                             ;
+  local basedir = "/EDGELUA" .. "/LIB/";
+  local chunk = loadScript(basedir .. filename);
+  local lib = nil;
+  if (chunk) then
+                                     ;
+    lib = chunk();
+  end
+  collectgarbage();
+  return lib;
+end
+
+local errorCode = 0;
+
+-- __WmMixerConfig = nil;
+
+local function loadLibM()
+  if not __libM then
+    __libM = loadLib("libM.lua");
+    if not __libM then
+      errorCode = 1;
+    end
+  end
+end
+
+local function clamp(value)
+  return math.max(math.min(value, 1024), -1024);
+end
 
 local input = {
    {"Eing 1", SOURCE},
    {"Eing 2", SOURCE},
    {"Gew 1->2", VALUE, -100, 100, 0},
    {"Gew 2->1", VALUE, -100, 100, 0},
-   {"VSP", VALUE, 1, 2, 1}
+-- {"VSP", VALUE, 1, 2, 1}
 };
 
-local output = { "VspSrv1", "VspSrv2" };
+local output = {
+ "VspS1",
+ "VspS2"
+};
 
-local function run(a, b, wa, wb, vsp)
+local function run(a, b, wa, wb)
    local ab = math.abs(a);
    local bb = math.abs(b);
    local as = a + ((bb * wb) / 100);
@@ -86,8 +123,11 @@ local function run(a, b, wa, wb, vsp)
    local Vsp1 = (as * 1024) / rmax;
    local Vsp2 = (bs * 1024) / rmax;
 
-   return Csp1, Vsp2;
-
+   return Vsp1, Vsp2;
 end
 
-return {input=input, run=run, output=output}
+return {
+ input = input,
+ run = run,
+ output = output
+};

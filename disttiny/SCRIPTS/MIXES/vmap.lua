@@ -25,7 +25,7 @@ end
 
 local errorCode = 0;
 
-__WmMixerConfig = nil;
+-- __WmMixerConfig = nil;
 
 local function loadLibM()
   if not __libM then

@@ -21,7 +21,7 @@ end
 
 local errorCode = 0;
 
-__WmMixerConfig = nil;
+-- __WmMixerConfig = nil;
 
 local function loadLibM()
   if not __libM then
@@ -49,12 +49,12 @@ local output = {
 
 local value = 0;
 
-local function run(input, reset, scale, deadband)
-   if (reset > 0) then
+local function run(inp, reset, scale, deadband)
+   if (reset) and (reset > 0) then
       value = 0;
    else
-      if (math.abs(input) >= (deadband * 10.24)) then
-         local i = (input * scale) / 10240;
+      if (inp) and (math.abs(inp) >= (deadband * 10.24)) then
+         local i = (inp * scale) / 10240;
          value = clamp(value + i);
       end
    end

@@ -25,11 +25,11 @@ end
 
 local errorCode = 0;
 
-__stopWmSw2 = 0;
-__WmSw2Config = nil;
-__WmSw2ForeignInput = 0;
-__WmSw2Warning1 = nil;
-__WmSw2Warning2 = nil;
+-- __stopWmSw2 = 0;
+-- __WmSw2Config = nil;
+-- __WmSw2ForeignInput = 0;
+-- __WmSw2Warning1 = nil;
+-- __WmSw2Warning2 = nil;
 
 local function loadLibI()
   if not __libI then
