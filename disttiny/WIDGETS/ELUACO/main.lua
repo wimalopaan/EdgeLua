@@ -181,6 +181,9 @@ end
 local function background(widget)
   if (errorCode == 0) then
     if ((getTime() - lastRun) > 100) then
+      if not(__stopWmSw2) then
+        __stopWmSw2 = 0;
+      end
       __stopWmSw2 = bit32.band(__stopWmSw2, bit32.bnot(1));
     end
   end
