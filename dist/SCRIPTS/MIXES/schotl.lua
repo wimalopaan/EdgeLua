@@ -50,8 +50,8 @@ local output = {
  "Dir 1",
  "Pow 2",
  "Dir 2",
- -- "State1",
- -- "State2"
+ "State1",
+ "State2"
 };
 
 local lastDirs = {
@@ -104,7 +104,6 @@ local function run(a1, b1, a2, b2, deadband, to)
          state2 = 0;
       end
       return (SchottelPow1 / max1), SchottelDir1, (SchottelPow2 / max2), SchottelDir2, state1, state2;
--- return (SchottelPow1 / max1), SchottelDir1, (SchottelPow2 / max2), SchottelDir2;
    else
       return 0, 0, 0, 0, 0, 0;
    end
