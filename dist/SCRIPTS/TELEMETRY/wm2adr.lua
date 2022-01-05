@@ -134,6 +134,9 @@ end
 local function run_telemetry(event)
     lcd.clear();
     if (errorCode == 0) then
+      if not(__stopWmSw2) then
+        __stopWmSw2 = 0;
+      end
         __stopWmSw2 = bit32.bor(__stopWmSw2, 2);
         lastRun = getTime();
         lcd.drawScreenTitle("Learn address", 1, 1);

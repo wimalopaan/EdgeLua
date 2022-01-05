@@ -110,6 +110,9 @@ local lastRun = 0;
 local function run_telemetry(event)
   if (errorCode == 0) then
     lcd.clear();
+    if not(__stopWmSw2) then
+      __stopWmSw2 = 0;
+    end
     __stopWmSw2 = bit32.bor(__stopWmSw2, 1);
     lastRun = getTime();
     __libD.processEvents(__WmSw2Config, menu, menuState, event, queue, __libD.selectParamItem);

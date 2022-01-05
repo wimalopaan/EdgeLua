@@ -52,10 +52,13 @@ end
 local function run_telemetry(event) 
     lcd.clear();
     if (errorCode == 0) then
-        __stopWmSw2 = bit32.bor(__stopWmSw2, STOPMASK_ADRESS);
-        lastRun = getTime();
-        lcd.drawScreenTitle("Learn address", 1, 1);
-        __libD.displayAddressConfig(__WmSw2Config, widget, paramEncoder, paramScaler, menuState, event, touch);
+      if not(__stopWmSw2) then
+        __stopWmSw2 = 0;
+      end
+      __stopWmSw2 = bit32.bor(__stopWmSw2, STOPMASK_ADRESS);
+      lastRun = getTime();
+      lcd.drawScreenTitle("Learn address", 1, 1);
+      __libD.displayAddressConfig(__WmSw2Config, widget, paramEncoder, paramScaler, menuState, event, touch);
     else
       lcd.drawText(0, 0, "Error: " .. errorCode, DBLSIZE);
     end
@@ -63,6 +66,9 @@ local function run_telemetry(event)
 
 local function background_telemetry()
     if (errorCode == 0) then
+      if not(__stopWmSw2) then
+        __stopWmSw2 = 0;
+      end
       if ((getTime() - lastRun) > 100) then
         __stopWmSw2 = bit32.band(__stopWmSw2, bit32.bnot(STOPMASK_ADRESS));
         menuState[1] = 0; -- deselected state
