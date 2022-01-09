@@ -206,6 +206,9 @@ end
 local function background_telemetry()
   if (errorCode == 0) then
                                                                    ;
+    if not(__stopWmSw2) then
+      __stopWmSw2 = 0;
+    end
     if ((getTime() - lastRun) > 100) then
       __stopWmSw2 = bit32.band(__stopWmSw2, bit32.bnot(1));
     end
