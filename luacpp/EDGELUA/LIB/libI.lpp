@@ -845,6 +845,7 @@ local function initMenuBW(menu)
         -- all switches can get lsmode
         if (item.lsmode) and (item.lsmode >= 1) and (item.lsmode <= 2) then
             lsmode = item.lsmode;
+            TRACE("**** lsmode: ", item.switch, lsmode);
         end
       end
       -- todo: remove nil

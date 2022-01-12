@@ -16,8 +16,9 @@
 local name = "EL_But";
 local options = {};
 local config = nil;
-local menuState = {};
-local buttonState = {0, 0, 0, 0, 0, 0};
+
+local initFailed = -1;
+local lastTime = 0;
 
 local bmpExpandSmall = nil;
 local bmpRoundSmall = nil;
@@ -40,7 +41,11 @@ local function insertSRFFs(config)
           setStickySwitch(lsNumber, false);
         elseif (ls.func == LS_FUNC_STICKY) then 
           TRACE("insertSRFFs: found", b.name);
-          setStickySwitch(lsNumber, false);
+          if (setStickySwitch(lsNumber, false)) then
+            if (initFailed < 0) then
+              initFailed = i;
+            end
+          end
         else  
           TRACE("insertSRFFs: occupied", b.name);
           return 2;
@@ -97,6 +102,24 @@ end
 
 local function background(widget)
   if (errorCode == 0) then
+    TRACE3("backgound");
+    if (initFailed >= 0) then
+      local t = getTime();
+      if ((t - lastTime) > 20) then
+        lastTime = t;
+        for i, b in ipairs(config.buttons) do  
+          if ((i >= initFailed) and (b.ls > 0)) then
+            local lsNumber = b.ls - 1;
+            TRACE3("inial reset: ", lsNumber);
+            if (setStickySwitch(lsNumber, false)) then
+              initFailed = i;
+              return;
+            end
+          end
+        end
+        initFailed = -1;
+        end
+    end
   end
 end
 
@@ -174,6 +197,7 @@ local function displayButtons(config, widget, event, touch)
 end
 
 local function refresh(widget, event, touch)
+  background(widget);
   __libD.updateWidgetDimensions(widget, event);
   if (errorCode == 0) and (config) then
     if (widget[W_Width] <= (LCD_W / 2)) then

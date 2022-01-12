@@ -486,7 +486,7 @@ local function initConfigBW(config, modifyModel)
     cfg[9] = 2; --sbus
   end
 
-  local footer = "Vers: " .. "2.31";
+  local footer = "Vers: " .. "2.32";
   if (cfg[9] == 0) then
     footer = footer .. " Mod: xjt";
   elseif (cfg[9] == 1) then
@@ -925,6 +925,7 @@ local function initMenuBW(menu)
         -- all switches can get lsmode
         if (item.lsmode) and (item.lsmode >= 1) and (item.lsmode <= 2) then
             lsmode = item.lsmode;
+                                                       ;
         end
       end
       -- todo: remove nil
