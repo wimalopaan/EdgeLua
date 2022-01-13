@@ -81,7 +81,10 @@ local function create(zone, options)
     return {};
   end
 
-  insertSRFFs(config);
+  local r = insertSRFFs(config);
+  if (r > 0) then
+    errorCode = 10 + r;
+  end
 
   local widget = __libI.initWidget(zone, options);
   collectgarbage();
@@ -89,6 +92,28 @@ local function create(zone, options)
   bmpExpandSmall = Bitmap.open(BASE_DIR .. "/ICONS/48px/expand.png");
   bmpRoundSmall = Bitmap.open(BASE_DIR .. "/ICONS/48px/round.png");
   bmpRoundLarge = Bitmap.open(BASE_DIR .. "/ICONS/72px/round.png");
+
+  if (bmpExpandSmall) then
+    local w, h = Bitmap.getSize(bmpExpandSmall);
+    if (w == 0) then
+      TRACE("missing image 0");
+      errorCode = 20;        
+    end
+  end
+  if (bmpRoundLarge) then
+    local w, h = Bitmap.getSize(bmpRoundLarge);
+    if (w == 0) then
+      TRACE("missing image 1");
+      errorCode = 21;        
+    end
+  end
+  if (bmpRoundSmall) then
+    local w, h = Bitmap.getSize(bmpRoundSmall);
+    if (w == 0) then
+      TRACE("missing image 2");
+      errorCode = 22;
+    end
+  end
 
   __libI = nil;
   collectgarbage();

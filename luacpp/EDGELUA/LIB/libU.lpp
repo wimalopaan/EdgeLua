@@ -268,7 +268,7 @@ local function displayDebugBW(widget)
 
   y = y + widget[W_FontHSmall]; 
   lcd.drawText(x3, y, debugText[DEBUG_TEXT_FuncNames], SMLSIZE);
-  #ifdef USE_NEW_STRING_OPTION
+  #ifdef USE_FUNCTION_NAMES
   if (LS_FUNC_VEQUAL) then 
       lcd.drawText(x4, y, "y", SMLSIZE);
   else
