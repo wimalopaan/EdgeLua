@@ -146,14 +146,14 @@ local name = "EL_But";
 local options = {
   { "Name", STRING},
 };
-local config = nil;
 
+local config = nil;
 local initFailed = -1;
 local lastTime = 0;
 
-local bmpExpandSmall = nil;
-local bmpRoundSmall = nil;
-local bmpRoundLarge = nil;
+local iconWidget = nil;
+local iconDefaultSmall = nil;
+local iconDefaultLarge = nil;
 
 local function insertSRFFs(config)
   if not (config.buttons) then
@@ -185,6 +185,28 @@ local function insertSRFFs(config)
     end
   end
   return 0;
+end
+
+local iconTable = {}; -- hash table for icon bitmaps, only hash based access
+
+local function loadIcon(filename)
+  if (iconTable[filename]) then
+                                      ;
+    return iconTable[filename], true;
+  end
+  local icon = Bitmap.open(filename);
+  local ok = true;
+  if (icon) then
+    local w, h = Bitmap.getSize(icon);
+    if (w == 0) then
+                                        ;
+      ok = false;
+    else
+                                       ;
+      iconTable[filename] = icon;
+    end
+  end
+  return icon, ok;
 end
 
 local function create(zone, options)
@@ -225,31 +247,9 @@ local function create(zone, options)
   local widget = __libI.initWidget(zone, options);
   collectgarbage();
 
-  bmpExpandSmall = Bitmap.open("/EDGELUA" .. "/ICONS/48px/expand.png");
-  bmpRoundSmall = Bitmap.open("/EDGELUA" .. "/ICONS/48px/round.png");
-  bmpRoundLarge = Bitmap.open("/EDGELUA" .. "/ICONS/72px/round.png");
-
-  if (bmpExpandSmall) then
-    local w, h = Bitmap.getSize(bmpExpandSmall);
-    if (w == 0) then
-                              ;
-      errorCode = 20;
-    end
-  end
-  if (bmpRoundLarge) then
-    local w, h = Bitmap.getSize(bmpRoundLarge);
-    if (w == 0) then
-                              ;
-      errorCode = 21;
-    end
-  end
-  if (bmpRoundSmall) then
-    local w, h = Bitmap.getSize(bmpRoundSmall);
-    if (w == 0) then
-                              ;
-      errorCode = 22;
-    end
-  end
+  iconWidget = loadIcon("/EDGELUA" .. "/ICONS/48px/" .. "expand.png");
+  iconDefaultSmall = loadIcon("/EDGELUA" .. "/ICONS/48px/" .. "round.png");
+  iconDefaultLarge = loadIcon("/EDGELUA" .. "/ICONS/72px/" .. "round.png");
 
   __libI = nil;
   collectgarbage();
@@ -323,12 +323,34 @@ local function displayButtons(config, widget, event, touch)
       end
 
       if (#config.buttons <= 4) then
-        lcd.drawBitmap(bmpRoundLarge, x + fw / 2 - 36, y + fh / 2 - 36);
+        if (config.buttons[idx].iconData) then
+          lcd.drawBitmap(config.buttons[idx].iconData, x + fw / 2 - 36, y + fh / 2 - 36);
+        else
+          if (config.buttons[idx].icon) then
+            local icon, ok = loadIcon("/EDGELUA" .. "/ICONS/72px/" .. config.buttons[idx].icon);
+            if (ok) then
+              config.buttons[idx].iconData = icon;
+            end
+          else
+            lcd.drawBitmap(iconDefaultLarge, x + fw / 2 - 36, y + fh / 2 - 36);
+          end
+        end
         if (config.buttons[idx].name) then
           lcd.drawText(x + 2 * border, y + 2 * border, config.buttons[idx].name, MIDSIZE + COLOR_THEME_PRIMARY1);
         end
       else
-        lcd.drawBitmap(bmpRoundSmall, x + fw / 2 - 24, y + fh / 2 - 24);
+        if (config.buttons[idx].iconData) then
+          lcd.drawBitmap(config.buttons[idx].iconData, x + fw / 2 - 24, y + fh / 2 - 24);
+        else
+          if (config.buttons[idx].icon) then
+            local icon, ok = loadIcon("/EDGELUA" .. "/ICONS/48px/" .. config.buttons[idx].icon);
+            if (ok) then
+              config.buttons[idx].iconData = icon;
+            end
+          else
+            lcd.drawBitmap(iconDefaultSmall, x + fw / 2 - 24, y + fh / 2 - 24);
+          end
+        end
         if (config.buttons[idx].name) then
           lcd.drawText(x + 2 * border, y + 2 * border, config.buttons[idx].name, SMLSIZE + COLOR_THEME_PRIMARY1);
         end
@@ -362,8 +384,8 @@ local function refresh(widget, event, touch)
   __libD.updateWidgetDimensions(widget, event);
   if (errorCode == 0) and (config) then
     if (widget[3] <= (LCD_W / 2)) then
-      if (bmpExpandSmall) then
-        lcd.drawBitmap(bmpExpandSmall, widget[1], widget[2] + widget[4] / 2 - 24);
+      if (iconWidget) then
+        lcd.drawBitmap(iconWidget, widget[1], widget[2] + widget[4] / 2 - 24);
       end
       lcd.drawText(widget[1] + 60, widget[2] + widget[4] / 2 - widget[9], config.name, MIDSIZE);
     else

@@ -12,13 +12,14 @@
 
 return {
     name = "Beleuchtung",
+    icon = "expand.png",
     layout = {rows = 2, cols = 2},
     buttons = {
-        {name = "Licht1", ls = 10},
+        {name = "Licht1", ls = 10, icon = "next.png"},
         {name = "Licht2", ls = 11},
-        {name = "Licht3", ls = 12},
+        {name = "Licht3", ls = 12, icon = "previous.png"},
         {name = "Licht4", ls = 13},
         {name = "Licht5", ls = 14},
-        {name = "Licht6", ls = 15},
+        {name = "Licht6", ls = 15, icon = "pause.png"},
     }
 };

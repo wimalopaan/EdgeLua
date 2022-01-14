@@ -13,18 +13,21 @@
 #include "../../widget.h"
 #include "../../file.lh"
 
+#define PATH_SMALL "/ICONS/48px/"
+#define PATH_LARGE "/ICONS/72px/"
+
 local name = "EL_But";
 local options = {
   { "Name", STRING},
 };
-local config = nil;
 
+local config = nil;
 local initFailed = -1;
 local lastTime = 0;
 
-local bmpExpandSmall = nil;
-local bmpRoundSmall = nil;
-local bmpRoundLarge = nil;
+local iconWidget = nil;
+local iconDefaultSmall = nil;
+local iconDefaultLarge = nil;
 
 local function insertSRFFs(config)
   if not (config.buttons) then 
@@ -56,6 +59,28 @@ local function insertSRFFs(config)
     end
   end
   return 0;
+end
+
+local iconTable = {}; -- hash table for icon bitmaps, only hash based access
+
+local function loadIcon(filename)
+  if (iconTable[filename]) then
+    TRACE("cache hit for: ", filename);
+    return iconTable[filename], true;
+  end
+  local icon = Bitmap.open(filename);
+  local ok = true;
+  if (icon) then
+    local w, h = Bitmap.getSize(icon);
+    if (w == 0) then
+      TRACE("missing image: ", filename);
+      ok = false;
+    else
+      TRACE("cache insert: ", filename);
+      iconTable[filename] = icon;
+    end
+  end
+  return icon, ok;
 end
 
 local function create(zone, options)
@@ -100,31 +125,9 @@ local function create(zone, options)
   local widget = __libI.initWidget(zone, options);
   collectgarbage();
 
-  bmpExpandSmall = Bitmap.open(BASE_DIR .. "/ICONS/48px/expand.png");
-  bmpRoundSmall = Bitmap.open(BASE_DIR .. "/ICONS/48px/round.png");
-  bmpRoundLarge = Bitmap.open(BASE_DIR .. "/ICONS/72px/round.png");
-
-  if (bmpExpandSmall) then
-    local w, h = Bitmap.getSize(bmpExpandSmall);
-    if (w == 0) then
-      TRACE("missing image 0");
-      errorCode = 20;        
-    end
-  end
-  if (bmpRoundLarge) then
-    local w, h = Bitmap.getSize(bmpRoundLarge);
-    if (w == 0) then
-      TRACE("missing image 1");
-      errorCode = 21;        
-    end
-  end
-  if (bmpRoundSmall) then
-    local w, h = Bitmap.getSize(bmpRoundSmall);
-    if (w == 0) then
-      TRACE("missing image 2");
-      errorCode = 22;
-    end
-  end
+  iconWidget = loadIcon(BASE_DIR .. PATH_SMALL .. "expand.png");
+  iconDefaultSmall = loadIcon(BASE_DIR .. PATH_SMALL .. "round.png");
+  iconDefaultLarge = loadIcon(BASE_DIR .. PATH_LARGE .. "round.png");
 
   __libI = nil;
   collectgarbage();
@@ -198,12 +201,34 @@ local function displayButtons(config, widget, event, touch)
       end
 
       if (#config.buttons <= 4) then
-        lcd.drawBitmap(bmpRoundLarge, x + fw / 2 - 36, y + fh / 2 - 36);
+        if (config.buttons[idx].iconData) then
+          lcd.drawBitmap(config.buttons[idx].iconData, x + fw / 2 - 36, y + fh / 2 - 36);
+        else
+          if (config.buttons[idx].icon) then
+            local icon, ok = loadIcon(BASE_DIR .. PATH_LARGE .. config.buttons[idx].icon);
+            if (ok) then
+              config.buttons[idx].iconData = icon;
+            end
+          else
+            lcd.drawBitmap(iconDefaultLarge, x + fw / 2 - 36, y + fh / 2 - 36);
+          end
+        end
         if (config.buttons[idx].name) then
           lcd.drawText(x + 2 * border, y + 2 * border, config.buttons[idx].name, MIDSIZE + COLOR_THEME_PRIMARY1);          
         end
       else
-        lcd.drawBitmap(bmpRoundSmall, x + fw / 2 - 24, y + fh / 2 - 24);
+        if (config.buttons[idx].iconData) then
+          lcd.drawBitmap(config.buttons[idx].iconData, x + fw / 2 - 24, y + fh / 2 - 24);
+        else
+          if (config.buttons[idx].icon) then
+            local icon, ok = loadIcon(BASE_DIR .. PATH_SMALL .. config.buttons[idx].icon);
+            if (ok) then
+              config.buttons[idx].iconData = icon;
+            end
+          else
+            lcd.drawBitmap(iconDefaultSmall, x + fw / 2 - 24, y + fh / 2 - 24);
+          end
+        end
         if (config.buttons[idx].name) then
           lcd.drawText(x + 2 * border, y + 2 * border, config.buttons[idx].name, SMLSIZE + COLOR_THEME_PRIMARY1);
         end
@@ -237,8 +262,8 @@ local function refresh(widget, event, touch)
   __libD.updateWidgetDimensions(widget, event);
   if (errorCode == 0) and (config) then
     if (widget[W_Width] <= (LCD_W / 2)) then
-      if (bmpExpandSmall) then
-        lcd.drawBitmap(bmpExpandSmall, widget[W_X], widget[W_Y] + widget[W_Height] / 2 - 24);        
+      if (iconWidget) then
+        lcd.drawBitmap(iconWidget, widget[W_X], widget[W_Y] + widget[W_Height] / 2 - 24);        
       end
       lcd.drawText(widget[W_X] + 60, widget[W_Y] + widget[W_Height] / 2 - widget[W_FontHLarge], config.name, MIDSIZE);
     else
