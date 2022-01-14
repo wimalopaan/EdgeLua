@@ -2,30 +2,37 @@
 
 #include "global.h"
 
-local function loadFile(baseDir)
+local function loadFile(baseDir, baseName)
     local content = nil;
     local filename = nil;
-    if (#model.getInfo().name > 0) then
-    filename = model.getInfo().name .. ".lua";
-    TRACE("loadFile", baseDir .. filename);
-    content = loadScript(baseDir .. filename);      
-    end
-    if not content then
-    if (LCD_W <= 128) then
-        filename = "tiny.lua";
+    if (baseName) then
+        filename = baseName .. ".lua";
         TRACE("loadFile", baseDir .. filename);
-        content = loadScript(baseDir .. filename);
-    elseif (LCD_W <= 212) then
-        filename = "medium.lua";
-        TRACE("loadFile", baseDir .. filename);
-        content = loadScript(baseDir .. filename);
-    else
-        filename = "large.lua";
-        TRACE("loadFile", baseDir .. filename);
-        content = loadScript(baseDir .. filename);
+        content = loadScript(baseDir .. filename);      
     end
+    if not(content) then
+        if (#model.getInfo().name > 0) then
+            filename = model.getInfo().name .. ".lua";
+            TRACE("loadFile", baseDir .. filename);
+            content = loadScript(baseDir .. filename);      
+        end            
     end
-    if not content then
+    if not(content) then
+        if (LCD_W <= 128) then
+            filename = "tiny.lua";
+            TRACE("loadFile", baseDir .. filename);
+            content = loadScript(baseDir .. filename);
+        elseif (LCD_W <= 212) then
+            filename = "medium.lua";
+            TRACE("loadFile", baseDir .. filename);
+            content = loadScript(baseDir .. filename);
+        else
+            filename = "large.lua";
+            TRACE("loadFile", baseDir .. filename);
+            content = loadScript(baseDir .. filename);
+        end
+    end
+    if not(content) then
         filename = "default.lua";
         TRACE("loadFile", baseDir .. filename);
         content = loadScript(baseDir .. filename);    

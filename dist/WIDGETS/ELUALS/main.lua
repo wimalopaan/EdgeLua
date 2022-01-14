@@ -94,30 +94,37 @@ local function loadLibU()
   collectgarbage();
 end
 
-local function loadFile(baseDir)
+local function loadFile(baseDir, baseName)
     local content = nil;
     local filename = nil;
-    if (#model.getInfo().name > 0) then
-    filename = model.getInfo().name .. ".lua";
-                                          ;
-    content = loadScript(baseDir .. filename);
-    end
-    if not content then
-    if (LCD_W <= 128) then
-        filename = "tiny.lua";
-                                              ;
-        content = loadScript(baseDir .. filename);
-    elseif (LCD_W <= 212) then
-        filename = "medium.lua";
-                                              ;
-        content = loadScript(baseDir .. filename);
-    else
-        filename = "large.lua";
+    if (baseName) then
+        filename = baseName .. ".lua";
                                               ;
         content = loadScript(baseDir .. filename);
     end
+    if not(content) then
+        if (#model.getInfo().name > 0) then
+            filename = model.getInfo().name .. ".lua";
+                                                  ;
+            content = loadScript(baseDir .. filename);
+        end
     end
-    if not content then
+    if not(content) then
+        if (LCD_W <= 128) then
+            filename = "tiny.lua";
+                                                  ;
+            content = loadScript(baseDir .. filename);
+        elseif (LCD_W <= 212) then
+            filename = "medium.lua";
+                                                  ;
+            content = loadScript(baseDir .. filename);
+        else
+            filename = "large.lua";
+                                                  ;
+            content = loadScript(baseDir .. filename);
+        end
+    end
+    if not(content) then
         filename = "default.lua";
                                               ;
         content = loadScript(baseDir .. filename);
@@ -136,7 +143,9 @@ local function loadConfig()
 end
 
 local name = "EL_But";
-local options = {};
+local options = {
+  { "Name", STRING},
+};
 local config = nil;
 
 local initFailed = -1;
@@ -189,7 +198,12 @@ local function create(zone, options)
     return {};
   end
 
-  config = loadFile("/EDGELUA" .. "/MODELS/LSBUT/");
+  local name = options.Name;
+  if not (type(name) == "string") then
+    name = __libU.optionString(name);
+  end
+
+  config = loadFile("/EDGELUA" .. "/MODELS/LSBUT/", name);
   if (config) then
     config = config();
 

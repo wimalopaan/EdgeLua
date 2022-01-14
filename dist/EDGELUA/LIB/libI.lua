@@ -10,30 +10,37 @@
 -- Please note that the above license also covers the transfer protocol used and the encoding scheme and
 -- all further principals of tranferring state and other information.
 
-local function loadFile(baseDir)
+local function loadFile(baseDir, baseName)
     local content = nil;
     local filename = nil;
-    if (#model.getInfo().name > 0) then
-    filename = model.getInfo().name .. ".lua";
-                                          ;
-    content = loadScript(baseDir .. filename);
-    end
-    if not content then
-    if (LCD_W <= 128) then
-        filename = "tiny.lua";
-                                              ;
-        content = loadScript(baseDir .. filename);
-    elseif (LCD_W <= 212) then
-        filename = "medium.lua";
-                                              ;
-        content = loadScript(baseDir .. filename);
-    else
-        filename = "large.lua";
+    if (baseName) then
+        filename = baseName .. ".lua";
                                               ;
         content = loadScript(baseDir .. filename);
     end
+    if not(content) then
+        if (#model.getInfo().name > 0) then
+            filename = model.getInfo().name .. ".lua";
+                                                  ;
+            content = loadScript(baseDir .. filename);
+        end
     end
-    if not content then
+    if not(content) then
+        if (LCD_W <= 128) then
+            filename = "tiny.lua";
+                                                  ;
+            content = loadScript(baseDir .. filename);
+        elseif (LCD_W <= 212) then
+            filename = "medium.lua";
+                                                  ;
+            content = loadScript(baseDir .. filename);
+        else
+            filename = "large.lua";
+                                                  ;
+            content = loadScript(baseDir .. filename);
+        end
+    end
+    if not(content) then
         filename = "default.lua";
                                               ;
         content = loadScript(baseDir .. filename);
@@ -486,7 +493,7 @@ local function initConfigBW(config, modifyModel)
     cfg[9] = 2; --sbus
   end
 
-  local footer = "Vers: " .. "2.32";
+  local footer = "Vers: " .. "2.33";
   if (cfg[9] == 0) then
     footer = footer .. " Mod: xjt";
   elseif (cfg[9] == 1) then

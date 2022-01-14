@@ -14,7 +14,9 @@
 #include "../../file.lh"
 
 local name = "EL_But";
-local options = {};
+local options = {
+  { "Name", STRING},
+};
 local config = nil;
 
 local initFailed = -1;
@@ -67,7 +69,16 @@ local function create(zone, options)
     return {};
   end
 
-  config = loadFile(BASE_DIR .. "/MODELS/LSBUT/");
+#ifdef USE_NEW_STRING_OPTION
+  local name = options.Name;
+  if not (type(name) == "string") then
+    name =  __libU.optionString(name);
+  end
+#else
+  local name = __libU.optionString(options.Name);
+#endif
+
+  config = loadFile(BASE_DIR .. "/MODELS/LSBUT/", name);
   if (config) then
     config = config();
 
