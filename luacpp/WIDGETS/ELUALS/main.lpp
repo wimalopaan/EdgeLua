@@ -103,6 +103,7 @@ local function create(zone, options)
 #ifdef USE_NEW_STRING_OPTION
   local name = options.Name;
   if not (type(name) == "string") then
+    TRACE("not string");
     name =  __libU.optionString(name);
   end
 #else

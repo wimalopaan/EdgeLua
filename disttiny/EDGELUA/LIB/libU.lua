@@ -89,7 +89,7 @@ local function displayDebugBW(widget)
   local x3 = x1 + widget[3] / 2;
   local x4 = x1 + 3 * widget[3] / 4;
 
-      lcd.drawText(x1, y, debugText[7] .. "2.36", SMLSIZE);
+      lcd.drawText(x1, y, debugText[7] .. "2.37", SMLSIZE);
 
   y = y + widget[8];
   lcd.drawText(x1, y, debugText[1] , SMLSIZE);
@@ -162,7 +162,7 @@ local function displayDebugBW(widget)
   if (widget[11]) then
     local opt = widget[11].Test;
     if (type(opt) == "string") then
-      lcd.drawText(x4, y, "y", SMLSIZE);
+      lcd.drawText(x4, y, "y: " .. opt, SMLSIZE);
     else
       lcd.drawText(x4, y, "n", SMLSIZE);
     end

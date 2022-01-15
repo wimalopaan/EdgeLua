@@ -253,7 +253,7 @@ local function displayDebugBW(widget)
   if (widget[W_Options]) then
     local opt = widget[W_Options].Test;
     if (type(opt) == "string") then 
-      lcd.drawText(x4, y, "y", SMLSIZE);
+      lcd.drawText(x4, y, "y: " .. opt, SMLSIZE);
     else
       lcd.drawText(x4, y, "n", SMLSIZE);
     end      
