@@ -19,6 +19,7 @@
 local name = "EL_But";
 local options = {
   { "Name", STRING},
+  { "Reset", VALUE, 0, 0, 1},
 };
 
 local config = nil;
@@ -120,6 +121,10 @@ local function create(zone, options)
   local r = insertSRFFs(config);
   if (r > 0) then
     errorCode = 10 + r;
+  end
+
+  if (options.Reset == 0) then
+    initFailed = -1; -- no follwing explicit reset
   end
 
   local widget = __libI.initWidget(zone, options);
