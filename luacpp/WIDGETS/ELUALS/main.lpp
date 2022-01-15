@@ -35,6 +35,11 @@ local function insertSRFFs(config)
     return 1;
   end
 
+  if not LS_FUNC_STICKY then
+    TRACE("fallback");
+    LS_FUNC_STICKY = LSFUNC_STICKY;
+  end
+
   for i, b in ipairs(config.buttons) do  
     if (b.ls > 0) then
       local lsNumber = b.ls - 1;

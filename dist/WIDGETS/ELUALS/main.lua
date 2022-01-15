@@ -161,6 +161,11 @@ local function insertSRFFs(config)
     return 1;
   end
 
+  if not LS_FUNC_STICKY then
+                     ;
+    LS_FUNC_STICKY = 18;
+  end
+
   for i, b in ipairs(config.buttons) do
     if (b.ls > 0) then
       local lsNumber = b.ls - 1;

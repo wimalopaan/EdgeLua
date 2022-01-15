@@ -41,6 +41,7 @@
 // fallback IDs for functions
 #define LSFUNC_A_EQ_X 1
 #define LSFUNC_A_GT_X 3
+#define LSFUNC_STICKY 18
 
 #define TRIMS_MODE_DISABLE_TRIM 31
 
