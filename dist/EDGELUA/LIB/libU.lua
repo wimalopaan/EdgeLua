@@ -10,6 +10,35 @@
 -- Please note that the above license also covers the transfer protocol used and the encoding scheme and
 -- all further principals of tranferring state and other information.
 
+local function isDigit(v)
+  return (v >= string.byte("0")) and (v <= string.byte("9"));
+end
+
+local function isLetter(v)
+  return (v >= string.byte("A") and (v <= string.byte("Z"))) or (v >= string.byte("a") and (v <= string.byte("z")));
+end
+
+local function nthChar(n, v)
+  local c = bit32.extract(v, n * 8, 8);
+  if (isDigit(c) or isLetter(c)) then
+    return string.char(c);
+  end
+  return nil;
+end
+
+local function optionString(option)
+  local s = "";
+  for i = 0,3 do
+    local c = nthChar(i, option);
+    if (c) then
+      s = s .. c;
+    else
+      return s;
+    end;
+  end
+  return s
+end
+
 -- local function serialize(table, filename)
 -- if type(table) == "table" then
 -- io.write("{\n")

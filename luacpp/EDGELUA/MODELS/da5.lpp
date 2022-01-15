@@ -17,7 +17,7 @@
 local gstates1 = {"aus", "ein1", "ein2"};
 
 local menu = {
-  title = "AnalogDemo",
+  title = "DA Demo 5",
   saveValues = true,
   { 
     title = "Analog 1",
