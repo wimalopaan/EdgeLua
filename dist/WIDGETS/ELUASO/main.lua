@@ -1,0 +1,111 @@
+--
+-- WM OTXE - OpenTX Extensions
+-- Copyright (C) 2020 Wilhelm Meier <wilhelm.wm.meier@googlemail.com>
+--
+
+-- This work is licensed under the Creative Commons Attribution-NonCommercial-NoDerivatives 4.0 International License.
+-- To view a copy of this license, visit http:
+-- or send a letter to Creative Commons, PO Box 1866, Mountain View, CA 94042, USA.
+
+local options = {
+  { "Steer", SOURCE, 1},
+  { "Throttle", SOURCE, 2},
+  { "Actual", SOURCE, 3},
+  { "Number", VALUE, 0, 0, 3}
+};
+
+local function create(zone, options)
+   zone.cx = zone.x + zone.w / 2;
+   zone.cy = zone.y + zone.h / 2;
+   return {
+      zone = zone,
+      options = options,
+      events = 0
+   };
+end
+
+local function update(widget, options)
+  widget.options = options;
+end
+
+local function background(widget)
+end
+
+function refresh(widget, event, touchState)
+   local steer = getValue(widget.options.Steer);
+   local throttle = getValue(widget.options.Throttle);
+   local actual = (getValue(widget.options.Actual) - 512) * 2;
+
+   local number = widget.options.Number;
+   local side = number % 2;
+
+   lcd.clear();
+
+   if (side == 0) then
+      lcd.drawText(widget.zone.x, widget.zone.y, "Schottel Links: " .. number, LEFT + SMLSIZE);
+   else
+      lcd.drawText(widget.zone.x + widget.zone.w, widget.zone.y, "Schottel Rechts: " .. number, RIGHT + SMLSIZE);
+   end
+
+   local rr = math.min(widget.zone.w / 2, widget.zone.h / 2) * 0.8;
+
+   local r1 = rr * 0.9;
+   local r2 = rr * 1.1;
+   local r3 = rr / 0.9;
+   local r4 = rr * 0.9;
+
+   lcd.drawCircle(widget.zone.cx, widget.zone.cy, rr, SOLID + DARKGREEN);
+
+   lcd.drawFilledCircle(widget.zone.cx, widget.zone.cy, 5, SOLID + BLUE);
+
+   for i = 0, 11 do
+      local phi = (2 * math.pi * i) / 12;
+      local tx1 = widget.zone.cx + r1 * math.cos(phi);
+      local ty1 = widget.zone.cy + r1 * math.sin(phi);
+      local tx2 = widget.zone.cx + r2 * math.cos(phi);
+      local ty2 = widget.zone.cy + r2 * math.sin(phi);
+      lcd.drawLine(tx1, ty1, tx2, ty2, SOLID + BLACK);
+   end
+
+   local steer_phi = math.pi * steer / 1024 + math.pi / 2;
+   local actual_phi = math.pi * actual / 1024 + math.pi / 2;
+   local thr_norm = math.max(0, throttle / 1024);
+   local thr_r = rr * (1 - thr_norm);
+
+   local delta_phi = math.pi / 30;
+
+   local steer_xa = widget.zone.cx - thr_r * math.cos(steer_phi);
+   local steer_ya = widget.zone.cy - thr_r * math.sin(steer_phi);
+   local steer_xe = widget.zone.cx - rr * math.cos(steer_phi);
+   local steer_ye = widget.zone.cy - rr * math.sin(steer_phi);
+   lcd.drawLine(steer_xa, steer_ya, steer_xe, steer_ye, SOLID + DARKRED);
+
+   local r5 = math.min(r4, thr_r);
+   local ix = widget.zone.cx - r5 * math.cos(steer_phi);
+   local iy = widget.zone.cy - r5 * math.sin(steer_phi);
+   local d = 10;
+   local dx = d * math.sin(steer_phi);
+   local dy = d * math.cos(steer_phi);
+   local steer_x2 = ix - dx;
+   local steer_y2 = iy + dy;
+   local steer_x3 = ix + dx;
+   local steer_y3 = iy - dy;
+   lcd.drawFilledTriangle(steer_xe, steer_ye, steer_x2, steer_y2, steer_x3, steer_y3, SOLID + RED);
+
+   local actual_x1 = widget.zone.cx - rr * math.cos(actual_phi);
+   local actual_y1 = widget.zone.cy - rr * math.sin(actual_phi);
+   local actual_x2 = widget.zone.cx - r3 * math.cos(actual_phi + delta_phi);
+   local actual_y2 = widget.zone.cy - r3 * math.sin(actual_phi + delta_phi);
+   local actual_x3 = widget.zone.cx - r3 * math.cos(actual_phi - delta_phi);
+   local actual_y3 = widget.zone.cy - r3 * math.sin(actual_phi - delta_phi);
+   lcd.drawFilledTriangle(actual_x1, actual_y1, actual_x2, actual_y2, actual_x3, actual_y3, SOLID + GREEN);
+
+end
+
+return { name="EL_Sch",
+  options = options,
+  create = create,
+  update = update,
+  refresh = refresh,
+  background = background
+};

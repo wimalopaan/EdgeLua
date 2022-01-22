@@ -61,7 +61,7 @@ local dirs = {
 
 local function run()
 -- lcd.clear();
-  lcd.drawText(0, 0, "Compiling ..." .. "2.37", TEXT_COLOR);
+  lcd.drawText(0, 0, "Compiling ..." .. "2.38", TEXT_COLOR);
   local t = getTime();
   local dir = nil;
   if ((t - lastTime) > 50) then
