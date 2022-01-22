@@ -37,21 +37,21 @@ local function clamp(value)
 end
 
 local input = {
-   {"Eing A1", SOURCE},
-   {"Eing B1", SOURCE},
-   {"Eing A2", SOURCE},
-   {"Eing B2", SOURCE},
+   {"Ein A1", SOURCE},
+   {"Ein B1", SOURCE},
+   {"Ein A2", SOURCE},
+   {"Ein B2", SOURCE},
    {"DeadB", VALUE, 1, 100, 10}, -- absolute value
    {"TimOut", VALUE, 1, 300, 100} -- milli secs
 };
 
 local output = {
-   "Pow 1",
- "Dir 1",
- "Pow 2",
- "Dir 2",
- "State1",
- "State2"
+   "P1",
+ "D1",
+ "P2",
+ "D2",
+ "S1",
+ "S2"
 };
 
 local lastDirs = {
