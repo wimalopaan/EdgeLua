@@ -100,15 +100,18 @@ local function create(zone, options)
     return {};
   end
 
-#ifdef USE_NEW_STRING_OPTION
   local name = options.Name;
-  if not (type(name) == "string") then
-    TRACE("not string");
-    name =  __libU.optionString(name);
-  end
+  if (name) then
+#ifdef USE_NEW_STRING_OPTION
+    TRACE("Name: ", name);
+    if not (type(name) == "string") then
+      TRACE("not string", name);
+      name =  __libU.optionString(name);
+    end
 #else
-  local name = __libU.optionString(options.Name);
-#endif
+    name = __libU.optionString(options.Name);
+#endif      
+  end
 
   config = loadFile(BASE_DIR .. "/MODELS/LSBUT/", name);
   if (config) then

@@ -30,14 +30,16 @@ end
 
 local function optionString(option)
   local s = "";
-  for i = 0,3 do
-    local c = nthChar(i, option);
-    if (c) then
-      s = s .. c;
-    else
-      return s;
-    end;
-  end
+  if (option) then
+    for i = 0,3 do
+      local c = nthChar(i, option);
+      if (c) then
+        s = s .. c;
+      else
+        return s;
+      end;
+    end
+    end 
   return s
 end
 

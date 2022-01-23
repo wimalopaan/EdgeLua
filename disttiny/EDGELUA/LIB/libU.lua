@@ -28,14 +28,16 @@ end
 
 local function optionString(option)
   local s = "";
-  for i = 0,3 do
-    local c = nthChar(i, option);
-    if (c) then
-      s = s .. c;
-    else
-      return s;
-    end;
-  end
+  if (option) then
+    for i = 0,3 do
+      local c = nthChar(i, option);
+      if (c) then
+        s = s .. c;
+      else
+        return s;
+      end;
+    end
+    end
   return s
 end
 
@@ -89,7 +91,7 @@ local function displayDebugBW(widget)
   local x3 = x1 + widget[3] / 2;
   local x4 = x1 + 3 * widget[3] / 4;
 
-      lcd.drawText(x1, y, debugText[7] .. "2.38", SMLSIZE);
+      lcd.drawText(x1, y, debugText[7] .. "2.39", SMLSIZE);
 
   y = y + widget[8];
   lcd.drawText(x1, y, debugText[1] , SMLSIZE);

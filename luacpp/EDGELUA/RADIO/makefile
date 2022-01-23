@@ -6,4 +6,6 @@ medium.lua: medium.lpp ../../global.h ../../version.h ../../constants.h
 
 tiny.lua: tiny.lpp ../../global.h ../../version.h ../../constants.h 
 
+subdirs = SLIDER
+
 -include ../../makefile.include

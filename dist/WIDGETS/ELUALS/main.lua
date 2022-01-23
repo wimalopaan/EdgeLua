@@ -227,9 +227,14 @@ local function create(zone, options)
   end
 
   local name = options.Name;
-  if not (type(name) == "string") then
-                       ;
-    name = __libU.optionString(name);
+  if (name) then
+
+                         ;
+    if not (type(name) == "string") then
+                               ;
+      name = __libU.optionString(name);
+    end
+
   end
 
   config = loadFile("/EDGELUA" .. "/MODELS/LSBUT/", name);

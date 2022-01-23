@@ -102,7 +102,7 @@ function refresh(widget, event, touchState)
 
 end
 
-return { name="WM Shottel",
+return { name="EL_Sch",
   options = options,
   create = create,
   update = update,

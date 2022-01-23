@@ -1,0 +1,120 @@
+--
+-- EdgeLUA - EdgeTx / OpenTx Extensions 
+-- Copyright (C) 2021 Wilhelm Meier <wilhelm.wm.meier@googlemail.com>
+--
+-- This work is licensed under the Creative Commons Attribution-NonCommercial-NoDerivatives 4.0 International License. 
+-- To view a copy of this license, visit http://creativecommons.org/licenses/by-nc-nd/4.0/ 
+-- or send a letter to Creative Commons, PO Box 1866, Mountain View, CA 94042, USA.
+
+-- IMPORTANT
+-- Please note that the above license also covers the transfer protocol used and the encoding scheme and 
+-- all further principals of tranferring state and other information.
+
+#include "../../widget.h"
+#include "../../file.lh"
+
+#define PATH_SMALL "/ICONS/48px/"
+#define PATH_LARGE "/ICONS/72px/"
+
+local name = "EL_Sli";
+local options = {
+  { "Name", STRING}
+};
+
+local options = {};
+local iconWidget = nil;
+
+local iconTable = {}; -- hash table for icon bitmaps, only hash based access
+
+local function loadIcon(filename)
+  if (iconTable[filename]) then
+    TRACE("cache hit for: ", filename);
+    return iconTable[filename], true;
+  end
+  local icon = Bitmap.open(filename);
+  local ok = true;
+  if (icon) then
+    local w, h = Bitmap.getSize(icon);
+    if (w == 0) then
+      TRACE("missing image: ", filename);
+      ok = false;
+    else
+      TRACE("cache insert: ", filename);
+      iconTable[filename] = icon;
+    end
+  end
+  return icon, ok;
+end
+
+
+local function create(zone, options)
+  load();
+  collectgarbage();
+
+  if (errorCode > 0) then
+    return {};
+  end
+
+  local widget = __libI.initWidget(zone, options);
+  collectgarbage();
+
+  __libI = nil; -- free memory
+
+  collectgarbage();
+
+  local name = options.Name;
+  if (name) then
+#ifdef USE_NEW_STRING_OPTION
+    if not (type(name) == "string") then
+      TRACE("not string2: ", name);
+      name =  __libU.optionString(name);
+    end
+#else
+    name = __libU.optionString(options.Name);
+#endif
+  end
+
+  config = loadFile(BASE_DIR .. "/RADIO/SLIDER/", name);
+  if (config) then
+    config = config();
+
+    if not (config.name) then
+      config.name = "unnamed";
+    end
+
+  end
+
+  if (errorCode > 0) then
+    return {};
+  end
+
+  iconWidget = loadIcon(BASE_DIR .. PATH_SMALL .. "expand.png");
+
+  return widget;
+end
+
+local function update(widget, options)
+  widget[W_Options] = options;
+end
+
+local function background(widget)
+  if (errorCode == 0) then
+  end
+end
+
+local function refresh(widget, event, touch)
+  __libD.updateWidgetDimensions(widget, event);
+  if (errorCode == 0) then
+  else
+    lcd.drawText(widget[W_X], widget[W_Y], "Error: " .. errorCode, DBLSIZE);
+  end
+end
+
+return { 
+  name=name,
+  options=options,
+  create=create,
+  update=update,
+  refresh=refresh,
+  background=background
+};
