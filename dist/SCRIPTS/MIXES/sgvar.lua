@@ -11,12 +11,12 @@
 -- all further principals of tranferring state and other information.
 
 local function loadLib(filename)
-                             ;
+  print("TRACE: " , "loadLib:", filename );
   local basedir = "/EDGELUA" .. "/LIB/";
   local chunk = loadScript(basedir .. filename);
   local lib = nil;
   if (chunk) then
-                                     ;
+    print("TRACE: " , "loadLib chunk:", filename );
     lib = chunk();
   end
   collectgarbage();
@@ -43,25 +43,28 @@ end
 local output = {
    "sw_var",
 
+   "transp",
+   "raw"
+
 };
 
 local gvar = 0;
 
 local function initGV()
-                                          ;
+   print("TRACE: " , "sgvar: init: ", __WmMixerConfig );
    if not(__WmMixerConfig) then
       if not __libM then
         loadLibM();
-                                     ;
+        print("TRACE: " , "vmap: libM: ", __libM );
         if __libM then
          local config = __libM.loadConfig();
-                                        ;
+         print("TRACE: " , "vmap: config: ", config );
          if not(config) then
             errorCode = 4;
             return;
          end
          __WmMixerConfig = __libM.initConfig(config); -- not modify model
-                                                  ;
+         print("TRACE: " , "vmap initConfig", __WmMixerConfig );
          collectgarbage();
         end
       end
@@ -70,7 +73,7 @@ local function initGV()
    local bendcfg = __WmMixerConfig[2][backend];
 
    gvar = bendcfg[2];
-                               ;
+   print("TRACE: " , "sgvar: gvar: ", gvar );
 
 end
 
@@ -80,25 +83,25 @@ end
 
 local function transportGlobalLua()
 
-   return __Sw2MixerValue;
+   return __Sw2MixerValue, 0, 0;
 
 end
 
 local function transportGV()
                                            ;
 
-   return model.getGlobalVariable(gvar, 0);
+   return model.getGlobalVariable(gvar, 0), 1, model.getGlobalVariable((gvar + 1), 0);
 
 end
 
 local function transportShm()
 
-   return getShmVar(1);
+   return getShmVar(1), 2, 0;
 
 end
 
 if (LCD_W <= 212) then
-                                         ;
+   print("TRACE: " , "sgvar: use transportGlobalLua" );
    return {
       output = output,
       run = transportGlobalLua
@@ -106,13 +109,13 @@ if (LCD_W <= 212) then
 else
 
    if (getShmVar) then
-                                      ;
+      print("TRACE: " , "sgvar: use transportShm" );
       return {
          output = output,
          run = transportShm
       };
    else
-                                     ;
+      print("TRACE: " , "sgvar: use transportGV" );
       return {
          init = initGV,
          output = output,

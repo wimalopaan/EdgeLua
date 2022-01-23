@@ -15,11 +15,11 @@
 return {
   name = "Slider",
   icon = "expand.png",
-  layout = {rows = 2, cols = 2},
+  layout = "V", -- H: left2right, V: top2bottom
   slider = {
-      {name = "Licht1", shm = 10, color = "red"},
-      {name = "Licht2", shm = 11, color = "green"},
-      {name = "Licht3", shm = 12, color = "blue"},
-      {name = "Licht4", shm = 13, color = "cyan"},
+      {name = "Licht1", shm = 10, color = 0xff0000},
+      {name = "Licht2", shm = 11, color = 0x00ff00},
+      {name = "Licht3", shm = 12, color = 0x0000ff},
+      {name = "Licht4", shm = 13, color = 0xff00ff},
   }
 };

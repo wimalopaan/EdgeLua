@@ -11,12 +11,12 @@
 -- all further principals of tranferring state and other information.
 
 local function loadLib(filename)
-                             ;
+  print("TRACE: " , "loadLib:", filename );
   local basedir = "/EDGELUA" .. "/LIB/";
   local chunk = loadScript(basedir .. filename);
   local lib = nil;
   if (chunk) then
-                                     ;
+    print("TRACE: " , "loadLib chunk:", filename );
     lib = chunk();
   end
   collectgarbage();
@@ -177,7 +177,7 @@ local function init_telemetry()
   queue = __libP.Class.Queue.new();
 
   collectgarbage();
-                                         ;
+  print("TRACE: " , "gc6: ", collectgarbage("count") );
 end
 
 local function background_telemetry()

@@ -41,29 +41,27 @@ local function clamp(value)
 end
 
 local input = {
-    {"Input1", SOURCE},
-    {"Input2", SOURCE},
-    {"Input3", SOURCE},
-    {"Input4", SOURCE},
-    {"V1", VALUE, 0, 100, 10},
-    {"V2", VALUE, 0, 100, 2}
+    {"shm0", VALUE, 1, 16, 10}, -- absolute value
+    {"shm1", VALUE, 1, 16, 11}, -- absolute value
+    {"shm2", VALUE, 1, 16, 12}, -- absolute value
+    {"shm3", VALUE, 1, 16, 13}, -- absolute value
+    {"shm4", VALUE, 1, 16, 14}, -- absolute value
  };
 
-local output = {
-    "Incremental",
-    "I2",
-    "I3",
-    "I4",
-    "I5",
-    "I6",
+ local output = {
+   "shm0",
+   "shm1",
+   "shm2",
+   "shm3",
+   "shm4"
 };
 
-local function run(s1, s2, s3, s4, v1, v2)
-    return s1, (s1 + s2), (s1 + s2 + s3), (s1 + s2 + s3 + s4), v1, v2;
+local function transportShm(s0, s1, s2, s3, s4)
+   return getShmVar(s0), getShmVar(s1), getShmVar(s2), getShmVar(s3), getShmVar(s4);
 end
 
 return {
-    input = input,
     output = output,
-    run = run
+    input = input,
+    run = transportShm
 };

@@ -11,12 +11,12 @@
 -- all further principals of tranferring state and other information.
 
 local function loadLib(filename)
-  print("TRACE: " , "loadLib:", filename );
+                             ;
   local basedir = "/EDGELUA" .. "/LIB/";
   local chunk = loadScript(basedir .. filename);
   local lib = nil;
   if (chunk) then
-    print("TRACE: " , "loadLib chunk:", filename );
+                                     ;
     lib = chunk();
   end
   collectgarbage();
@@ -94,70 +94,124 @@ local function loadLibU()
   collectgarbage();
 end
 
-local name = "EL_Ani";
-local options = {};
-local animations = nil;
-local fsmState = {};
-local currentAnimation = nil;
+local function loadFile(baseDir, baseName)
+    local content = nil;
+    local filename = nil;
+    if (baseName) then
+        filename = baseName .. ".lua";
+                                              ;
+        content = loadScript(baseDir .. filename);
+    end
+    if not(content) then
+        if (#model.getInfo().name > 0) then
+            filename = model.getInfo().name .. ".lua";
+                                                  ;
+            content = loadScript(baseDir .. filename);
+        end
+    end
+    if not(content) then
+        if (LCD_W <= 128) then
+            filename = "tiny.lua";
+                                                  ;
+            content = loadScript(baseDir .. filename);
+        elseif (LCD_W <= 212) then
+            filename = "medium.lua";
+                                                  ;
+            content = loadScript(baseDir .. filename);
+        else
+            filename = "large.lua";
+                                                  ;
+            content = loadScript(baseDir .. filename);
+        end
+    end
+    if not(content) then
+        filename = "default.lua";
+                                              ;
+        content = loadScript(baseDir .. filename);
+    end
+    return content, filename;
+end
 
-local bmpExpandSmall = nil;
+local function loadConfig()
+    local baseDir = "/EDGELUA" .. "/RADIO/";
+    local cfg = loadFile(baseDir);
+                            ;
+    if (cfg) then
+        return cfg();
+    end
+    return nil;
+end
+
+local name = "EL_Sli";
+local options = {
+  { "Name", STRING}
+};
+
+local options = {};
+local iconWidget = nil;
+
+local iconTable = {}; -- hash table for icon bitmaps, only hash based access
+
+local function loadIcon(filename)
+  if (iconTable[filename]) then
+                                      ;
+    return iconTable[filename], true;
+  end
+  local icon = Bitmap.open(filename);
+  local ok = true;
+  if (icon) then
+    local w, h = Bitmap.getSize(icon);
+    if (w == 0) then
+                                        ;
+      ok = false;
+    else
+                                       ;
+      iconTable[filename] = icon;
+    end
+  end
+  return icon, ok;
+end
 
 local function create(zone, options)
   load();
-  loadLibA();
   collectgarbage();
-
-  print("TRACE: " , "A0" );
 
   if (errorCode > 0) then
     return {};
   end
 
-  print("TRACE: " , "A1" );
   local widget = __libI.initWidget(zone, options);
   collectgarbage();
-
-  print("TRACE: " , "A2" );
-
-  if not(__WmSw2Config) then
-    local config = __libI.loadConfig();
-    if not(config) then
-      errorCode = 4;
-      return widget;
-    end
-    __WmSw2Config = __libI.initConfig(config, true);
-  end
-  collectgarbage();
-
-  print("TRACE: " , "A3" );
-
-  animations = __libA.loadAnimations(__WmSw2Config);
-
-  print("TRACE: " , "A4" );
-
-  if not(animations) then
-    errorCode = 5;
-    return widget;
-  end
-
-  animations = __libA.initAnimations(animations);
-
-  print("TRACE: " , "A5" );
-
-  if not(animations) then
-    errorCode = 6;
-    return widget;
-  end
-
-  __libA.initAnimationFSM(fsmState);
-
-  print("TRACE: " , "A6" );
 
   __libI = nil; -- free memory
 
   collectgarbage();
 
-  bmpExpandSmall = Bitmap.open("/EDGELUA" .. "/ICONS/48px/expand.png");
+  local name = options.Name;
+  if (name) then
+
+    if not (type(name) == "string") then
+                                  ;
+      name = __libU.optionString(name);
+    end
+
+  end
+
+  config = loadFile("/EDGELUA" .. "/RADIO/SLIDER/", name);
+  if (config) then
+    config = config();
+
+    if not (config.name) then
+      config.name = "unnamed";
+    end
+
+  end
+
+  if (errorCode > 0) then
+    return {};
+  end
+
+  iconWidget = loadIcon("/EDGELUA" .. "/ICONS/48px/" .. "expand.png");
 
   return widget;
 end
@@ -168,17 +222,12 @@ end
 
 local function background(widget)
   if (errorCode == 0) then
-    if (__stopWmSw2) and (__stopWmSw2 == 0) then
-      currentAnimation = __libA.runAnimation(currentAnimation, fsmState);
-    end
   end
 end
 
 local function refresh(widget, event, touch)
   __libD.updateWidgetDimensions(widget, event);
   if (errorCode == 0) then
-    currentAnimation = __libA.chooseAnimation(__WmSw2Config, widget, animations, fsmState, event, touch, bmpExpandSmall);
-    background();
   else
     lcd.drawText(widget[1], widget[2], "Error: " .. errorCode, DBLSIZE);
   end

@@ -1,0 +1,39 @@
+---
+-- EdgeLUA - EdgeTx / OpenTx Extensions 
+-- Copyright (C) 2021 Wilhelm Meier <wilhelm.wm.meier@googlemail.com>
+--
+-- This work is licensed under the Creative Commons Attribution-NonCommercial-NoDerivatives 4.0 International License. 
+-- To view a copy of this license, visit http://creativecommons.org/licenses/by-nc-nd/4.0/ 
+-- or send a letter to Creative Commons, PO Box 1866, Mountain View, CA 94042, USA.
+
+-- IMPORTANT
+-- Please note that the above license also covers the transfer protocol used and the encoding scheme and 
+-- all further principals of tranferring state and other information.
+
+#include "../../mixer.lh"
+
+local input = {
+    {"shm0", VALUE, 1, 16, 10}, -- absolute value
+    {"shm1", VALUE, 1, 16, 11}, -- absolute value
+    {"shm2", VALUE, 1, 16, 12}, -- absolute value
+    {"shm3", VALUE, 1, 16, 13}, -- absolute value
+    {"shm4", VALUE, 1, 16, 14}, -- absolute value
+ };
+ 
+ local output = { 
+   "shm0",
+   "shm1",
+   "shm2",
+   "shm3",
+   "shm4"
+};
+
+local function transportShm(s0, s1, s2, s3, s4)
+   return getShmVar(s0), getShmVar(s1), getShmVar(s2), getShmVar(s3), getShmVar(s4);
+end
+
+return {
+    output = output,
+    input = input,
+    run = transportShm
+};

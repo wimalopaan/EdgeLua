@@ -10,12 +10,14 @@
 -- Please note that the above license also covers the transfer protocol used and the encoding scheme and
 -- all further principals of tranferring state and other information.
 
-local function run()
-    lcd.clear();
-    lcd.drawText(10, 10, "Version: " .. "2.40", MIDSIZE);
-    return 0;
-end
-
 return {
-  run = run
+  name = "Slider",
+  icon = "expand.png",
+  layout = {rows = 2, cols = 2},
+  slider = {
+      {name = "Licht1", shm = 10, color = "red"},
+      {name = "Licht2", shm = 11, color = "green"},
+      {name = "Licht3", shm = 12, color = "blue"},
+      {name = "Licht4", shm = 13, color = "cyan"},
+  }
 };

@@ -1,6 +1,8 @@
 
 #targets += sgvar.lua vmap.lua e2ibus.lua e2sbus.lua e2xjt.lua vsp.lua schotl.lua comp.lua increm.lua test.lua
-targets += sgvar.lua vmap.lua vsp.lua schtl.lua incrm.lua test.lua
+targets += sgvar.lua vmap.lua vsp.lua schtl.lua incrm.lua test.lua shm.lua
+
+shm.lua: shm.lpp ../../global.h ../../version.h ../../constants.h ../../functions.lh
 
 sgvar.lua: sgvar.lpp ../../global.h ../../version.h ../../constants.h ../../functions.lh
 
