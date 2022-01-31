@@ -11,12 +11,12 @@
 -- all further principals of tranferring state and other information.
 
 local function loadLib(filename)
-  print("TRACE: " , "loadLib:", filename );
+                             ;
   local basedir = "/EDGELUA" .. "/LIB/";
   local chunk = loadScript(basedir .. filename);
   local lib = nil;
   if (chunk) then
-    print("TRACE: " , "loadLib chunk:", filename );
+                                     ;
     lib = chunk();
   end
   collectgarbage();
@@ -99,34 +99,34 @@ local function loadFile(baseDir, baseName)
     local filename = nil;
     if (baseName) then
         filename = baseName .. ".lua";
-        print("TRACE: " , "loadFile", baseDir .. filename );
+                                              ;
         content = loadScript(baseDir .. filename);
     end
     if not(content) then
         if (#model.getInfo().name > 0) then
             filename = model.getInfo().name .. ".lua";
-            print("TRACE: " , "loadFile", baseDir .. filename );
+                                                  ;
             content = loadScript(baseDir .. filename);
         end
     end
     if not(content) then
         if (LCD_W <= 128) then
             filename = "tiny.lua";
-            print("TRACE: " , "loadFile", baseDir .. filename );
+                                                  ;
             content = loadScript(baseDir .. filename);
         elseif (LCD_W <= 212) then
             filename = "medium.lua";
-            print("TRACE: " , "loadFile", baseDir .. filename );
+                                                  ;
             content = loadScript(baseDir .. filename);
         else
             filename = "large.lua";
-            print("TRACE: " , "loadFile", baseDir .. filename );
+                                                  ;
             content = loadScript(baseDir .. filename);
         end
     end
     if not(content) then
         filename = "default.lua";
-        print("TRACE: " , "loadFile", baseDir .. filename );
+                                              ;
         content = loadScript(baseDir .. filename);
     end
     return content, filename;
@@ -135,7 +135,7 @@ end
 local function loadConfig()
     local baseDir = "/EDGELUA" .. "/RADIO/";
     local cfg = loadFile(baseDir);
-    print("TRACE: " , "loadConfig", cfg );
+                            ;
     if (cfg) then
         return cfg();
     end
@@ -155,7 +155,7 @@ local iconTable = {}; -- hash table for icon bitmaps, only hash based access
 
 local function loadIcon(filename)
   if (iconTable[filename]) then
-    print("TRACE: " , "cache hit for: ", filename );
+                                      ;
     return iconTable[filename], true;
   end
   local icon = Bitmap.open(filename);
@@ -163,10 +163,10 @@ local function loadIcon(filename)
   if (icon) then
     local w, h = Bitmap.getSize(icon);
     if (w == 0) then
-      print("TRACE: " , "missing image: ", filename );
+                                        ;
       ok = false;
     else
-      print("TRACE: " , "cache insert: ", filename );
+                                       ;
       iconTable[filename] = icon;
     end
   end
@@ -192,7 +192,7 @@ local function create(zone, options)
   if (name) then
 
     if not (type(name) == "string") then
-      print("TRACE: " , "not string2: ", name );
+                                  ;
       name = __libU.optionString(name);
     end
 
@@ -256,23 +256,28 @@ end
 local function displayAllSlider(config, widget, event, touch)
                               ;
 
-  if (#config.slider > 0) then
-    local width = widget[3] / ( 2 * #config.slider + 1);
-    local yborder = widget[4] * 0.1;
-    local height = widget[4] - 2 * yborder;
+  if (config.layout == "V") then
+    if (#config.slider > 0) then
+      local width = widget[3] / ( 2 * #config.slider + 1);
+      local yborder = widget[4] * 0.1;
+      local height = widget[4] - 2 * yborder;
 
-    local y = yborder;
+      local y = yborder;
 
-    for si, sl in ipairs(config.slider) do
-      local slider = {
-         x = (2 * (si - 1) + 1 ) * width;
-         y = yborder;
-         w = width;
-         h = height;
-         data = sl;
-      };
-      displaySliderVertical(slider, widget, event, touch);
+      for si, sl in ipairs(config.slider) do
+        local slider = {
+           x = (2 * (si - 1) + 1 ) * width;
+           y = yborder;
+           w = width;
+           h = height;
+           data = sl;
+        };
+        displaySliderVertical(slider, widget, event, touch);
+      end
     end
+  end
+  if (config.layout == "H") then
+
   end
   return 0;
 end

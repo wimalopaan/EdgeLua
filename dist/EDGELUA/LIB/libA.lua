@@ -69,7 +69,7 @@ local function initAnimations(anims)
       canim[2] = math.floor(anim.length * 100);
     end
 
-    print("TRACE: " , "init anim", ia, canim[1], canim[2] );
+                                                                ;
 
     if (anim.switches) then
       local swt = {};
@@ -110,7 +110,7 @@ local function initAnimations(anims)
       canims[#canims + 1] = canim;
     end
   end
-  print("TRACE: " , "init anims: number", #canims );
+                                      ;
   return canims;
 end
 
@@ -141,7 +141,7 @@ local function runAnimation(anim, state)
   if (state[2] == 0) then -- state: init
     __WmSw2Warning1 = "Animation";
     __WmSw2Warning2 = anim[1];
-    print("TRACE: " , "Anim:", anim[1], anim[2], #anim[3], #anim[4] );
+                                                                                                           ;
     state[2] = 1;
     state[3] = t; -- start of anim
     state[4] = t; -- last seq point
@@ -159,7 +159,7 @@ local function runAnimation(anim, state)
             transition[3] = 1;
             setItem(fn, module, transition[2]);
             if (it == #swt[3]) then
-              print("TRACE: " , "last t" );
+                             ;
               state[7] = state[7] + 1;
             end
             break;
@@ -176,7 +176,7 @@ local function runAnimation(anim, state)
             state[4] = t;
             setItem(fn, module, seqpoint[2]);
             if (it == #sws[3]) then
-              print("TRACE: " , "last s" );
+                             ;
               state[7] = state[7] + 1;
             end
             break;
@@ -188,11 +188,11 @@ local function runAnimation(anim, state)
     if (anim[2] > 0) and ((t - state[3]) >= anim[2]) then
       state[3] = t; -- restart
       state[4] = t;
-      print("TRACE: " , "restart" );
+                      ;
       clearAnim(anim);
     end
     if (anim[2] == 0) and (state[7] >= 2) then
-      print("TRACE: " , "stop" );
+                   ;
       state[2] = 0;
       state[5] = 0;
       __WmSw2Warning1 = nil;

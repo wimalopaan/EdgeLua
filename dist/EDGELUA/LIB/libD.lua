@@ -492,7 +492,7 @@ end
 
 local function displayMenuColorNoTheme(config, widget, menu, overlays, state, event, remote, warning1, warning2, pagetitles, menudata)
 -- lcd.clear()
--- print("TRACE: " , "displayMenuColorNoTheme", widget[1], widget[2], widget[3], widget[4] );
+-- ;
 
   if (warning) then
     local ww, wh = lcd.sizeText(warning, DBLSIZE);
@@ -653,17 +653,10 @@ local function selectItem(menu, menuState, queue)
   setAndPushItem(queue, item, menuState[2]);
 end
 
-local lastEvent = 0;
-
 local function processEventsBWScroll(config, menu, menuState, event, queue, callback)
   if (event == EVT_VIRTUAL_ENTER) then
     callback(menu, menuState, queue);
   else
-
-    if (event ~= lastEvent) then
-                                            ;
-      lastEvent = event;
-    end
 
     if (event > 0) then
       menuDeselect(menuState);
@@ -685,11 +678,6 @@ local function processEventsBWKeys(config, menu, menuState, event, queue, callba
   if (event == EVT_VIRTUAL_ENTER) then
     callback(menu, menuState, queue);
   else
-
-    if (event ~= lastEvent) then
-                                          ;
-      lastEvent = event;
-    end
 
     if (event > 0) then
       menuDeselect(menuState);
@@ -772,7 +760,7 @@ local function processShortCuts(shortCuts, queue, switches)
       local item = sc[2];
       if not(item[3] == v) then
         setAndPushItem(queue, item, v);
-        print("TRACE: " , "processShortCuts:", item[1], item[3] );
+                                                                     ;
       end
     end
   end
@@ -831,7 +819,7 @@ local function processTrims(config, menu, menuState, buttonState, queue, callbac
   end
   processTrimsNext(config, buttonState, nextCB);
   local selectCB = function()
-    print("TRACE: " , "selectCB" );
+                     ;
     callback(menu, menuState, queue);
   end
   processTrimsSelect(config, buttonState, selectCB);
@@ -972,7 +960,7 @@ local function processRemoteInput(config, menu, queue, remoteState)
     remoteState[2] = module;
     remoteState[3] = fn;
     remoteState[4] = state;
-    print("TRACE: " , "remote: ", module, fn, state );
+                                        ;
     setAndPushItem(queue, item, state);
     -- local push = {[1] = item, [2] = item[3]};
     -- item[3] = state;
@@ -1017,7 +1005,7 @@ local function displayAddressConfigBW(config, widget, encoder, pScaler, state, e
     lcd.drawText(widget[1], widget[2] + 3 * widget[9], "Switch on RX and device", MIDSIZE);
 
     local bendcfg = config[20][1];
-    print("TRACE: " , "Address: ", adr );
+                            ;
     encoder(bendcfg[2], 14, adr); -- learn code
 
     if (event == EVT_VIRTUAL_ENTER) then
@@ -1045,7 +1033,7 @@ local function displayAddressConfigColor(config, widget, encoder, pScaler, state
   end
 
   processTrimsSelect(config, buttonState, function()
-    print("TRACE: " , "selectCB" );
+                     ;
     event = EVT_VIRTUAL_ENTER;
   end);
 
@@ -1078,7 +1066,7 @@ local function displayAddressConfigColor(config, widget, encoder, pScaler, state
     lcd.drawFilledRectangle(rect.xmin, rect.ymin, rect.xmax - rect.xmin + 1, rect.ymax - rect.ymin + 1, COLOR_THEME_ACTIVE);
     lcd.drawText(rect.xmin + 5, rect.ymin + 5, "Switch on RX and device", MIDSIZE + COLOR_THEME_PRIMARY2);
 
-    print("TRACE: " , "Address: ", adr );
+                           ;
     local bendcfg = config[20][1];
     encoder(bendcfg[2], 14, adr);
 

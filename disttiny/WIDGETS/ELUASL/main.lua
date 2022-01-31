@@ -148,6 +148,7 @@ local options = {
 };
 
 local options = {};
+local config = nil;
 local iconWidget = nil;
 
 local iconTable = {}; -- hash table for icon bitmaps, only hash based access
@@ -204,7 +205,6 @@ local function create(zone, options)
     if not (config.name) then
       config.name = "unnamed";
     end
-
   end
 
   if (errorCode > 0) then
@@ -214,6 +214,72 @@ local function create(zone, options)
   iconWidget = loadIcon("/EDGELUA" .. "/ICONS/48px/" .. "expand.png");
 
   return widget;
+end
+
+local function inside(touch, area)
+                                                                                       ;
+  if ((touch.x >= area.x) and (touch.x < (area.x + area.w)) and (touch.y >= area.y) and (touch.y <= (area.y + area.h))) then
+    return true;
+  end
+  return false;
+end
+
+local function displaySliderVertical(slider, widget, event, touch)
+  lcd.drawFilledRectangle(slider.x, slider.y, slider.w, slider.h, lcd.RGB(slider.data.color));
+  lcd.drawRectangle(slider.x, slider.y, slider.w, slider.h, COLOR_THEME_PRIMARY2);
+  lcd.drawText(slider.x, slider.y - 1.1 * widget[8], slider.data.name, COLOR_THEME_PRIMARY1);
+
+  local value = -1 * getShmVar(slider.data.shm);
+  local position = slider.h * (value / 1024 + 1) / 2 + slider.y;
+
+  lcd.drawFilledRectangle(slider.x, position - 5, slider.w, 10, COLOR_THEME_PRIMARY1);
+
+  if (event == EVT_TOUCH_SLIDE) then
+    if (inside(touch, slider)) then
+      local d = (touch.y - slider.y) / slider.h;
+      local v = -1 * (d - 0.5) * 2048;
+                                            ;
+      setShmVar(slider.data.shm, v);
+      return 1;
+    end
+  elseif (event == EVT_TOUCH_TAP) then
+    if (touch.tapCount == 2) then
+      if (inside(touch, slider)) then
+        setShmVar(slider.data.shm, 0);
+        return 2;
+      end
+    end
+  end
+  return 0;
+end
+
+local function displayAllSlider(config, widget, event, touch)
+                              ;
+
+  if (config.layout == "V") then
+    if (#config.slider > 0) then
+      local width = widget[3] / ( 2 * #config.slider + 1);
+      local yborder = widget[4] * 0.1;
+      local height = widget[4] - 2 * yborder;
+
+      local y = yborder;
+
+      for si, sl in ipairs(config.slider) do
+        local slider = {
+           x = (2 * (si - 1) + 1 ) * width;
+           y = yborder;
+           w = width;
+           h = height;
+           data = sl;
+        };
+        displaySliderVertical(slider, widget, event, touch);
+      end
+    end
+  end
+  if (config.layout == "H") then
+
+  end
+  return 0;
 end
 
 local function update(widget, options)
@@ -227,7 +293,18 @@ end
 
 local function refresh(widget, event, touch)
   __libD.updateWidgetDimensions(widget, event);
-  if (errorCode == 0) then
+  if (errorCode == 0) and (config) then
+    if (widget[3] <= (LCD_W / 2)) then
+      if (iconWidget) then
+        lcd.drawBitmap(iconWidget, widget[1], widget[2] + widget[4] / 2 - 24);
+      end
+      lcd.drawText(widget[1] + 60, widget[2] + widget[4] / 2 - widget[9], config.name, MIDSIZE);
+    else
+      local error = displayAllSlider(config, widget, event, touch);
+      if (error > 0) then
+        lcd.drawText(widget[1], widget[2], "Error: " .. error, DBLSIZE);
+      end
+    end
   else
     lcd.drawText(widget[1], widget[2], "Error: " .. errorCode, DBLSIZE);
   end

@@ -11,12 +11,12 @@
 -- all further principals of tranferring state and other information.
 
 local function loadLib(filename)
-  print("TRACE: " , "loadLib:", filename );
+                             ;
   local basedir = "/EDGELUA" .. "/LIB/";
   local chunk = loadScript(basedir .. filename);
   local lib = nil;
   if (chunk) then
-    print("TRACE: " , "loadLib chunk:", filename );
+                                     ;
     lib = chunk();
   end
   collectgarbage();
@@ -172,11 +172,11 @@ local function background(widget)
     __libD.processShortCuts(shortCuts, queue, switches);
     __libD.processRemoteInput(__WmSw2Config, menu, queue, remoteInput);
     if (__WmSw2ForeignInput) and (lastForeignInput ~= __WmSw2ForeignInput) then
-      print("TRACE: " , "foreignInput", __WmSw2ForeignInput );
+                                                ;
       __libD.processForeignInput(__WmSw2Config, __WmSw2ForeignInput, menu, queue);
       lastForeignInput = __WmSw2ForeignInput;
     end
-    if (__stopWmSw2) and (__stopWmSw2 == 0) then
+    if ((__stopWmSw2) and (__stopWmSw2 == 0)) or not (__stopWmSw2) then
       switchFSM(__WmSw2Config, menu, queue, fsmState, encoder, exportValues, autoResets);
     end
 

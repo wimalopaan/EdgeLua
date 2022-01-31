@@ -1,0 +1,38 @@
+--
+-- EdgeLUA - EdgeTx / OpenTx Extensions
+-- Copyright (C) 2021 Wilhelm Meier <wilhelm.wm.meier@googlemail.com>
+--
+-- This work is licensed under the Creative Commons Attribution-NonCommercial-NoDerivatives 4.0 International License.
+-- To view a copy of this license, visit http:
+-- or send a letter to Creative Commons, PO Box 1866, Mountain View, CA 94042, USA.
+
+-- IMPORTANT
+-- Please note that the above license also covers the transfer protocol used and the encoding scheme and
+-- all further principals of tranferring state and other information.
+
+local gstates1 = {"aus", "ein1", "ein2"};
+
+local menu = {
+  title = "TipTip",
+  saveValues = false,
+  {
+    title = "Deck 1",
+    {"M1A", states = gstates1, state = 1, switch = "sa", fn = 1, module = 1},
+    {"M1B", states = gstates1, state = 1, switch = "sb", fn = 2, module = 1},
+    {"M1C", states = gstates1, state = 1, switch = nil, fn = 3, module = 1},
+    {"M1D", states = gstates1, state = 1, switch = nil, fn = 4, module = 1},
+    {"M1E", states = gstates1, state = 1, switch = "ls1", fn = 5, module = 1, lsmode = 1},
+  },
+  {
+    title = "Deck 2",
+    {"M1A", states = gstates1, state = 1, switch = "sa", fn = 1, module = 2},
+    {"M1B", states = gstates1, state = 1, switch = "sb", fn = 2, module = 2},
+  },
+}
+
+local map = {
+  {module = 1, type = 9, description = "MoMo Sauerland Vorne"},
+  {module = 2, type = 9, description = "MoMo Sauerland Hinten"},
+};
+
+return menu, map, exportValues;

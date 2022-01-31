@@ -133,23 +133,28 @@ end
 local function displayAllSlider(config, widget, event, touch)
   TRACE3("Display All Slider");
 
-  if (#config.slider > 0) then
-    local width = widget[W_Width] / ( 2 * #config.slider + 1);
-    local yborder = widget[W_Height] * 0.1; 
-    local height = widget[W_Height]  - 2 * yborder;
-
-    local y =  yborder; 
-
-    for si, sl in ipairs(config.slider) do
-      local slider = {
-         x = (2 * (si - 1)  + 1 ) * width;
-         y = yborder;
-         w = width;
-         h = height;
-         data = sl;
-      };
-      displaySliderVertical(slider, widget, event, touch);
-    end
+  if (config.layout == "V") then
+    if (#config.slider > 0) then
+      local width = widget[W_Width] / ( 2 * #config.slider + 1);
+      local yborder = widget[W_Height] * 0.1; 
+      local height = widget[W_Height]  - 2 * yborder;
+  
+      local y =  yborder; 
+  
+      for si, sl in ipairs(config.slider) do
+        local slider = {
+           x = (2 * (si - 1)  + 1 ) * width;
+           y = yborder;
+           w = width;
+           h = height;
+           data = sl;
+        };
+        displaySliderVertical(slider, widget, event, touch);
+      end
+    end      
+  end
+  if (config.layout == "H") then
+    
   end
   return 0;
 end

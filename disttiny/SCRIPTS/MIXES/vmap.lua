@@ -102,9 +102,12 @@ local function demux(value)
 
       local channel = math.min(value % 10, #chValues);
 
-      chValues[channel] = values[chValue] * 10.24;
+                                                      ;
 
-                                                                                         ;
+      if (channel > 0) and (chValue > 0) then
+         chValues[channel] = values[chValue] * 10.24;
+                                                                                            ;
+      end
 
    end
    return chValues[1], chValues[2], chValues[3], chValues[4], chValues[5];
@@ -119,7 +122,7 @@ local function transportGV()
 end
 
 local function transportShm()
-   return demux(getShmVar(1));
+   return demux(getShmVar(2));
 end
 
 if (LCD_W <= 212) then
