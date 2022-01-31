@@ -1,0 +1,64 @@
+--
+-- EdgeLUA - EdgeTx / OpenTx Extensions 
+-- Copyright (C) 2021 Wilhelm Meier <wilhelm.wm.meier@googlemail.com>
+--
+-- This work is licensed under the Creative Commons Attribution-NonCommercial-NoDerivatives 4.0 International License. 
+-- To view a copy of this license, visit http://creativecommons.org/licenses/by-nc-nd/4.0/ 
+-- or send a letter to Creative Commons, PO Box 1866, Mountain View, CA 94042, USA.
+
+-- IMPORTANT
+-- Please note that the above license also covers the transfer protocol used and the encoding scheme and 
+-- all further principals of tranferring state and other information.
+
+#include "../../global.h"
+
+return {
+  title = "TX16s",
+
+  firstColumnWidth = 110,
+
+  parameterDial = "s1",
+
+  module = 0;
+
+  -- IMPORTANT: 
+  -- if use tiptip-backend, then also install vmap.lua mixer script
+  
+  backend = 3; -- 1: sbus/ibus; 2: s.port/f.port (tbd); 3: tiptip (maybe); 4: solexpert (tbd)
+
+--  #include "common.lh"
+
+  #include "flightmodes.lh"
+
+  navigation = {
+    #ifdef USE_TRIM_NAMES
+    next     = "t5d", -- maybe jsx, jsy on x12s with curve
+    previous = "t5u", 
+    select   = "t6u",   
+    #endif
+    #ifdef USE_GETSWITCHID
+    next     = "5d", -- maybe jsx, jsy on x12s with curve
+    previous = "5u", 
+    select   = "6u",   
+    #endif
+
+    scrollUpDn = "ls", -- direct navigating
+    scrollLR = "rs",
+    pageSwitch = "6pos",
+    --  pageSwitch = "ext1",
+
+    #ifdef USE_FALLBACK_IDS
+    fallbackIds = { -- switch IDs, if determining via above strings does not work (OpenTx)
+      next     = 69, -- "5d"
+      previous = 70, -- "5u"
+      select   = 72, -- "6u"    
+    },
+    #endif
+   },
+
+  #include "backends.lh" 
+
+  #include "safemode.lh"
+
+  #include "export.lh"
+};
