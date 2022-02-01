@@ -130,6 +130,35 @@ local function displaySliderVertical(slider, widget, event, touch)
   return 0;
 end
 
+local function displaySliderHorizontal(slider, widget, event, touch)
+  lcd.drawFilledRectangle(slider.x, slider.y, slider.w, slider.h, lcd.RGB(slider.data.color));
+  lcd.drawRectangle(slider.x, slider.y, slider.w, slider.h, COLOR_THEME_PRIMARY2);
+  lcd.drawText(slider.x, slider.y - 1.1 * widget[W_FontHSmall], slider.data.name, COLOR_THEME_PRIMARY1);
+
+  local value = -1 * getShmVar(slider.data.shm);
+  local position = slider.w * (value / 1024 + 1) / 2 + slider.x;
+
+  lcd.drawFilledRectangle(position - 5, slider.y, 10, slider.h, COLOR_THEME_PRIMARY1);
+
+  if (event == EVT_TOUCH_SLIDE) then
+    if (inside(touch, slider)) then
+      local d = (touch.x - slider.x) / slider.w;
+      local v = -1 * (d - 0.5) * 2048;
+      TRACE3("slider:", slider.data.name, v);
+      setShmVar(slider.data.shm, v);
+      return 1;
+    end
+  elseif (event == EVT_TOUCH_TAP) then
+    if (touch.tapCount == 2) then
+      if (inside(touch, slider)) then
+        setShmVar(slider.data.shm, 0);
+        return 2;
+      end
+    end
+  end
+  return 0;
+end
+
 local function displayAllSlider(config, widget, event, touch)
   TRACE3("Display All Slider");
 
@@ -154,7 +183,24 @@ local function displayAllSlider(config, widget, event, touch)
     end      
   end
   if (config.layout == "H") then
-    
+    if (#config.slider > 0) then
+      local height = widget[W_Height] / ( 2 * #config.slider + 1);
+      local xborder = widget[W_Width] * 0.1; 
+      local width = widget[W_Width] - 2 * xborder;
+  
+      local y =  yborder; 
+  
+      for si, sl in ipairs(config.slider) do
+        local slider = {
+           x = xborder;
+           y = (2 * (si - 1)  + 1 ) * height;
+           w = width;
+           h = height;
+           data = sl;
+        };
+        displaySliderHorizontal(slider, widget, event, touch);
+      end
+    end          
   end
   return 0;
 end
