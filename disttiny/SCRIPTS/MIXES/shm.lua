@@ -57,7 +57,16 @@ local input = {
 };
 
 local function transportShm(s0, s1, s2, s3, s4)
-   return getShmVar(s0), getShmVar(s1), getShmVar(s2), getShmVar(s3), getShmVar(s4);
+   local indizes = {s0, s1, s2, s3, s4};
+   local values = {0, 0, 0, 0, 0};
+
+   for i, index in ipairs(indizes) do
+      if (index >= 1) and (index <= 16) then
+         values[i] = getShmVar(index);
+                                               ;
+      end
+   end
+   return values[1], values[2], values[3], values[4], values[5];
 end
 
 return {
