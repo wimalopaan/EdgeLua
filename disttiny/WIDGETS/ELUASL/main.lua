@@ -147,7 +147,6 @@ local options = {
   { "Name", STRING}
 };
 
-local options = {};
 local config = nil;
 local iconWidget = nil;
 
