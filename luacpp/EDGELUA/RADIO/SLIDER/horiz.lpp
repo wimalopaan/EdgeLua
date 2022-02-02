@@ -13,7 +13,7 @@
 #include "../../../global.h"
 
 return {
-  name = "SliderH",
+  name = "Slider 10-12",
   icon = "expand.png",
   layout = "H", -- H: left2right, V: top2bottom
   slider = {

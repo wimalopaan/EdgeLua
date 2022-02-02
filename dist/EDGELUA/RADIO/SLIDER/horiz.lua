@@ -11,7 +11,7 @@
 -- all further principals of tranferring state and other information.
 
 return {
-  name = "SliderH",
+  name = "Slider 10-12",
   icon = "expand.png",
   layout = "H", -- H: left2right, V: top2bottom
   slider = {
