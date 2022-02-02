@@ -300,7 +300,9 @@ local function displayAllSlider(config, widget, event, touch)
            h = height;
            data = sl;
         };
-        displaySliderVertical(slider, widget, event, touch);
+        if (displaySliderVertical(slider, widget, event, touch) > 0) then
+          event = 0;
+        end
       end
     end
   end
@@ -320,7 +322,9 @@ local function displayAllSlider(config, widget, event, touch)
            h = height;
            data = sl;
         };
-        displaySliderHorizontal(slider, widget, event, touch);
+        if (displaySliderHorizontal(slider, widget, event, touch) > 0) then
+          event = 0;
+        end
       end
     end
   end
