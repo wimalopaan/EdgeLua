@@ -20,8 +20,13 @@ local output = {
    "mod5"
 };
 
+local chValues = {0, 0, 0, 0, 0}; -- outputs
+
 local gvar = 0;
-local values = nil;
+local backend = 0; 
+local bendcfg = nil;
+local values = nil; -- tiptip
+local exportValues = nil; -- bus
 
 local function initConfig()
    TRACE("vmap: init: ", __WmMixerConfig);
@@ -43,50 +48,86 @@ local function initConfig()
       end
    end
 
-   local backend = __WmMixerConfig[MIXCFG_Backend];   
-   local bendcfg = __WmMixerConfig[MIXCFG_Backend_Data][backend];
+   backend = __WmMixerConfig[MIXCFG_Backend];   
+   bendcfg = __WmMixerConfig[MIXCFG_Backend_Data][backend];
 
    if (backend == CFG_BEND_Bus) then
-      
+      gvar = bendcfg[BEND_BUS_ExportMixerGlobalVariable];
+      exportValues = bendcfg[BEND_BUS_ExportValues];
+      TRACE("vmap: bus: gvar: ", gvar, exportValues);         
    end
    if (backend == CFG_BEND_TipTip) then
       gvar = bendcfg[BEND_TIPTIP_MixerGlobalVariable];
       values = bendcfg[BEND_TIPTIP_Values];
-      TRACE("vmap: gvar: ", gvar, values);         
+      TRACE("vmap: tiptip: gvar: ", gvar, values);         
    end
 end
 
 if (LCD_W <= 212) then
-   GLOBAL_LUA_MIX_VAR = 0;
+   GLOBAL_LUA_MIX_VMAP_VAR = 0;
 end
- 
-local lastValue = 0;
- 
-local function demux(value)
-   local chValues = {0, 0, 0, 0, 0};
-   if (value ~= lastValue) then
-      TRACE3("vmap value:", value);
-      lastValue = value;
-   end
-   if (values) then
-      local chValue = math.min(value % 10, #values);
-      value = math.floor(value / 10);
-  
-      local channel = math.min(value % 10, #chValues);
-  
-      TRACE3("vmap value 2:", value, channel, chValue);
 
-      if (channel > 0) and (chValue > 0) then
-         chValues[channel] = values[chValue] * 10.24;       
-         TRACE3("vmap: chValue:", chValue, "chan:", channel, "chValues:", chValues[channel]);         
-      end
-  
+local function demuxBendBus(value)
+--   local chValues = {0, 0, 0, 0, 0};
+   if (exportValues) then
+      local state = value % 10; -- (1000 * <export>) + (100 * <function>) + (10 * <module>) + <valueIndex>
+      value = math.floor(value / 10);
+      local module = value % 10;
+      value = math.floor(value / 10);
+      local fn = value % 10;
+      value = math.floor(value / 10);
+      local export = value % 10;
+
+      export = math.min(export, #exportValues);
+      local evalues = exportValues[export];
+      state = math.min(state, #evalues);
+
+      if (module > 0) and (state > 0) then
+         chValues[module] = evalues[state] * 10.24;       
+         TRACE3("vmap: chValue:", state, "chan:", module, "chValues:", chValues[module]);         
+      end  
+   end
+   return chValues[1], chValues[2], chValues[3], chValues[4], chValues[5];    
+end
+
+local function demuxBendTipTip(value)
+--   local chValues = {0, 0, 0, 0, 0};
+   if (values) then
+      local state = math.min(value % 10, #values); -- (1000 * <export>) + (100 * <function>) + (10 * <module>) + <valueIndex>
+      value = math.floor(value / 10);
+      local module = math.min(value % 10, #chValues);
+      TRACE3("vmap tip m i:", module, state);
+      if (module > 0) and (state > 0) then
+         chValues[module] = values[state] * 10.24;       
+         TRACE3("vmap: chValue:", state, "chan:", module, "chValues:", chValues[module]);         
+      end  
    end   
    return chValues[1], chValues[2], chValues[3], chValues[4], chValues[5];    
 end
 
+#ifdef DEBUG
+local lastValue = 0; -- only for debug
+#endif
+
+local function demux(value)
+   #ifdef DEBUG
+   if (value ~= lastValue) then
+      TRACE3("vmap value:", value);
+      lastValue = value;
+   end
+   #endif
+
+   if (backend == 1) then
+      return demuxBendBus(value);
+   elseif (backend == 3) then
+      return demuxBendTipTip(value);      
+   end
+
+   return chValues[1], chValues[2], chValues[3], chValues[4], chValues[5];    
+end
+
 local function transportGlobalLua()
-   return demux(GLOBAL_LUA_MIX_VAR);
+   return demux(GLOBAL_LUA_MIX_VMAP_VAR);
 end
 
 local function transportGV()

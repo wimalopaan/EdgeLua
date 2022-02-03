@@ -97,7 +97,7 @@ local function demux(value)
       lastValue = value;
    end
    if (values) then
-      local chValue = math.min(value % 10, #values);
+      local chValue = math.min(value % 10, #values); -- 10 * <channel> + <valueIndex>
       value = math.floor(value / 10);
 
       local channel = math.min(value % 10, #chValues);

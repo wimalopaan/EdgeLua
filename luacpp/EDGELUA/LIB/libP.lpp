@@ -151,6 +151,7 @@ local function transportToMixer(gv, value)
 end
 
 local function transportToVmap(gv, value)
+  -- dummy: function is set to real transport function based on radio and capabilities
 end
 
 local function sportConfigFSM()
@@ -314,14 +315,15 @@ local function exportBus(bcfg, item)
   local exportValues = bcfg[BEND_BUS_ExportValues];
   if (exportValues) then
     if (item[ITEM_Export]) and (item[ITEM_Export] <= #exportValues) then
-      TRACE("exportBus Exp:", item[ITEM_Export]);
+      TRACE3("exportBus Exp:", item[ITEM_Export]);
       local stateValues = exportValues[item[ITEM_Export]];
       if (stateValues) then
         if (item[ITEM_State] <= #stateValues) then
-          local expValue = stateValues[ item[ITEM_State] ] * 10.24;
+          local expValue = (item[ITEM_Export] * 1000) + (item[ITEM_Function] * 100) + (item[ITEM_Module] * 10) + item[ITEM_State]; -- see export mixer script
           if (bcfg[BEND_BUS_ExportMixerGlobalVariable]) then
-            TRACE("exportBus gv:", bcfg[BEND_BUS_ExportMixerGlobalVariable], expValue);
-            model.setGlobalVariable(bcfg[BEND_BUS_ExportMixerGlobalVariable], 0, expValue);
+            TRACE3("exportBus gv:", bcfg[BEND_BUS_ExportMixerGlobalVariable], expValue);
+            transportToVmap(bcfg[BEND_BUS_ExportMixerGlobalVariable], expValue); -- bus backend also uses vmap-var for exporting: requires export-mixer script
+--            model.setGlobalVariable(bcfg[BEND_BUS_ExportMixerGlobalVariable], 0, expValue);
           end
         end          
       end
@@ -430,7 +432,7 @@ local function transportGlobalLua(gv, value)
 end
 
 local function transportGlobalLuaVmap(gv, value)
-  GLOBAL_LUA_MIX_VAR = value;
+  GLOBAL_LUA_MIX_VMAP_VAR = value;
   TRACE3("transportGlobalVmap", value);
 end
 

@@ -11,12 +11,12 @@
 -- all further principals of tranferring state and other information.
 
 local function loadLib(filename)
-                             ;
+  print("TRACE: " , "loadLib:", filename );
   local basedir = "/EDGELUA" .. "/LIB/";
   local chunk = loadScript(basedir .. filename);
   local lib = nil;
   if (chunk) then
-                                     ;
+    print("TRACE: " , "loadLib chunk:", filename );
     lib = chunk();
   end
   collectgarbage();
@@ -48,73 +48,111 @@ local output = {
    "mod5"
 };
 
+local chValues = {0, 0, 0, 0, 0}; -- outputs
+
 local gvar = 0;
-local values = nil;
+local backend = 0;
+local bendcfg = nil;
+local values = nil; -- tiptip
+local exportValues = nil; -- bus
 
 local function initConfig()
-                                         ;
+   print("TRACE: " , "vmap: init: ", __WmMixerConfig );
    if not(__WmMixerConfig) then
       if not __libM then
         loadLibM();
-                                     ;
+        print("TRACE: " , "vmap: libM: ", __libM );
         if __libM then
          local config = __libM.loadConfig();
-                                        ;
+         print("TRACE: " , "vmap: config: ", config );
          if not(config) then
             errorCode = 4;
             return;
          end
          __WmMixerConfig = __libM.initConfig(config); -- not modify model
-                                                  ;
+         print("TRACE: " , "vmap initConfig", __WmMixerConfig );
          collectgarbage();
         end
       end
    end
 
-   local backend = __WmMixerConfig[1];
-   local bendcfg = __WmMixerConfig[2][backend];
+   backend = __WmMixerConfig[1];
+   bendcfg = __WmMixerConfig[2][backend];
 
    if (backend == 1) then
-
+      gvar = bendcfg[4];
+      exportValues = bendcfg[3];
+      print("TRACE: " , "vmap: bus: gvar: ", gvar, exportValues );
    end
    if (backend == 3) then
       gvar = bendcfg[3];
       values = bendcfg[4];
-                                         ;
+      print("TRACE: " , "vmap: tiptip: gvar: ", gvar, values );
    end
 end
 
 if (LCD_W <= 212) then
-   __Sw2MixerValue = 0;
+   __Sw2MixerValueVmap = 0;
 end
 
-local lastValue = 0;
-
-local function demux(value)
-   local chValues = {0, 0, 0, 0, 0};
-   if (value ~= lastValue) then
-                                  ;
-      lastValue = value;
-   end
-   if (values) then
-      local chValue = math.min(value % 10, #values);
+local function demuxBendBus(value)
+-- local chValues = {0, 0, 0, 0, 0};
+   if (exportValues) then
+      local state = value % 10; -- (1000 * <export>) + (100 * <function>) + (10 * <module>) + <valueIndex>
       value = math.floor(value / 10);
+      local module = value % 10;
+      value = math.floor(value / 10);
+      local fn = value % 10;
+      value = math.floor(value / 10);
+      local export = value % 10;
 
-      local channel = math.min(value % 10, #chValues);
+      export = math.min(export, #exportValues);
+      local evalues = exportValues[export];
+      state = math.min(state, #evalues);
 
-                                                      ;
-
-      if (channel > 0) and (chValue > 0) then
-         chValues[channel] = values[chValue] * 10.24;
-                                                                                            ;
+      if (module > 0) and (state > 0) then
+         chValues[module] = evalues[state] * 10.24;
+                                                                                        ;
       end
-
    end
    return chValues[1], chValues[2], chValues[3], chValues[4], chValues[5];
 end
 
+local function demuxBendTipTip(value)
+-- local chValues = {0, 0, 0, 0, 0};
+   if (values) then
+      local state = math.min(value % 10, #values); -- (1000 * <export>) + (100 * <function>) + (10 * <module>) + <valueIndex>
+      value = math.floor(value / 10);
+      local module = math.min(value % 10, #chValues);
+                                            ;
+      if (module > 0) and (state > 0) then
+         chValues[module] = values[state] * 10.24;
+                                                                                        ;
+      end
+   end
+   return chValues[1], chValues[2], chValues[3], chValues[4], chValues[5];
+end
+
+local lastValue = 0; -- only for debug
+
+local function demux(value)
+
+   if (value ~= lastValue) then
+                                  ;
+      lastValue = value;
+   end
+
+   if (backend == 1) then
+      return demuxBendBus(value);
+   elseif (backend == 3) then
+      return demuxBendTipTip(value);
+   end
+
+   return chValues[1], chValues[2], chValues[3], chValues[4], chValues[5];
+end
+
 local function transportGlobalLua()
-   return demux(__Sw2MixerValue);
+   return demux(__Sw2MixerValueVmap);
 end
 
 local function transportGV()
@@ -126,7 +164,7 @@ local function transportShm()
 end
 
 if (LCD_W <= 212) then
-                                        ;
+   print("TRACE: " , "vmap: use transportGlobalLua" );
    return {
        init = initConfig,
        output = output,
@@ -134,14 +172,14 @@ if (LCD_W <= 212) then
    };
 else
    if (getShmVar) then
-                                     ;
+      print("TRACE: " , "vmap: use transportShm" );
       return {
         init = initConfig,
         output = output,
         run = transportShm
       };
    else
-                                    ;
+      print("TRACE: " , "vmap: use transportGV" );
       return {
          init = initConfig,
          output = output,

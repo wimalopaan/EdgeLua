@@ -10,18 +10,17 @@
 -- Please note that the above license also covers the transfer protocol used and the encoding scheme and
 -- all further principals of tranferring state and other information.
 
--- Default menu for large radios w/ color lcd
+-- exporting switch states needs mixer script vmap to be setup too
 
 local gstates1 = {"aus", "ein", "blink 1", "blink 2"};
 
 local menu = {
-  title = "Autoreset Demo",
+  title = "Export Demo",
   saveValues = false,
   {
-    title = "Kollektion",
-    {"ScheinW1", states = gstates1, state = 1, switch = nil, fn = 1, module = 1, autoreset = 30}, -- 300ms
-    {"ScheinW2", states = gstates1, state = 1, switch = nil, fn = 2, module = 1, autoreset = 100}, -- 1000ms = 1s
-    {"ScheinW3", states = {"ein", "aus"}, state = 1, switch = "sf", fn = 3, module = 2, lsmode = 1, autoreset = 50}, -- 500ms
+    title = "Kollektion1",
+    {"M1A", states = gstates1, state = 1, switch = "sa", fn = 1, module = 1, export = 1}, -- export values set 1 (see config under /EDGELUA/RADIO)
+    {"M1B", states = gstates1, state = 1, switch = "sb", fn = 2, module = 1, export = 3}, -- export values set 3
   },
 }
 
