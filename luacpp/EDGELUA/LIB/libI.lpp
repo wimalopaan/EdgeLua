@@ -385,6 +385,7 @@ local function initConfigBW(config, modifyModel)
   end
 
   local footer = "Vers: " .. VERSION;
+  #ifdef USE_LONG_FOOTER
   if (cfg[CFG_Encoding] == 0) then
     footer = footer .. " Mod: xjt";
   elseif (cfg[CFG_Encoding] == 1) then
@@ -397,6 +398,7 @@ local function initConfigBW(config, modifyModel)
   if (config.title) then
     footer = footer .. " Conf: " .. config.title;
   end
+  #endif
   cfg[CFG_Footer] = footer;
 
   if (config.backend >= 1) and (config.backend <= 4) then
@@ -405,6 +407,18 @@ local function initConfigBW(config, modifyModel)
     cfg[CFG_Backend] = 1;
   end 
 
+  #ifdef USE_LONG_FOOTER
+  if (cfg[CFG_Backend] == 1) then
+    APPEND(cfg[CFG_Footer], " Bend: bus"); 
+  elseif (cfg[CFG_Backend] == 2) then
+    APPEND(cfg[CFG_Footer], " Bend: sport"); 
+  elseif (cfg[CFG_Backend] == 3) then
+    APPEND(cfg[CFG_Footer], " Bend: tiptip"); 
+  elseif (cfg[CFG_Backend] == 4) then 
+    APPEND(cfg[CFG_Footer], " Bend: sole"); 
+  end
+  #endif
+  
 --  model.deleteMixes();
 
   #ifdef INCLUDE_SAFEMODE

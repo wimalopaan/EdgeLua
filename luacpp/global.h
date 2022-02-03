@@ -3,7 +3,7 @@
 // activates TRACE macros: set via make
 // #define DEBUG 
 
-// inactivates soem extra feature for small radios (T12): set via make
+// inactivates some extra feature for small radios (T12): set via make
 // #define SELECT_TINY
 
 #ifdef SELECT_TINY 
@@ -21,6 +21,7 @@
 #define USE_BACKEND_TIPTIP
 #define USE_BACKEND_SOLEXPERT
 #define USE_VALUE_STORAGE
+#define USE_LONG_FOOTER
 #endif
 
 #define USE_DEPRECATED

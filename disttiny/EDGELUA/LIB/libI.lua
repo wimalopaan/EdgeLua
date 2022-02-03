@@ -370,19 +370,7 @@ local function initConfigBW(config, modifyModel)
     cfg[9] = 2; --sbus
   end
 
-  local footer = "Vers: " .. "2.46";
-  if (cfg[9] == 0) then
-    footer = footer .. " Mod: xjt";
-  elseif (cfg[9] == 1) then
-    footer = footer .. " Mod: ibus";
-  elseif (cfg[9] == 3) then
-    footer = footer .. " Mod: isrm";
-  else
-    footer = footer .. " Mod: sbus";
-  end
-  if (config.title) then
-    footer = footer .. " Conf: " .. config.title;
-  end
+  local footer = "Vers: " .. "2.47";
   cfg[19] = footer;
 
   if (config.backend >= 1) and (config.backend <= 4) then
@@ -390,7 +378,6 @@ local function initConfigBW(config, modifyModel)
   else
     cfg[14] = 1;
   end
-
 -- model.deleteMixes();
 
   if (modifyModel) and (config.safeMode) then
