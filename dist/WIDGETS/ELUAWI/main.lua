@@ -11,12 +11,12 @@
 -- all further principals of tranferring state and other information.
 
 local function loadLib(filename)
-  print("TRACE: " , "loadLib:", filename );
+                             ;
   local basedir = "/EDGELUA" .. "/LIB/";
   local chunk = loadScript(basedir .. filename);
   local lib = nil;
   if (chunk) then
-    print("TRACE: " , "loadLib chunk:", filename );
+                                     ;
     lib = chunk();
   end
   collectgarbage();
@@ -253,19 +253,19 @@ local function refresh(widget, event, touch)
       local module = widget[11].Adresse;
       if (covers(touch, holdBtn)) then
         buttonState = 1;
-        print("TRACE: " , "buttonState", buttonState );
+                                         ;
       elseif (covers(touch, leftBtn)) then
         buttonState = 2;
-        print("TRACE: " , "buttonState", buttonState );
+                                         ;
       elseif (covers(touch, rightBtn)) then
         buttonState = 3;
-        print("TRACE: " , "buttonState", buttonState );
+                                         ;
       elseif (covers(touch, stopBtn)) then
         buttonState = 4;
-        print("TRACE: " , "buttonState", buttonState );
+                                         ;
       end
       __WmSw2ForeignInput = buttonState + 10 * fn + 100 * module;
-      print("TRACE: " , "buttonState FI", __WmSw2ForeignInput );
+                                                  ;
     end
 
   else

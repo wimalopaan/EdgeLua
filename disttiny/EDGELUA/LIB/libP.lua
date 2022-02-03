@@ -167,6 +167,7 @@ local function transportToMixer(gv, value)
 end
 
 local function transportToVmap(gv, value)
+  -- dummy: function is set to real transport function based on radio and capabilities
 end
 
 local function sportConfigFSM()
@@ -374,7 +375,7 @@ local function transportGlobalLua(gv, value)
 end
 
 local function transportGlobalLuaVmap(gv, value)
-  __Sw2MixerValue = value;
+  __Sw2MixerValueVmap = value;
                                       ;
 end
 

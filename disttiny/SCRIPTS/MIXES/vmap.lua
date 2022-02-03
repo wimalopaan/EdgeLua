@@ -48,8 +48,13 @@ local output = {
    "mod5"
 };
 
+local chValues = {0, 0, 0, 0, 0}; -- outputs
+
 local gvar = 0;
-local values = nil;
+local backend = 0;
+local bendcfg = nil;
+local values = nil; -- tiptip
+local exportValues = nil; -- bus
 
 local function initConfig()
                                          ;
@@ -71,50 +76,76 @@ local function initConfig()
       end
    end
 
-   local backend = __WmMixerConfig[1];
-   local bendcfg = __WmMixerConfig[2][backend];
+   backend = __WmMixerConfig[1];
+   bendcfg = __WmMixerConfig[2][backend];
 
    if (backend == 1) then
-
+      gvar = bendcfg[4];
+      exportValues = bendcfg[3];
+                                                    ;
    end
    if (backend == 3) then
       gvar = bendcfg[3];
       values = bendcfg[4];
-                                         ;
+                                                 ;
    end
 end
 
 if (LCD_W <= 212) then
-   __Sw2MixerValue = 0;
+   __Sw2MixerValueVmap = 0;
 end
 
-local lastValue = 0;
-
-local function demux(value)
-   local chValues = {0, 0, 0, 0, 0};
-   if (value ~= lastValue) then
-                                  ;
-      lastValue = value;
-   end
-   if (values) then
-      local chValue = math.min(value % 10, #values); -- 10 * <channel> + <valueIndex>
+local function demuxBendBus(value)
+-- local chValues = {0, 0, 0, 0, 0};
+   if (exportValues) then
+      local state = value % 10; -- (1000 * <export>) + (100 * <function>) + (10 * <module>) + <valueIndex>
       value = math.floor(value / 10);
+      local module = value % 10;
+      value = math.floor(value / 10);
+      local fn = value % 10;
+      value = math.floor(value / 10);
+      local export = value % 10;
 
-      local channel = math.min(value % 10, #chValues);
+      export = math.min(export, #exportValues);
+      local evalues = exportValues[export];
+      state = math.min(state, #evalues);
 
-                                                      ;
-
-      if (channel > 0) and (chValue > 0) then
-         chValues[channel] = values[chValue] * 10.24;
-                                                                                            ;
+      if (module > 0) and (state > 0) then
+         chValues[module] = evalues[state] * 10.24;
+                                                                                        ;
       end
-
    end
    return chValues[1], chValues[2], chValues[3], chValues[4], chValues[5];
 end
 
+local function demuxBendTipTip(value)
+-- local chValues = {0, 0, 0, 0, 0};
+   if (values) then
+      local state = math.min(value % 10, #values); -- (1000 * <export>) + (100 * <function>) + (10 * <module>) + <valueIndex>
+      value = math.floor(value / 10);
+      local module = math.min(value % 10, #chValues);
+                                            ;
+      if (module > 0) and (state > 0) then
+         chValues[module] = values[state] * 10.24;
+                                                                                        ;
+      end
+   end
+   return chValues[1], chValues[2], chValues[3], chValues[4], chValues[5];
+end
+
+local function demux(value)
+
+   if (backend == 1) then
+      return demuxBendBus(value);
+   elseif (backend == 3) then
+      return demuxBendTipTip(value);
+   end
+
+   return chValues[1], chValues[2], chValues[3], chValues[4], chValues[5];
+end
+
 local function transportGlobalLua()
-   return demux(__Sw2MixerValue);
+   return demux(__Sw2MixerValueVmap);
 end
 
 local function transportGV()

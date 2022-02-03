@@ -11,12 +11,12 @@
 -- all further principals of tranferring state and other information.
 
 local function loadLib(filename)
-  print("TRACE: " , "loadLib:", filename );
+                             ;
   local basedir = "/EDGELUA" .. "/LIB/";
   local chunk = loadScript(basedir .. filename);
   local lib = nil;
   if (chunk) then
-    print("TRACE: " , "loadLib chunk:", filename );
+                                     ;
     lib = chunk();
   end
   collectgarbage();
@@ -129,16 +129,16 @@ local function create(zone, options)
 
   if (CHAR_TRIM) and (getSwitchIndex) then
     local t5u = getSwitchIndex(CHAR_TRIM .. "5u");
-    print("TRACE: " , "5u", t5u );
+                    ;
   else
-    print("TRACE: " , "5u", "no char constants" );
+                                    ;
   end
 
   if (getPhysicalSwitches) then
     local sws = getPhysicalSwitches();
-    print("TRACE: " , "getPhysicalSwitches N", #sws );
+                                        ;
     for i, sw in ipairs(sws) do
-      print("TRACE: " , "getPhysicalSwitches", i, sw[1], sw[2] );
+                                                   ;
     end
   end
 
