@@ -1,0 +1,13 @@
+= EdgeLua
+
+Repository of LUA scripts for EdgeTx and OpenTx (mostly)
+
+== Installation
+
+===  `Horus`-like radios
+
+Copy all of `dist` onto your SD-Card
+
+===  `Taranis`-like radios
+
+Copy all of `disttiny` onto your SD-Card
