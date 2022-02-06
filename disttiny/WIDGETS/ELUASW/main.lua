@@ -190,11 +190,11 @@ local function background(widget)
 
     __libD.processForeignInputFromQueue(__WmSw2Config, __WmSw2ForeignInputQueue, menu, queue);
 
-    if (__WmSw2ForeignInput) and (lastForeignInput ~= __WmSw2ForeignInput) then
-                                                                            ;
-      __libD.processForeignInput(__WmSw2Config, __WmSw2ForeignInput, menu, queue);
-      lastForeignInput = __WmSw2ForeignInput;
-    end
+    -- if (__WmSw2ForeignInput) and (lastForeignInput ~= __WmSw2ForeignInput) then
+    -- ;
+    -- __libD.processForeignInput(__WmSw2Config, __WmSw2ForeignInput, menu, queue);
+    -- lastForeignInput = __WmSw2ForeignInput;
+    -- end
 
     if ((__stopWmSw2) and (__stopWmSw2 == 0)) or not (__stopWmSw2) then
       switchFSM(__WmSw2Config, menu, queue, fsmState, encoder, exportValues, autoResets);

@@ -519,21 +519,21 @@ local function findItem(cmenu, fn, module) -- compressed-menu
   return nil;
 end
 
-local function processForeignInput(config, foreignInput, menu, queue)
-  local state = foreignInput % 10;
-  foreignInput = math.floor(foreignInput / 10);
-  local fn = foreignInput % 10;
-  foreignInput = math.floor(foreignInput / 10);
-  local module = foreignInput % 10;
+-- local function processForeignInput(config, foreignInput, menu, queue)
+-- local state = foreignInput % 10;
+-- foreignInput = math.floor(foreignInput / 10);
+-- local fn = foreignInput % 10;
+-- foreignInput = math.floor(foreignInput / 10);
+-- local module = foreignInput % 10;
 
-  local item = findItem(menu, fn, module);
-  if (item) then
-    setAndPushItem(queue, item, state);
-    -- local push = {[1] = item, [2] = item[3]};
-    -- item[3] = state;
-    -- queue:push(push);
-  end
-end
+-- local item = findItem(menu, fn, module);
+-- if (item) then
+-- setAndPushItem(queue, item, state);
+-- -- local push = {[1] = item, [2] = item[3]};
+-- -- item[3] = state;
+-- -- queue:push(push);
+-- end
+-- end
 
 local function processForeignInputFromQueue(config, foreignQueue, menu, queue)
   if (foreignQueue:size() > 0) then
@@ -652,7 +652,8 @@ if (LCD_W <= 128) then
     processOverlays = processOverlays,
     selectItem = selectItem,
     selectParamItem = selectParamItem,
-    processForeignInput = processForeignInput,
+    -- processForeignInput = processForeignInput,
+    processForeignInputFromQueue = processForeignInputFromQueue,
     displayAddressConfig = displayAddressConfigBW,
   };
 elseif (LCD_W <= 212) then
@@ -671,7 +672,7 @@ elseif (LCD_W <= 212) then
     processOverlays = processOverlays,
     selectItem = selectItem,
     selectParamItem = selectParamItem,
-    processForeignInput = processForeignInput,
+    -- processForeignInput = processForeignInput,
     processForeignInputFromQueue = processForeignInputFromQueue,
     displayAddressConfig = displayAddressConfigBW,
   };
@@ -689,7 +690,7 @@ else
       processButtons = processButtons,
       selectItem = selectItem,
       selectParamItem = selectParamItem,
-      processForeignInput = processForeignInput,
+      -- processForeignInput = processForeignInput,
       processForeignInputFromQueue = processForeignInputFromQueue,
       processRemoteInput = processRemoteInput,
       displayAddressConfig = displayAddressConfigColor,
@@ -708,7 +709,7 @@ else
       processButtons = processButtons,
       selectItem = selectItem,
       selectParamItem = selectParamItem,
-      processForeignInput = processForeignInput,
+      -- processForeignInput = processForeignInput,
       processForeignInputFromQueue = processForeignInputFromQueue,
       processRemoteInput = processRemoteInput,
       displayAddressConfig = displayAddressConfigColorNoTheme,
