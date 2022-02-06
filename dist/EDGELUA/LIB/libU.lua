@@ -56,7 +56,7 @@ end
 -- end
 
 local function appendToFile(file, values)
-                             ;
+  print("TRACE: " , "appendToFile", file );
   io.write(file, "\t{");
   for i, v in ipairs(values) do
     io.write(file, v .. ",");
@@ -66,7 +66,7 @@ end
 
 local function saveValues(menu, filename, state)
   if (state[6]) then
-                             ;
+    print("TRACE: " , "saveValues dirty" );
     state[6] = false;
 
     local file = io.open(filename, "w");
@@ -75,39 +75,39 @@ local function saveValues(menu, filename, state)
       for ip, page in ipairs(menu) do
         for il, pline in ipairs(page) do
           local pitem = pline[1];
-                                                ;
+          print("TRACE: " , "saveValues", pitem[1] );
           appendToFile(file, pline[2]);
         end
       end
       io.write(file, "};\n");
       io.close(file);
     else
-                                               ;
+      print("TRACE: " , "saveValue open failed:", filename );
     end
   end
 end
 
 local function initValues(menu, filename)
-                               ;
+  print("TRACE: " , "initValues", filename );
   local data = loadfile(filename);
-                           ;
+  print("TRACE: " , "initValues", data );
   if (data) then
     local table = data();
     if (table) then
-                                 ;
+      print("TRACE: " , "initValues", #table );
       local lineNumber = 1;
       for ip, page in ipairs(menu) do
         for il, pline in ipairs(page) do
           local pitem = pline[1];
           if not(table[lineNumber]) then
-                                                         ;
+            print("TRACE: " , "wrong number of lines in value table" );
             return false;
           else
             if (#table[lineNumber] == #pline[2]) then
-                                                           ;
+              print("TRACE: " , "initValues assign", pitem[1] );
               pline[2] = table[lineNumber];
             else
-                                                             ;
+              print("TRACE: " , "initValues no match", pitem[1] );
             end
           end
           lineNumber = lineNumber + 1;
@@ -155,7 +155,7 @@ local function displayDebugBW(widget)
   local x3 = x1 + widget[3] / 2;
   local x4 = x1 + 3 * widget[3] / 4;
 
-      lcd.drawText(x1, y, debugText[7] .. "2.51", SMLSIZE);
+      lcd.drawText(x1, y, debugText[7] .. "2.52" .. " (dbg)", SMLSIZE);
 
   y = y + widget[8];
   lcd.drawText(x1, y, debugText[1] , SMLSIZE);

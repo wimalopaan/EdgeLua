@@ -11,12 +11,12 @@
 -- all further principals of tranferring state and other information.
 
 local function loadLib(filename)
-                             ;
+  print("TRACE: " , "loadLib:", filename );
   local basedir = "/EDGELUA" .. "/LIB/";
   local chunk = loadScript(basedir .. filename);
   local lib = nil;
   if (chunk) then
-                                     ;
+    print("TRACE: " , "loadLib chunk:", filename );
     lib = chunk();
   end
   collectgarbage();
@@ -180,7 +180,7 @@ local function create(zone, options)
   loadLibR();
   if (__libR) then
     remotes = __libR.initRemotes();
-                                       ;
+    print("TRACE: " , "ELUASW: remotes: ", remotes );
   end
 
   return widget;
@@ -197,11 +197,11 @@ local function background(widget)
 
     __libD.processForeignInputFromQueue(__WmSw2Config, __WmSw2ForeignInputQueue, menu, queue);
 
-    if (__WmSw2ForeignInput) and (lastForeignInput ~= __WmSw2ForeignInput) then
-                                                                            ;
-      __libD.processForeignInput(__WmSw2Config, __WmSw2ForeignInput, menu, queue);
-      lastForeignInput = __WmSw2ForeignInput;
-    end
+    -- if (__WmSw2ForeignInput) and (lastForeignInput ~= __WmSw2ForeignInput) then
+    -- print("TRACE: " , "foreignInput: ", __WmSw2ForeignInput, __WmSw2ForeignInputQueue );
+    -- __libD.processForeignInput(__WmSw2Config, __WmSw2ForeignInput, menu, queue);
+    -- lastForeignInput = __WmSw2ForeignInput;
+    -- end
 
     if (__libR) then
       __libR.processRemotes(remotes);

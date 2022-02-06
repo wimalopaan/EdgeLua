@@ -107,11 +107,11 @@ local function background(widget)
 
     __libD.processForeignInputFromQueue(__WmSw2Config, __WmSw2ForeignInputQueue, menu, queue);
 
-    if (__WmSw2ForeignInput) and (lastForeignInput ~= __WmSw2ForeignInput) then
-      TRACE("foreignInput: ", __WmSw2ForeignInput, __WmSw2ForeignInputQueue);
-      __libD.processForeignInput(__WmSw2Config, __WmSw2ForeignInput, menu, queue);
-      lastForeignInput = __WmSw2ForeignInput;
-    end
+    -- if (__WmSw2ForeignInput) and (lastForeignInput ~= __WmSw2ForeignInput) then
+    --   TRACE("foreignInput: ", __WmSw2ForeignInput, __WmSw2ForeignInputQueue);
+    --   __libD.processForeignInput(__WmSw2Config, __WmSw2ForeignInput, menu, queue);
+    --   lastForeignInput = __WmSw2ForeignInput;
+    -- end
     #ifdef USE_REMOTE_SWITCHES
     if (__libR) then
       __libR.processRemotes(remotes);

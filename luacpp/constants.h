@@ -7,7 +7,8 @@
 #define GLOBAL_LUA_MIX_VMAP_VAR   __Sw2MixerValueVmap
 #define GLOABL_LUA_CONFIG    __WmSw2Config
 #define GLOBAL_LUA_STOP_MASK __stopWmSw2
-#define GLOBAL_LUA_FOREIGN   __WmSw2ForeignInput
+// #define GLOBAL_LUA_FOREIGN   __WmSw2ForeignInput
+#define GLOBAL_LUA_Queue     __WmSw2ForeignInputQueue
 #define GLOABL_LUA_WARN1     __WmSw2Warning1
 #define GLOBAL_LUA_WARN2     __WmSw2Warning2
 

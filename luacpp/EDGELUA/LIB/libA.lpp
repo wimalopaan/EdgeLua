@@ -96,7 +96,7 @@ end
 
 local function setItem(fn, module, state, queue)
   TRACE2("setItem", fn, module, state);
-  __WmSw2ForeignInput = module * 100 + fn * 10 + state;
+--  __WmSw2ForeignInput = module * 100 + fn * 10 + state;
   local item= {};
   item[ITEM_Function] = fn;
   item[ITEM_Module] = module;

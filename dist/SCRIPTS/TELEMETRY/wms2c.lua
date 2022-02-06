@@ -11,12 +11,12 @@
 -- all further principals of tranferring state and other information.
 
 local function loadLib(filename)
-                             ;
+  print("TRACE: " , "loadLib:", filename );
   local basedir = "/EDGELUA" .. "/LIB/";
   local chunk = loadScript(basedir .. filename);
   local lib = nil;
   if (chunk) then
-                                     ;
+    print("TRACE: " , "loadLib chunk:", filename );
     lib = chunk();
   end
   collectgarbage();
@@ -192,9 +192,10 @@ local function init_telemetry()
 
   collectgarbage();
 
+    print("TRACE: " , "valuesFilename:", valuesFileName )
     if (valuesFileName) then
       loadLibU();
-
+      print("TRACE: " , "valuesFilename:", valuesFileName )
       if (__libU) then
         local ok = __libU.initValues(menu, valuesFileName);
         if not(ok) then

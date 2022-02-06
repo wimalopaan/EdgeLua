@@ -44,6 +44,10 @@ local function create(zone, options)
   end 
   collectgarbage();
 
+  if not(__WmSw2ForeignInputQueue) then
+    __WmSw2ForeignInputQueue = __libP.Class.Queue.new();
+  end
+
   return widget;
 end
 
@@ -186,8 +190,13 @@ local function refresh(widget, event, touch)
         buttonState = 4;
         TRACE("buttonState", buttonState);
       end
-      __WmSw2ForeignInput = buttonState + 10 * fn + 100 * module;
-      TRACE("buttonState FI", __WmSw2ForeignInput);
+      -- __WmSw2ForeignInput = buttonState + 10 * fn + 100 * module;
+      -- TRACE("buttonState FI", __WmSw2ForeignInput);
+      local item = {};
+      item[ITEM_Function] = fn;
+      item[ITEM_Module] = module;
+      item[ITEM_State] = buttonState;
+      __WmSw2ForeignInputQueue:push(item);
     end   
 
   else

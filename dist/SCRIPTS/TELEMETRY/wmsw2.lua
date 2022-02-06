@@ -11,12 +11,12 @@
 -- all further principals of tranferring state and other information.
 
 local function loadLib(filename)
-                             ;
+  print("TRACE: " , "loadLib:", filename );
   local basedir = "/EDGELUA" .. "/LIB/";
   local chunk = loadScript(basedir .. filename);
   local lib = nil;
   if (chunk) then
-                                     ;
+    print("TRACE: " , "loadLib chunk:", filename );
     lib = chunk();
   end
   collectgarbage();
@@ -118,7 +118,7 @@ local switchFSM = {};
 local encoder = nil;
 local rssiState = {};
 local exportValues = {0, -50, 50, 100}; -- percent
-local lastForeignInput = 0;
+-- local lastForeignInput = 0;
 
 local function run_telemetry(event)
 
@@ -186,18 +186,25 @@ local function init_telemetry()
 
   queue = __libP.Class.Queue.new();
 
+  if not(__WmSw2ForeignInputQueue) then
+    __WmSw2ForeignInputQueue = __libP.Class.Queue.new();
+  end
+
   collectgarbage();
-                                         ;
+  print("TRACE: " , "gc6: ", collectgarbage("count") );
 end
 
 local function background_telemetry()
   if (errorCode == 0) then
     __libD.processShortCuts(shortCuts, queue, switches);
     __libD.processOverlays(overlays, menuState, queue, switches);
-    if (__WmSw2ForeignInput) and (lastForeignInput ~= __WmSw2ForeignInput) then
-      __libD.processForeignInput(__WmSw2Config, __WmSw2ForeignInput, menu, queue);
-      lastForeignInput = __WmSw2ForeignInput;
-    end
+
+    __libD.processForeignInputFromQueue(__WmSw2Config, __WmSw2ForeignInputQueue, menu, queue);
+
+    -- if (__WmSw2ForeignInput) and (lastForeignInput ~= __WmSw2ForeignInput) then
+    -- __libD.processForeignInput(__WmSw2Config, __WmSw2ForeignInput, menu, queue);
+    -- lastForeignInput = __WmSw2ForeignInput;
+    -- end
                                                   ;
     if (__stopWmSw2) and (__stopWmSw2 == 0) then
       switchFSM(__WmSw2Config, menu, queue, fsmState, encoder, exportValues, autoResets);
