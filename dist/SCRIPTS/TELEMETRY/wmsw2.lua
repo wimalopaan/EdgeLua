@@ -94,6 +94,16 @@ local function loadLibU()
   collectgarbage();
 end
 
+local function loadLibR()
+  if not __libR then
+    __libR = loadLib("libR.lua");
+    if not __libR then
+      errorCode = 3.3;
+    end
+  end
+  collectgarbage();
+end
+
 local widget = {};
 local menuState = {1, 1, 1, 0, 0}; -- row, col, page
 local menu = {};

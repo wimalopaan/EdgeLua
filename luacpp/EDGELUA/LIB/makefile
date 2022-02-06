@@ -1,4 +1,4 @@
-targets += libA.lua libI.lua libD.lua libP.lua libU.lua libM.lua
+targets += libA.lua libI.lua libD.lua libP.lua libU.lua libM.lua libR.lua
 
 libA.lua: libA.lpp ../../global.h ../../version.h ../../constants.h ../../functions.lh sort.lh
 
@@ -11,5 +11,7 @@ libM.lua: libM.lpp ../../global.h ../../version.h ../../constants.h ../../functi
 libP.lua: libP.lpp ../../global.h ../../version.h ../../constants.h ../../functions.lh sort.lh
 
 libU.lua: libU.lpp ../../global.h ../../version.h ../../constants.h ../../functions.lh
+
+libR.lua: libR.lpp ../../global.h ../../version.h ../../constants.h ../../functions.lh
 
 -include ../../makefile.include

@@ -14,7 +14,7 @@ local function sort(table, key) -- sort up
   for i = 1, (#table - 1) do
     if (table[i][key] > table[i + 1][key]) then
       local tmp = table[i];
-      table[i] = transition[i + 1];
+      table[i] = table[i + 1];
       table[i + 1] = tmp;
       i = 1;
     end
@@ -25,7 +25,7 @@ local function sortDown(table, key)
     for i = 1, (#table - 1) do
       if (table[i][key] < table[i + 1][key]) then
         local tmp = table[i];
-        table[i] = transition[i + 1];
+        table[i] = table[i + 1];
         table[i + 1] = tmp;
         i = 1;
       end
@@ -71,42 +71,40 @@ local function initAnimations(anims)
 
                                                                 ;
 
+    local trans = {};
     if (anim.switches) then
-      local swt = {};
-      local sws = {};
+      local allTransitions = {};
       for si, s in ipairs(anim.switches) do
         if (s.transitions) then
-          local sw = {};
-          sw[1] = s.fn;
-          sw[2] = s.module;
-          local transitions = {};
           for it, t in ipairs(s.transitions) do
-            transitions[it] = {math.floor(t.at * 100), t.state, 0};
-          end
-          sort(transitions, 1);
-          sw[3] = transitions;
-          if (#transitions > 1) then
-            swt[#swt + 1] = sw;
+            trans = {};
+            trans[1] = s.fn;
+            trans[2] = s.module;
+            trans[3] = t.state;
+            trans[4] = math.floor(t.at * 100);
+            trans[5] = false;
+            allTransitions[#allTransitions + 1] = trans;
           end
         elseif (s.sequence) then
-          local sw = {};
-          sw[1] = s.fn;
-          sw[2] = s.module;
-          local durations = {};
-          for is, s in ipairs(s.sequence) do
-            durations[is] = {math.floor(s.duration * 100), s.state, 0};
-          end
-          sw[3] = durations;
-          if (#durations > 1) then
-            sws[#sws + 1] = sw;
+          local t = 0;
+          for it, d in ipairs(s.sequence) do
+            trans = {};
+            trans[1] = s.fn;
+            trans[2] = s.module;
+            trans[3] = d.state;
+            trans[4] = t;
+            trans[5] = false;
+            allTransitions[#allTransitions + 1] = trans;
+            t = t + math.floor(d.duration * 100);
           end
         end
       end
-      canim[3] = swt;
-      canim[4] = sws;
-    end
-    if (canim[1]) and (canim[2])
-          and (canim[3] or canim[4]) then
+      sort(allTransitions, 4);
+      canim[3] = allTransitions;
+
+      -- for ci, tr in ipairs(canim[3]) do
+      -- ;
+      -- end
       canims[#canims + 1] = canim;
     end
   end
@@ -114,84 +112,60 @@ local function initAnimations(anims)
   return canims;
 end
 
-local function setItem(fn, module, state)
+local function setItem(fn, module, state, queue)
                                       ;
   __WmSw2ForeignInput = module * 100 + fn * 10 + state;
+  local item= {};
+  item[4] = fn;
+  item[5] = module;
+  item[3] = state;
+  queue:push(item);
 end
 
 local function clearAnim(anim)
-  for i, swt in ipairs(anim[3]) do
-    for it, transition in ipairs(swt[3]) do
-      transition[3] = 0;
-    end
-  end
-  for i, sws in ipairs(anim[4]) do
-    for is, seqpoint in ipairs(sws[3]) do
-      seqpoint[3] = 0;
-    end
+  for i, tr in ipairs(anim[3]) do
+    tr[5] = false;
   end
 end
 
-local function runAnimation(anim, state)
+local function runAnimation(anim, state, queue)
   if not(anim) then
     return;
   end
   local t = getTime();
+  local wasLastTransition = false;
 
   if (state[2] == 0) then -- state: init
     __WmSw2Warning1 = "Animation";
     __WmSw2Warning2 = anim[1];
-                                                                                                           ;
+                                                                               ;
     state[2] = 1;
     state[3] = t; -- start of anim
     state[4] = t; -- last seq point
-    state[7] = 0; -- last trans or seq reached
     clearAnim(anim);
   elseif (state[2] == 1) then -- state: run
-    if ((t - state[1]) >= 10) then
-      local diffTime = t - state[3];
-      __WmSw2Warning1 = "Animation [" .. math.floor(diffTime / 100) .. "/" .. math.floor(anim[2] / 100) .. "]";
-      for i, swt in ipairs(anim[3]) do
-        local fn = swt[1];
-        local module = swt[2];
-        for it, transition in ipairs(swt[3]) do
-          if (transition[3] == 0) and (diffTime >= transition[1]) then
-            transition[3] = 1;
-            setItem(fn, module, transition[2]);
-            if (it == #swt[3]) then
-                             ;
-              state[7] = state[7] + 1;
-            end
-            break;
-          end
+    local diffTime = t - state[3];
+    __WmSw2Warning1 = "Animation [" .. math.floor(diffTime / 100) .. "/" .. math.floor(anim[2] / 100) .. "]";
+    for it, tr in ipairs(anim[3]) do
+      local fn = tr[1];
+      local module = tr[2];
+      if not(tr[5]) and (diffTime >= tr[4]) then
+        tr[5] = true;
+        setItem(fn, module, tr[3], queue);
+                                                                ;
+        if (it == #anim[3]) then
+          wasLastTransition = true;
         end
       end
-      diffTime = t - state[4];
-      for i, sws in ipairs(anim[4]) do
-        local fn = sws[1];
-        local module = sws[2];
-        for it, seqpoint in ipairs(sws[3]) do
-          if (seqpoint[3] == 0) and (diffTime >= seqpoint[1]) then
-            seqpoint[3] = 1;
-            state[4] = t;
-            setItem(fn, module, seqpoint[2]);
-            if (it == #sws[3]) then
-                             ;
-              state[7] = state[7] + 1;
-            end
-            break;
-          end
-        end
-      end
-      state[1] = t;
     end
+    state[1] = t;
     if (anim[2] > 0) and ((t - state[3]) >= anim[2]) then
       state[3] = t; -- restart
       state[4] = t;
                       ;
       clearAnim(anim);
     end
-    if (anim[2] == 0) and (state[7] >= 2) then
+    if (anim[2] == 0) and (wasLastTransition) then
                    ;
       state[2] = 0;
       state[5] = 0;
@@ -215,7 +189,6 @@ local function initAnimationFSM(state)
   resetState(state);
   state[5] = 0; -- active anim [1...4]
   state[8] = 0; -- selection
-  state[7] = 0;
   state[8] = 1;
 end
 

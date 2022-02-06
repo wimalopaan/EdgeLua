@@ -94,6 +94,16 @@ local function loadLibU()
   collectgarbage();
 end
 
+local function loadLibR()
+  if not __libR then
+    __libR = loadLib("libR.lua");
+    if not __libR then
+      errorCode = 3.3;
+    end
+  end
+  collectgarbage();
+end
+
 local name = "EL_Gui";
 local options = {};
 local menuState = {1, 1, 1, 0, 0}; -- row, col, page
@@ -112,8 +122,11 @@ local encoder = nil;
 local exportValues = {0, -50, 50, 100}; -- percent
 local rssiState = {};
 
-local lastForeignInput = 0;
-local remoteInput = {0, 0, 0, 0};
+local remotes = nil; -- libR Trainer inputs
+
+local lastForeignInput = 0; -- other widgets
+
+local remoteInput = {0, 0, 0, 0}; -- desk input
 
 local function create(zone, options)
   load();
@@ -158,8 +171,11 @@ local function create(zone, options)
 
   queue = __libP.Class.Queue.new();
 
-  collectgarbage();
+  if not(__WmSw2ForeignInputQueue) then
+    __WmSw2ForeignInputQueue = __libP.Class.Queue.new();
+  end
 
+  collectgarbage();
   return widget;
 end
 
@@ -171,11 +187,15 @@ local function background(widget)
   if (errorCode == 0) then
     __libD.processShortCuts(shortCuts, queue, switches);
     __libD.processRemoteInput(__WmSw2Config, menu, queue, remoteInput);
+
+    __libD.processForeignInputFromQueue(__WmSw2Config, __WmSw2ForeignInputQueue, menu, queue);
+
     if (__WmSw2ForeignInput) and (lastForeignInput ~= __WmSw2ForeignInput) then
-                                                ;
+                                                                            ;
       __libD.processForeignInput(__WmSw2Config, __WmSw2ForeignInput, menu, queue);
       lastForeignInput = __WmSw2ForeignInput;
     end
+
     if ((__stopWmSw2) and (__stopWmSw2 == 0)) or not (__stopWmSw2) then
       switchFSM(__WmSw2Config, menu, queue, fsmState, encoder, exportValues, autoResets);
     end

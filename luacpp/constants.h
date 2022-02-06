@@ -142,24 +142,31 @@
 
 #define ANIM_Name 1
 #define ANIM_Length 2
-#define ANIM_StatePoints 3
-#define ANIM_StateDurations 4
+#define ANIM_Transitions 3
 
-#define ASTATEPOINT_Function 1
-#define ASTATEPOINT_Module 2
-#define ASTATEPOINT_TimeStates 3
+#define ANIM_TRANS_Function 1
+#define ANIM_TRANS_Module 2
+#define ANIM_TRANS_State 3
+#define ANIM_TRANS_Time 4
+#define ANIM_TRANS_Done 5
 
-#define ATIMESTATE_Time 1
-#define ATIMESTATE_State 2
-#define ATIMESTATE_Done 3
+// #define ANIM_StateDurations 4
 
-#define ASTATEDUR_Function 1
-#define ASTATEDUR_Module 2
-#define ASTATEDUR_DurationStates 3
+// #define ASTATEPOINT_Function 1
+// #define ASTATEPOINT_Module 2
+// #define ASTATEPOINT_TimeStates 3
 
-#define ADURSTATE_Duration 1
-#define ADURSTATE_State 2
-#define ADURSTATE_Done 3
+// #define ATIMESTATE_Time 1
+// #define ATIMESTATE_State 2
+// #define ATIMESTATE_Done 3
+
+// #define ASTATEDUR_Function 1
+// #define ASTATEDUR_Module 2
+// #define ASTATEDUR_DurationStates 3
+
+// #define ADURSTATE_Duration 1
+// #define ADURSTATE_State 2
+// #define ADURSTATE_Done 3
 
 #define FSMANIM_LastTime 1
 #define FSMANIM_State 2
@@ -167,7 +174,7 @@
 #define FSMANIM_LastSwitch 4
 #define FSMANIM_ActiveAnim 5
 //#define FSMANIM_Selection 6
-#define FSMANIM_LastReached 7
+//#define FSMANIM_LastReached 7
 #define FSMANIM_CursorRow 8
 
 #define ALLFSMS_STATE_Init 0
@@ -238,3 +245,10 @@
 #define DEBUG_TEXT_Filename 9
 #define DEBUG_TEXT_StringOption 10
 #define DEBUG_TEXT_FuncNames 11
+
+#define REMOTE_SW_Name 1
+#define REMOTE_SW_thresh 2
+#define REMOTE_SW_map 3
+#define REMOTE_SW_fn 4
+#define REMOTE_SW_module 5
+#define REMOTE_SW_Id 6

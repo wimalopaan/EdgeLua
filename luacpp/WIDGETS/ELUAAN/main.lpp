@@ -69,6 +69,10 @@ local function create(zone, options)
 
   __libA.initAnimationFSM(fsmState);
 
+  if not(__WmSw2ForeignInputQueue) then
+    __WmSw2ForeignInputQueue = __libP.Class.Queue.new();
+  end
+
   TRACE("A6");
 
   __libI = nil; -- free memory
@@ -86,8 +90,9 @@ end
 
 local function background(widget)
   if (errorCode == 0) then
-    if (__stopWmSw2) and (__stopWmSw2 == 0) then
-      currentAnimation = __libA.runAnimation(currentAnimation, fsmState);
+    if ((__stopWmSw2) and (__stopWmSw2 == 0)) or not (__stopWmSw2) then
+      TRACE3("background ani, queue", __WmSw2ForeignInputQueue)
+      currentAnimation = __libA.runAnimation(currentAnimation, fsmState, __WmSw2ForeignInputQueue);
     end
   end
 end

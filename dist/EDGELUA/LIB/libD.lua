@@ -939,6 +939,23 @@ local function processForeignInput(config, foreignInput, menu, queue)
   end
 end
 
+local function processForeignInputFromQueue(config, foreignQueue, menu, queue)
+  if (foreignQueue:size() > 0) then
+                                                              ;
+    local fitem = foreignQueue:pop();
+    if (fitem) then
+      local item = findItem(menu, fitem[4], fitem[5]);
+                                                                                          ;
+      if (item) then
+        setAndPushItem(queue, item, fitem[3]);
+        -- local push = {[1] = item, [2] = item[3]};
+        -- item[3] = state;
+        -- queue:push(push);
+      end
+    end
+  end
+end
+
 local function processRemoteInput(config, menu, queue, remoteState)
   if (not config[8]) then
     return;
@@ -1174,6 +1191,7 @@ elseif (LCD_W <= 212) then
     selectItem = selectItem,
     selectParamItem = selectParamItem,
     processForeignInput = processForeignInput,
+    processForeignInputFromQueue = processForeignInputFromQueue,
     displayAddressConfig = displayAddressConfigBW,
   };
 else
@@ -1191,6 +1209,7 @@ else
       selectItem = selectItem,
       selectParamItem = selectParamItem,
       processForeignInput = processForeignInput,
+      processForeignInputFromQueue = processForeignInputFromQueue,
       processRemoteInput = processRemoteInput,
       displayAddressConfig = displayAddressConfigColor,
       displayFmRssiWarning = displayFmRssiWarningColor,
@@ -1209,6 +1228,7 @@ else
       selectItem = selectItem,
       selectParamItem = selectParamItem,
       processForeignInput = processForeignInput,
+      processForeignInputFromQueue = processForeignInputFromQueue,
       processRemoteInput = processRemoteInput,
       displayAddressConfig = displayAddressConfigColorNoTheme,
       displayFmRssiWarning = displayFmRssiWarningColor,

@@ -1,4 +1,4 @@
 
-targets += default.lua
+targets += default.lua simple.lua
 
 include ../../makefile.include

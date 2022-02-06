@@ -10,12 +10,15 @@
 -- Please note that the above license also covers the transfer protocol used and the encoding scheme and
 -- all further principals of tranferring state and other information.
 
-local function run()
-    lcd.clear();
-    lcd.drawText(10, 10, "Version: " .. "2.51", MIDSIZE);
-    return 0;
-end
+local maps = {
+    {2, 1, 3},
+};
+
+local threshes = {
+    {-33, 33},
+};
 
 return {
-  run = run
+    {"trn1", threshes[1], maps[1], fn = 1, module = 1},
+    {"trn2", threshes[1], maps[1], fn = 2, module = 1},
 };

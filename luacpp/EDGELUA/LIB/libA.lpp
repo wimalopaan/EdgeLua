@@ -53,42 +53,40 @@ local function initAnimations(anims)
 
     TRACE("init anim", ia, canim[ANIM_Name], canim[ANIM_Length]);
 
+    local trans = {};
     if (anim.switches) then
-      local swt = {};
-      local sws = {};
+      local allTransitions = {};
       for si, s in ipairs(anim.switches) do
         if (s.transitions) then
-          local sw = {};
-          sw[ASTATEPOINT_Function] = s.fn;
-          sw[ASTATEPOINT_Module] = s.module;
-          local transitions = {};
           for it, t in ipairs(s.transitions) do
-            transitions[it] = {math.floor(t.at * 100), t.state, 0};
+            trans = {};
+            trans[ANIM_TRANS_Function] = s.fn;
+            trans[ANIM_TRANS_Module] = s.module;
+            trans[ANIM_TRANS_State] = t.state;
+            trans[ANIM_TRANS_Time] = math.floor(t.at * 100);
+            trans[ANIM_TRANS_Done] = false;
+            ADD(allTransitions, trans);
           end
-          sort(transitions, ATIMESTATE_Time);
-          sw[ASTATEPOINT_TimeStates] = transitions;
-          if (#transitions > 1) then
-            ADD(swt, sw);
-          end
-        elseif (s.sequence) then
-          local sw = {};
-          sw[ASTATEDUR_Function] = s.fn;
-          sw[ASTATEDUR_Module] = s.module;
-          local durations = {};
-          for is, s in ipairs(s.sequence) do
-            durations[is] = {math.floor(s.duration * 100), s.state, 0};
-          end
-          sw[ASTATEDUR_DurationStates] = durations;
-          if (#durations > 1) then
-            ADD(sws, sw);
+        elseif (s.sequence) then          
+          local t = 0;
+          for it, d in ipairs(s.sequence) do
+            trans = {};
+            trans[ANIM_TRANS_Function] = s.fn;
+            trans[ANIM_TRANS_Module] = s.module;
+            trans[ANIM_TRANS_State] = d.state;
+            trans[ANIM_TRANS_Time] = t;            
+            trans[ANIM_TRANS_Done] = false;
+            ADD(allTransitions, trans);
+            t = t + math.floor(d.duration * 100);
           end
         end
       end
-      canim[ANIM_StatePoints] = swt;
-      canim[ANIM_StateDurations] = sws;
-    end
-    if (canim[ANIM_Name]) and (canim[ANIM_Length]) 
-          and (canim[ANIM_StatePoints] or canim[ANIM_StateDurations]) then
+      sort(allTransitions, ANIM_TRANS_Time);
+      canim[ANIM_Transitions] = allTransitions;
+
+      -- for ci, tr in ipairs(canim[ANIM_Transitions]) do
+      --   TRACE("canim trans", tr[ANIM_TRANS_Function], tr[ANIM_TRANS_Module], tr[ANIM_TRANS_Time], tr[ANIM_TRANS_State]);
+      -- end
       ADD(canims, canim);
     end
   end
@@ -96,84 +94,60 @@ local function initAnimations(anims)
   return canims;
 end
 
-local function setItem(fn, module, state)
+local function setItem(fn, module, state, queue)
   TRACE2("setItem", fn, module, state);
   __WmSw2ForeignInput = module * 100 + fn * 10 + state;
+  local item= {};
+  item[ITEM_Function] = fn;
+  item[ITEM_Module] = module;
+  item[ITEM_State] = state;
+  queue:push(item);
 end
 
 local function clearAnim(anim)
-  for i, swt in ipairs(anim[ANIM_StatePoints]) do
-    for it, transition in ipairs(swt[ASTATEPOINT_TimeStates]) do
-      transition[ATIMESTATE_Done] = 0;
-    end
-  end
-  for i, sws in ipairs(anim[ANIM_StateDurations]) do
-    for is, seqpoint in ipairs(sws[ASTATEDUR_DurationStates]) do
-      seqpoint[ADURSTATE_Done] = 0;
-    end
+  for i, tr in ipairs(anim[ANIM_Transitions]) do
+    tr[ANIM_TRANS_Done] = false;
   end
 end 
 
-local function runAnimation(anim, state)
+local function runAnimation(anim, state, queue)
   if not(anim) then
     return;
   end
   local t = getTime();
+  local wasLastTransition = false;
 
   if (state[FSMANIM_State] == FSMANIM_STATE_Init) then -- state: init
     __WmSw2Warning1 = "Animation";
     __WmSw2Warning2 = anim[ANIM_Name];
-    TRACE("Anim:", anim[ANIM_Name], anim[ANIM_Length], #anim[ANIM_StatePoints], #anim[ANIM_StateDurations]);
+    TRACE("Anim:", anim[ANIM_Name], anim[ANIM_Length], #anim[ANIM_Transitions]);
     state[FSMANIM_State] = FSMANIM_STATE_Run;
     state[FSMANIM_StartTime] = t; -- start of anim
     state[FSMANIM_LastSwitch] = t; -- last seq point
-    state[FSMANIM_LastReached] = 0; -- last trans or seq reached
     clearAnim(anim);
   elseif (state[FSMANIM_State] == FSMANIM_STATE_Run) then -- state: run
-    if ((t - state[FSMANIM_LastTime]) >= 10) then
-      local diffTime = t - state[FSMANIM_StartTime];
-      __WmSw2Warning1 = "Animation [" .. math.floor(diffTime / 100) .. "/" .. math.floor(anim[2] / 100) .. "]";
-      for i, swt in ipairs(anim[ANIM_StatePoints]) do
-        local fn = swt[ASTATEPOINT_Function];
-        local module = swt[ASTATEPOINT_Module];
-        for it, transition in ipairs(swt[ASTATEPOINT_TimeStates]) do
-          if (transition[ATIMESTATE_Done] == 0) and (diffTime >= transition[ATIMESTATE_Time]) then
-            transition[ATIMESTATE_Done] = 1;
-            setItem(fn, module, transition[ATIMESTATE_State]);
-            if (it == #swt[ASTATEPOINT_TimeStates]) then
-              TRACE("last t");
-              state[FSMANIM_LastReached] = state[FSMANIM_LastReached] + 1;
-            end
-            break;
-          end
+    local diffTime = t - state[FSMANIM_StartTime];
+    __WmSw2Warning1 = "Animation [" .. math.floor(diffTime / 100) .. "/" .. math.floor(anim[2] / 100) .. "]";
+    for it, tr in ipairs(anim[ANIM_Transitions]) do
+      local fn = tr[ANIM_TRANS_Function];
+      local module = tr[ANIM_TRANS_Module];
+      if not(tr[ANIM_TRANS_Done]) and (diffTime >= tr[ANIM_TRANS_Time]) then
+        tr[ANIM_TRANS_Done] = true;
+        setItem(fn, module, tr[ANIM_TRANS_State], queue);
+        TRACE("ani setItem: ", fn, module, tr[ANIM_TRANS_State]);
+        if (it == #anim[ANIM_Transitions]) then
+          wasLastTransition = true;
         end
       end
-      diffTime = t - state[FSMANIM_LastSwitch];
-      for i, sws in ipairs(anim[ANIM_StateDurations]) do
-        local fn = sws[ASTATEDUR_Function];
-        local module = sws[ASTATEDUR_Module];
-        for it, seqpoint in ipairs(sws[ASTATEDUR_DurationStates]) do
-          if (seqpoint[ADURSTATE_Done] == 0) and (diffTime >= seqpoint[ADURSTATE_Duration]) then
-            seqpoint[ADURSTATE_Done] = 1;
-            state[FSMANIM_LastSwitch] = t;
-            setItem(fn, module, seqpoint[ADURSTATE_State]);
-            if (it == #sws[ASTATEDUR_DurationStates]) then
-              TRACE("last s");
-              state[FSMANIM_LastReached] = state[FSMANIM_LastReached] + 1;
-            end
-            break;
-          end
-        end
-      end
-      state[FSMANIM_LastTime] = t;
     end
+    state[FSMANIM_LastTime] = t;
     if (anim[ANIM_Length] > 0) and ((t - state[FSMANIM_StartTime]) >= anim[ANIM_Length]) then
       state[FSMANIM_StartTime] = t; -- restart
       state[FSMANIM_LastSwitch] = t;
       TRACE("restart");
       clearAnim(anim);
     end 
-    if (anim[ANIM_Length] == 0) and (state[FSMANIM_LastReached] >= 2) then
+    if (anim[ANIM_Length] == 0) and (wasLastTransition) then
       TRACE("stop");
       state[FSMANIM_State] = FSMANIM_STATE_Init;
       state[FSMANIM_ActiveAnim] = 0;
@@ -197,7 +171,6 @@ local function initAnimationFSM(state)
   resetState(state);
   state[FSMANIM_ActiveAnim] = 0; -- active anim [1...4]
   state[FSMANIM_CursorRow] = 0; -- selection
-  state[FSMANIM_LastReached] = 0;
   state[FSMANIM_CursorRow] = 1;
 end
 

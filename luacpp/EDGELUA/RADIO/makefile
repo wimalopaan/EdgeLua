@@ -8,6 +8,6 @@ tiny.lua: tiny.lpp ../../global.h ../../version.h ../../constants.h
 
 tiptip.lua: tiptip.lpp ../../global.h ../../version.h ../../constants.h 
 
-subdirs = SLIDER
+subdirs = SLIDER REMOTE
 
 -include ../../makefile.include

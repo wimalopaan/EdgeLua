@@ -94,6 +94,16 @@ local function loadLibU()
   collectgarbage();
 end
 
+local function loadLibR()
+  if not __libR then
+    __libR = loadLib("libR.lua");
+    if not __libR then
+      errorCode = 3.3;
+    end
+  end
+  collectgarbage();
+end
+
 local name = "EL_Ani";
 local options = {};
 local animations = nil;
@@ -151,6 +161,10 @@ local function create(zone, options)
 
   __libA.initAnimationFSM(fsmState);
 
+  if not(__WmSw2ForeignInputQueue) then
+    __WmSw2ForeignInputQueue = __libP.Class.Queue.new();
+  end
+
              ;
 
   __libI = nil; -- free memory
@@ -168,8 +182,9 @@ end
 
 local function background(widget)
   if (errorCode == 0) then
-    if (__stopWmSw2) and (__stopWmSw2 == 0) then
-      currentAnimation = __libA.runAnimation(currentAnimation, fsmState);
+    if ((__stopWmSw2) and (__stopWmSw2 == 0)) or not (__stopWmSw2) then
+
+      currentAnimation = __libA.runAnimation(currentAnimation, fsmState, __WmSw2ForeignInputQueue);
     end
   end
 end
