@@ -162,6 +162,8 @@ local config = nil;
 local initFailed = -1;
 local lastTime = 0;
 
+local exclusiveGroups = {};
+
 local iconWidget = nil;
 local iconDefaultSmall = nil;
 local iconDefaultLarge = nil;
@@ -225,6 +227,22 @@ local function loadIcon(filename)
   return icon, ok;
 end
 
+local function makeGroups(config)
+  local groups = {};
+  for i, b in ipairs(config.buttons) do
+    if (b.ls > 0) then
+      if (b.exgroup > 0) then
+        if not (groups[b.exgroup]) then
+          groups[b.exgroup] = {};
+        end
+        groups[b.exgroup][#groups[b.exgroup] + 1] = b.ls;
+                                              ;
+      end
+    end
+  end
+  return groups;
+end
+
 local function create(zone, options)
   load();
   if (errorCode > 0) then
@@ -265,6 +283,8 @@ local function create(zone, options)
   if (r > 0) then
     errorCode = 10 + r;
   end
+
+  exclusiveGroups = makeGroups(config);
 
   if (options.Reset == 0) then
     initFailed = -1; -- no follwing explicit reset
@@ -396,6 +416,13 @@ local function displayButtons(config, widget, event, touch)
         if (getLogicalSwitchValue(lsNumber)) then
           setStickySwitch(config.buttons[i].ls - 1, false);
         else
+          if (config.buttons[i].exgroup) and (exclusiveGroups[config.buttons[i].exgroup]) then
+            for exgi, exls in ipairs(exclusiveGroups[config.buttons[i].exgroup]) do
+              if (config.buttons[i].ls ~= exls) then
+                setStickySwitch(exls - 1, false);
+              end
+            end
+          end
           setStickySwitch(config.buttons[i].ls - 1, true);
         end
       end
@@ -409,7 +436,7 @@ local function refresh(widget, event, touch)
   background(widget);
   __libD.updateWidgetDimensions(widget, event);
   if (errorCode == 0) and (config) then
-    if (widget[3] <= (LCD_W / 2)) then
+    if (widget[3] <= (LCD_W / 2)) or (widget[4] <= (LCD_H / 2)) then
       if (iconWidget) then
         lcd.drawBitmap(iconWidget, widget[1], widget[2] + widget[4] / 2 - 24);
       end

@@ -159,40 +159,43 @@ local function displayMenuBW(config, widget, menu, overlays, state, pagetitles)
     local y = widget[2] + widget[6] + (row - 1) * widget[5];
 
     local label = item[1];
-    if (item[7]) then
-      label = label .. "#";
-    end
 
-    if (item[9]) then
-      label = label .. "~";
-    end
-
-    for io, o in ipairs(overlay) do
-      if (o[2] == item) then
-        label = label .. "*";
+    if (label) and (#label > 0) then
+      if (item[7]) then
+        label = label .. "#";
       end
-    end
 
-    if (row == state[1]) then
-      lcd.drawText(x, y, label, SMLSIZE + INVERS);
-    else
-      lcd.drawText(x, y, label, SMLSIZE);
-    end
+      if (item[9]) then
+        label = label .. "~";
+      end
 
-    local fw = (widget[3] - config[2]) / #item[2];
-    x = x + config[2];
-
-    for col, st in ipairs(item[2]) do
-      if (col == item[3]) then
-        lcd.drawText(x, y, st, SMLSIZE + INVERS);
-      else
-        if (state[2] == col) and (row == state[1]) then
-          lcd.drawText(x, y, st, SMLSIZE + INVERS + BLINK);
-        else
-          lcd.drawText(x, y, st);
+      for io, o in ipairs(overlay) do
+        if (o[2] == item) then
+          label = label .. "*";
         end
       end
-      x = x + fw;
+
+      if (row == state[1]) then
+        lcd.drawText(x, y, label, SMLSIZE + INVERS);
+      else
+        lcd.drawText(x, y, label, SMLSIZE);
+      end
+
+      local fw = (widget[3] - config[2]) / #item[2];
+      x = x + config[2];
+
+      for col, st in ipairs(item[2]) do
+        if (col == item[3]) then
+          lcd.drawText(x, y, st, SMLSIZE + INVERS);
+        else
+          if (state[2] == col) and (row == state[1]) then
+            lcd.drawText(x, y, st, SMLSIZE + INVERS + BLINK);
+          else
+            lcd.drawText(x, y, st);
+          end
+        end
+        x = x + fw;
+      end
     end
   end
 end
@@ -490,9 +493,12 @@ local function processTouch(menu, menuState, event, touch)
     if (event == EVT_TOUCH_TAP) then
       for row, item in ipairs(page) do
         for col, rect in ipairs(item[8]) do
-          if (covers(touch, rect)) then
-            menuState[1] = row;
-            menuState[2] = col;
+          if not (string.sub(item[2][col], 1, 1) == "-") then
+                                                                                                       ;
+            if (covers(touch, rect)) then
+              menuState[1] = row;
+              menuState[2] = col;
+            end
           end
         end
       end

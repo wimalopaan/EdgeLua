@@ -11,12 +11,12 @@
 -- all further principals of tranferring state and other information.
 
 local function loadLib(filename)
-  print("TRACE: " , "loadLib:", filename );
+                             ;
   local basedir = "/EDGELUA" .. "/LIB/";
   local chunk = loadScript(basedir .. filename);
   local lib = nil;
   if (chunk) then
-    print("TRACE: " , "loadLib chunk:", filename );
+                                     ;
     lib = chunk();
   end
   collectgarbage();
@@ -117,17 +117,17 @@ local function create(zone, options)
   loadLibA();
   collectgarbage();
 
-  print("TRACE: " , "A0" );
+             ;
 
   if (errorCode > 0) then
     return {};
   end
 
-  print("TRACE: " , "A1" );
+             ;
   local widget = __libI.initWidget(zone, options);
   collectgarbage();
 
-  print("TRACE: " , "A2" );
+             ;
 
   if not(__WmSw2Config) then
     local config = __libI.loadConfig();
@@ -139,11 +139,11 @@ local function create(zone, options)
   end
   collectgarbage();
 
-  print("TRACE: " , "A3" );
+             ;
 
   animations = __libA.loadAnimations(__WmSw2Config);
 
-  print("TRACE: " , "A4" );
+             ;
 
   if not(animations) then
     errorCode = 5;
@@ -152,7 +152,7 @@ local function create(zone, options)
 
   animations = __libA.initAnimations(animations);
 
-  print("TRACE: " , "A5" );
+             ;
 
   if not(animations) then
     errorCode = 6;
@@ -165,7 +165,7 @@ local function create(zone, options)
     __WmSw2ForeignInputQueue = __libP.Class.Queue.new();
   end
 
-  print("TRACE: " , "A6" );
+             ;
 
   __libI = nil; -- free memory
 

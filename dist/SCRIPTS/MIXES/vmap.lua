@@ -11,12 +11,12 @@
 -- all further principals of tranferring state and other information.
 
 local function loadLib(filename)
-  print("TRACE: " , "loadLib:", filename );
+                             ;
   local basedir = "/EDGELUA" .. "/LIB/";
   local chunk = loadScript(basedir .. filename);
   local lib = nil;
   if (chunk) then
-    print("TRACE: " , "loadLib chunk:", filename );
+                                     ;
     lib = chunk();
   end
   collectgarbage();
@@ -57,20 +57,20 @@ local values = nil; -- tiptip
 local exportValues = nil; -- bus
 
 local function initConfig()
-   print("TRACE: " , "vmap: init: ", __WmMixerConfig );
+                                         ;
    if not(__WmMixerConfig) then
       if not __libM then
         loadLibM();
-        print("TRACE: " , "vmap: libM: ", __libM );
+                                     ;
         if __libM then
          local config = __libM.loadConfig();
-         print("TRACE: " , "vmap: config: ", config );
+                                        ;
          if not(config) then
             errorCode = 4;
             return;
          end
          __WmMixerConfig = __libM.initConfig(config); -- not modify model
-         print("TRACE: " , "vmap initConfig", __WmMixerConfig );
+                                                  ;
          collectgarbage();
         end
       end
@@ -82,12 +82,12 @@ local function initConfig()
    if (backend == 1) then
       gvar = bendcfg[4];
       exportValues = bendcfg[3];
-      print("TRACE: " , "vmap: bus: gvar: ", gvar, exportValues );
+                                                    ;
    end
    if (backend == 3) then
       gvar = bendcfg[3];
       values = bendcfg[4];
-      print("TRACE: " , "vmap: tiptip: gvar: ", gvar, values );
+                                                 ;
    end
 end
 
@@ -133,14 +133,7 @@ local function demuxBendTipTip(value)
    return chValues[1], chValues[2], chValues[3], chValues[4], chValues[5];
 end
 
-local lastValue = 0; -- only for debug
-
 local function demux(value)
-
-   if (value ~= lastValue) then
-                                  ;
-      lastValue = value;
-   end
 
    if (backend == 1) then
       return demuxBendBus(value);
@@ -164,7 +157,7 @@ local function transportShm()
 end
 
 if (LCD_W <= 212) then
-   print("TRACE: " , "vmap: use transportGlobalLua" );
+                                        ;
    return {
        init = initConfig,
        output = output,
@@ -172,14 +165,14 @@ if (LCD_W <= 212) then
    };
 else
    if (getShmVar) then
-      print("TRACE: " , "vmap: use transportShm" );
+                                     ;
       return {
         init = initConfig,
         output = output,
         run = transportShm
       };
    else
-      print("TRACE: " , "vmap: use transportGV" );
+                                    ;
       return {
          init = initConfig,
          output = output,

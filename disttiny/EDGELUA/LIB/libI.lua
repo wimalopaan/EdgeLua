@@ -370,7 +370,7 @@ local function initConfigBW(config, modifyModel)
     cfg[9] = 2; --sbus
   end
 
-  local footer = "Vers: " .. "2.52";
+  local footer = "Vers: " .. "2.53";
   cfg[19] = footer;
 
   if (config.backend >= 1) and (config.backend <= 4) then
@@ -648,7 +648,7 @@ local function initMenuBW(menu)
         -- all switches can get lsmode
         if (item.lsmode) and (item.lsmode >= 1) and (item.lsmode <= 2) then
             lsmode = item.lsmode;
-                                                       ;
+                                                        ;
         end
       end
       -- todo: remove nil
@@ -662,7 +662,9 @@ local function initMenuBW(menu)
         ) then
         cmenu[i][k] = citem;
         if (switchId) then
-          citem[1] = citem[1] .. "/" .. item.switch;
+          if (citem[1]) and (#citem[1] > 0) then
+            citem[1] = citem[1] .. "/" .. item.switch;
+          end
           local use = {citem, lsmode, i};
           if not switchUse[switchId] then
             switchUse[switchId] = {use};

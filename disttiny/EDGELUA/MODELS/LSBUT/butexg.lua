@@ -10,19 +10,13 @@
 -- Please note that the above license also covers the transfer protocol used and the encoding scheme and
 -- all further principals of tranferring state and other information.
 
-local maps = {
-    {2, 1, 3},
-    {1, 2},
-};
-
-local threshes = {
-    {-33, 33},
-    {0},
-};
-
 return {
-    {"trn1", threshes[1], maps[1], fn = 1, module = 1},
-    {"trn2", threshes[1], maps[1], fn = 2, module = 1},
-    {"trn5", threshes[2], maps[2], fn = 3, module = 1},
-
+    name = "Lichter",
+    layout = {rows = 2, cols = 2},
+    buttons = {
+        {name = "L1Ein1", ls = 20, exgroup = 1},
+        {name = "L1Ein2", ls = 21, exgroup = 1},
+        {name = "L2Ein1", ls = 22, exgroup = 2},
+        {name = "L2Ein2", ls = 23, exgroup = 2},
+    }
 };
