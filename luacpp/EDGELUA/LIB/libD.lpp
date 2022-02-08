@@ -357,40 +357,43 @@ local function displayMenuBW(config, widget, menu, overlays, state, pagetitles)
     local y = widget[W_Y] + widget[W_YOffset] + (row - 1) * widget[W_FontHeight];
 
     local label = item[ITEM_Name];
-    if (item[ITEM_Virtual]) then
-      label = label .. "#";
-    end
 
-    if (item[ITEM_AutoReset]) then
-      label = label .. "~";      
-    end
-
-    for io, o in ipairs(overlay) do
-      if (o[OVERLAY_Item] == item) then
-        label = label .. "*";
+    if (label) and (#label > 0) then
+      if (item[ITEM_Virtual]) then
+        label = label .. "#";
       end
-    end
-
-    if (row == state[MENUSTATE_Row]) then
-      lcd.drawText(x, y, label, SMLSIZE + INVERS);
-    else
-      lcd.drawText(x, y, label, SMLSIZE);
-    end
-
-    local fw = (widget[W_Width] - config[CFG_FirstColWidth]) / #item[ITEM_States];
-    x = x + config[CFG_FirstColWidth];
-
-    for col, st in ipairs(item[ITEM_States]) do
-      if (col == item[ITEM_State]) then
-        lcd.drawText(x, y, st, SMLSIZE + INVERS);
-      else 
-        if (state[MENUSTATE_Col] == col) and (row == state[MENUSTATE_Row]) then
-          lcd.drawText(x, y, st, SMLSIZE + INVERS + BLINK);
-        else
-          lcd.drawText(x, y, st);
+  
+      if (item[ITEM_AutoReset]) then
+        label = label .. "~";      
+      end
+  
+      for io, o in ipairs(overlay) do
+        if (o[OVERLAY_Item] == item) then
+          label = label .. "*";
         end
       end
-      x = x + fw;
+  
+      if (row == state[MENUSTATE_Row]) then
+        lcd.drawText(x, y, label, SMLSIZE + INVERS);
+      else
+        lcd.drawText(x, y, label, SMLSIZE);
+      end
+  
+      local fw = (widget[W_Width] - config[CFG_FirstColWidth]) / #item[ITEM_States];
+      x = x + config[CFG_FirstColWidth];
+  
+      for col, st in ipairs(item[ITEM_States]) do
+        if (col == item[ITEM_State]) then
+          lcd.drawText(x, y, st, SMLSIZE + INVERS);
+        else 
+          if (state[MENUSTATE_Col] == col) and (row == state[MENUSTATE_Row]) then
+            lcd.drawText(x, y, st, SMLSIZE + INVERS + BLINK);
+          else
+            lcd.drawText(x, y, st);
+          end
+        end
+        x = x + fw;
+      end
     end
   end
 end
@@ -448,52 +451,56 @@ local function displayMenuColor(config, widget, menu, overlays, state, event, re
     local y = widget[W_Y] + widget[W_YOffset] + (row - 1) * widget[W_FontHeight];
 
     local label = item[ITEM_Name];
-    if (item[ITEM_Virtual]) then
-      label = label .. "#";
-    end
 
-    if (item[ITEM_AutoReset]) then
-      label = label .. "~";      
-    end
-
-    for io, o in ipairs(overlay) do
-      if (o[OVERLAY_Item] == item) then
-        label = label .. "*";
+    if (label) and (#label > 0) then
+      if (item[ITEM_Virtual]) then
+        label = label .. "#";
       end
-    end
-
-    if (row == state[MENUSTATE_Row]) then
-      lcd.drawText(x, y, label, SMLSIZE + INVERS + COLOR_THEME_SECONDARY2, COLOR_THEME_PRIMARY2);
-    else
-      lcd.drawText(x, y, label, SMLSIZE + COLOR_THEME_PRIMARY1);
-    end
-
-    local fw = (widget[W_Width] - config[CFG_FirstColWidth]) / #item[ITEM_States];
-    x = x + config[CFG_FirstColWidth];
-
-    for col, st in ipairs(item[ITEM_States]) do
-      local rect = {xmin = x, ymin = y, xmax = x + fw, ymax = y + widget[W_FontHeight]};
-      item[ITEM_Rects][col] = rect;
-      if (col == item[ITEM_State]) then -- active
-        lcd.drawText(x, y, st, SMLSIZE + INVERS + COLOR_THEME_SECONDARY2, COLOR_THEME_PRIMARY2);
-        if (event) then
-          lcd.drawRectangle(x - 1, y - 1, fw - 1, widget[W_FontHeight]- 1, COLOR_THEME_ACTIVE);
-        end
-      else 
-        if (state[MENUSTATE_Col] == col) and (row == state[MENUSTATE_Row]) then -- focus
-          lcd.drawText(x, y, st, SMLSIZE + INVERS + BLINK + COLOR_THEME_SECONDARY2, COLOR_THEME_PRIMARY2);
-          if (event) then
-            lcd.drawRectangle(x - 1, y - 1, fw - 1, widget[W_FontHeight]- 1, COLOR_THEME_FOCUS);
-          end
-        else -- 
-          lcd.drawText(x, y, st, SMLSIZE + COLOR_THEME_PRIMARY1);
-          if (event) then
-            lcd.drawRectangle(x - 1, y - 1, fw - 1, widget[W_FontHeight]- 1, COLOR_THEME_PRIMARY3);
-          end
+  
+      if (item[ITEM_AutoReset]) then
+        label = label .. "~";      
+      end
+  
+      for io, o in ipairs(overlay) do
+        if (o[OVERLAY_Item] == item) then
+          label = label .. "*";
         end
       end
-      x = x + fw;
+  
+      if (row == state[MENUSTATE_Row]) then
+        lcd.drawText(x, y, label, SMLSIZE + INVERS + COLOR_THEME_SECONDARY2, COLOR_THEME_PRIMARY2);
+      else
+        lcd.drawText(x, y, label, SMLSIZE + COLOR_THEME_PRIMARY1);
+      end
+  
+      local fw = (widget[W_Width] - config[CFG_FirstColWidth]) / #item[ITEM_States];
+      x = x + config[CFG_FirstColWidth];
+  
+      for col, st in ipairs(item[ITEM_States]) do
+        local rect = {xmin = x, ymin = y, xmax = x + fw, ymax = y + widget[W_FontHeight]};
+        item[ITEM_Rects][col] = rect;
+        if (col == item[ITEM_State]) then -- active
+          lcd.drawText(x, y, st, SMLSIZE + INVERS + COLOR_THEME_SECONDARY2, COLOR_THEME_PRIMARY2);
+          if (event) then
+            lcd.drawRectangle(x - 1, y - 1, fw - 1, widget[W_FontHeight]- 1, COLOR_THEME_ACTIVE);
+          end
+        else 
+          if (state[MENUSTATE_Col] == col) and (row == state[MENUSTATE_Row]) then -- focus
+            lcd.drawText(x, y, st, SMLSIZE + INVERS + BLINK + COLOR_THEME_SECONDARY2, COLOR_THEME_PRIMARY2);
+            if (event) then
+              lcd.drawRectangle(x - 1, y - 1, fw - 1, widget[W_FontHeight]- 1, COLOR_THEME_FOCUS);
+            end
+          else -- 
+            lcd.drawText(x, y, st, SMLSIZE + COLOR_THEME_PRIMARY1);
+            if (event) then
+              lcd.drawRectangle(x - 1, y - 1, fw - 1, widget[W_FontHeight]- 1, COLOR_THEME_PRIMARY3);
+            end
+          end
+        end
+        x = x + fw;
+      end  
     end
+
   end
 end
 #endif 
@@ -533,42 +540,45 @@ local function displayMenuColorNoTheme(config, widget, menu, overlays, state, ev
     local y = widget[W_Y] + widget[W_YOffset] + (row - 1) * widget[W_FontHeight];
 
     local label = item[ITEM_Name];
-    if (item[ITEM_Virtual]) then
-      label = label .. "#";
-    end
 
-    if (item[ITEM_AutoReset]) then
-      label = label .. "~";      
-    end
-
-    for io, o in ipairs(overlay) do
-      if (o[OVERLAY_Item] == item) then
-        label = label .. "*";
+    if (label) and (#label > 0) then
+      if (item[ITEM_Virtual]) then
+        label = label .. "#";
       end
-    end
-
-    if (row == state[MENUSTATE_Row]) then
-      lcd.drawText(x, y, label, SMLSIZE + INVERS);
-    else
-      lcd.drawText(x, y, label, SMLSIZE);
-    end
-
-    local fw = (widget[W_Width] - config[CFG_FirstColWidth]) / #item[ITEM_States];
-    x = x + config[CFG_FirstColWidth];
-
-    for col, st in ipairs(item[ITEM_States]) do
-      local rect = {xmin = x, ymin = y, xmax = x + fw, ymax = y + widget[W_FontHeight]};
-      item[ITEM_Rects][col] = rect;
-      if (col == item[ITEM_State]) then -- active
-        lcd.drawText(x, y, st, SMLSIZE + INVERS);
-      else 
-        if (state[MENUSTATE_Col] == col) and (row == state[MENUSTATE_Row]) then -- focus
-          lcd.drawText(x, y, st, SMLSIZE + INVERS + BLINK);
-        else -- 
-          lcd.drawText(x, y, st, SMLSIZE);
+  
+      if (item[ITEM_AutoReset]) then
+        label = label .. "~";      
+      end
+  
+      for io, o in ipairs(overlay) do
+        if (o[OVERLAY_Item] == item) then
+          label = label .. "*";
         end
       end
-      x = x + fw;
+  
+      if (row == state[MENUSTATE_Row]) then
+        lcd.drawText(x, y, label, SMLSIZE + INVERS);
+      else
+        lcd.drawText(x, y, label, SMLSIZE);
+      end
+  
+      local fw = (widget[W_Width] - config[CFG_FirstColWidth]) / #item[ITEM_States];
+      x = x + config[CFG_FirstColWidth];
+  
+      for col, st in ipairs(item[ITEM_States]) do
+        local rect = {xmin = x, ymin = y, xmax = x + fw, ymax = y + widget[W_FontHeight]};
+        item[ITEM_Rects][col] = rect;
+        if (col == item[ITEM_State]) then -- active
+          lcd.drawText(x, y, st, SMLSIZE + INVERS);
+        else 
+          if (state[MENUSTATE_Col] == col) and (row == state[MENUSTATE_Row]) then -- focus
+            lcd.drawText(x, y, st, SMLSIZE + INVERS + BLINK);
+          else -- 
+            lcd.drawText(x, y, st, SMLSIZE);
+          end
+        end
+        x = x + fw;
+      end
     end
   end
 end
@@ -918,10 +928,13 @@ local function processTouch(menu, menuState, event, touch)
     local page = menu[activePageIndex];
     if (event == EVT_TOUCH_TAP) then
       for row, item in ipairs(page) do
-        for col, rect in ipairs(item[ITEM_Rects]) do   
-          if (covers(touch, rect)) then
-            menuState[MENUSTATE_Row] = row;
-            menuState[MENUSTATE_Col] = col;
+        for col, rect in ipairs(item[ITEM_Rects]) do
+          if not (string.sub(item[ITEM_States][col], 1, 1) == "-") then
+            TRACE3("processTouch: ", item[ITEM_States][col], string.sub(item[ITEM_States][col], 1, 1) );
+            if (covers(touch, rect)) then
+              menuState[MENUSTATE_Row] = row;
+              menuState[MENUSTATE_Col] = col;
+            end              
           end
         end
       end

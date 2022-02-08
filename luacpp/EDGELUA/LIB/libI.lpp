@@ -859,7 +859,7 @@ local function initMenuBW(menu)
         -- all switches can get lsmode
         if (item.lsmode) and (item.lsmode >= 1) and (item.lsmode <= 2) then
             lsmode = item.lsmode;
-            TRACE("**** lsmode: ", item.switch, lsmode);
+            TRACE3("**** lsmode: ", item.switch, lsmode);
         end
       end
       -- todo: remove nil
@@ -897,7 +897,9 @@ local function initMenuBW(menu)
         ) then
         cmenu[i][k] = citem;
         if (switchId) then
-          citem[ITEM_Name] = citem[ITEM_Name] .. "/" .. item.switch;
+          if (citem[ITEM_Name]) and (#citem[ITEM_Name] > 0) then
+            citem[ITEM_Name] = citem[ITEM_Name] .. "/" .. item.switch;
+          end
           local use = {citem, lsmode, i};
           if not switchUse[switchId] then
             switchUse[switchId] = {use};

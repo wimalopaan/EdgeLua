@@ -24,6 +24,7 @@
 #define USE_LONG_FOOTER
 #define USE_REMOTE_SWITCHES
 #define USE_DESK_INPUT
+#define USE_SUMDV3
 #endif
 
 #define USE_DEPRECATED

@@ -15,34 +15,34 @@ local function loadFile(baseDir, baseName)
     local filename = nil;
     if (baseName) then
         filename = baseName .. ".lua";
-                                              ;
+        print("TRACE: " , "loadFile", baseDir .. filename );
         content = loadScript(baseDir .. filename);
     end
     if not(content) then
         if (#model.getInfo().name > 0) then
             filename = model.getInfo().name .. ".lua";
-                                                  ;
+            print("TRACE: " , "loadFile", baseDir .. filename );
             content = loadScript(baseDir .. filename);
         end
     end
     if not(content) then
         if (LCD_W <= 128) then
             filename = "tiny.lua";
-                                                  ;
+            print("TRACE: " , "loadFile", baseDir .. filename );
             content = loadScript(baseDir .. filename);
         elseif (LCD_W <= 212) then
             filename = "medium.lua";
-                                                  ;
+            print("TRACE: " , "loadFile", baseDir .. filename );
             content = loadScript(baseDir .. filename);
         else
             filename = "large.lua";
-                                                  ;
+            print("TRACE: " , "loadFile", baseDir .. filename );
             content = loadScript(baseDir .. filename);
         end
     end
     if not(content) then
         filename = "default.lua";
-                                              ;
+        print("TRACE: " , "loadFile", baseDir .. filename );
         content = loadScript(baseDir .. filename);
     end
     return content, filename;
@@ -51,7 +51,7 @@ end
 local function loadConfig()
     local baseDir = "/EDGELUA" .. "/RADIO/";
     local cfg = loadFile(baseDir);
-                            ;
+    print("TRACE: " , "loadConfig", cfg );
     if (cfg) then
         return cfg();
     end
@@ -63,27 +63,27 @@ end
 -- local filename = nil;
 -- if (#model.getInfo().name > 0) then
 -- filename = model.getInfo().name .. ".lua";
--- ;
+-- print("TRACE: " , "loadFile", baseDir .. filename );
 -- content = loadScript(baseDir .. filename);
 -- end
 -- if not content then
 -- if (LCD_W <= 128) then
 -- filename = "tiny.lua";
--- ;
+-- print("TRACE: " , "loadFile", baseDir .. filename );
 -- content = loadScript(baseDir .. filename);
 -- elseif (LCD_W <= 212) then
 -- filename = "medium.lua";
--- ;
+-- print("TRACE: " , "loadFile", baseDir .. filename );
 -- content = loadScript(baseDir .. filename);
 -- else
 -- filename = "large.lua";
--- ;
+-- print("TRACE: " , "loadFile", baseDir .. filename );
 -- content = loadScript(baseDir .. filename);
 -- end
 -- end
 -- if not content then
 -- filename = "default.lua";
--- ;
+-- print("TRACE: " , "loadFile", baseDir .. filename );
 -- content = loadScript(baseDir .. filename);
 -- end
 -- return content, filename;
@@ -92,7 +92,7 @@ end
 -- local function loadConfig()
 -- local baseDir = "/EDGELUA" .. "/RADIO/";
 -- local cfg = loadFile(baseDir);
--- ;
+-- print("TRACE: " , "loadConfig", cfg );
 -- if (cfg) then
 -- return cfg();
 -- end
@@ -100,7 +100,7 @@ end
 -- end
 
 local function initBackendBus(config)
-                         ;
+  print("TRACE: " , "initBackendBus" );
   local data = {};
   if (config.backends.bus.stateTimeout) then
     data[1] = config.backends.bus.stateTimeout;
@@ -116,7 +116,7 @@ local function initBackendBus(config)
   if (config.export) then
     data[4] = config.export.mixerGlobalVariable;
     data[3] = config.export.values;
-                                                                                                                             ;
+    print("TRACE: " , "export: gv:", data[4], data[3], #data[3] );
   end
 
   return data;
@@ -128,7 +128,7 @@ local function initBackendSPort(config)
 end
 
 local function initBackendTipTip(config)
-                            ;
+  print("TRACE: " , "initBackendTipTip" );
   local data = {};
   if (config.backends.tiptip.shortTimeout) then
     data[1] = config.backends.tiptip.shortTimeout;
@@ -146,13 +146,13 @@ local function initBackendTipTip(config)
     data[3] = 7;
   end
   if (config.backends.tiptip.values) then
-                                                                                                     ;
+    print("TRACE: " , "initBackendTipTip values:", config.backends.tiptip.values, #config.backends.tiptip.values );
     data[4] = config.backends.tiptip.values;
   else
     data[4] = {0, 100, -100};
   end
 
-                                                                                                    ;
+  print("TRACE: " , "initBackendTipTip VALUES: ", data[2], data[1] );
 
   return data;
 end
@@ -243,13 +243,13 @@ local function getFirstFreeLogicalSwitch()
 end
 
 local function insertLogicalSwitchFor(id)
-                                     ;
+  print("TRACE: " , "insertLogicalSwitchFor", id );
 
   if (type(id) == "string") then
     if (getSwitchIndex) then
       local swid = getSwitchIndex(CHAR_TRIM .. id);
       if (swid) then
-                                                                ;
+        print("TRACE: " , "insertLogicalSwitchFor getSwitchIndex", id, swid );
         id = swid;
       else
         return -1;
@@ -278,7 +278,7 @@ local function insertLogicalSwitchFor(id)
       if (lsNumber >= 0) then
         local lsf = getFieldInfo("ls" .. (lsNumber + 1));
         if (lsf) then
-
+          print("TRACE: " , "insertLogicalSwitchFor", lsNumber, lsf.id )
           return lsf.id;
         end
       end
@@ -288,7 +288,7 @@ local function insertLogicalSwitchFor(id)
 end
 
 local function insertSettableSwitch(number)
-                               ;
+  print("TRACE: " , "insertSettableSwitch" );
   local max = getFieldInfo("max");
   if (max) then
     local maxId = max.id;
@@ -327,21 +327,21 @@ end
 -- local filename = nil;
 -- if (#model.getInfo().name > 0) then
 -- filename = model.getInfo().name .. ".lua";
--- ;
+-- print("TRACE: " , "loadFile", baseDir .. filename );
 -- content = loadScript(baseDir .. filename);
 -- end
 -- if not content then
 -- if (LCD_W <= 128) then
 -- filename = "tiny.lua";
--- ;
+-- print("TRACE: " , "loadFile", baseDir .. filename );
 -- content = loadScript(baseDir .. filename);
 -- elseif (LCD_W <= 212) then
 -- filename = "medium.lua";
--- ;
+-- print("TRACE: " , "loadFile", baseDir .. filename );
 -- content = loadScript(baseDir .. filename);
 -- else
 -- filename = "large.lua";
--- ;
+-- print("TRACE: " , "loadFile", baseDir .. filename );
 -- content = loadScript(baseDir .. filename);
 -- end
 -- end
@@ -351,7 +351,7 @@ end
 local function loadMenu()
   local baseDir = "/EDGELUA" .. "/MODELS/";
   local menu, filename = loadFile(baseDir);
-                                    ;
+  print("TRACE: " , "loadMenu:", menu, filename );
   if (menu) then
     local modchunk = loadScript("/EDGELUA" .. "/COMMON/swmods.lua");
     if (modchunk) then
@@ -368,7 +368,7 @@ end
 -- local function loadConfig()
 -- local baseDir = "/EDGELUA" .. "/RADIO/";
 -- local cfg = loadFile(baseDir);
--- ;
+-- print("TRACE: " , "loadCOnfig", cfg );
 -- if (cfg) then
 -- return cfg();
 -- end
@@ -378,7 +378,7 @@ end
 --[[
 
 local function initBackendBus(config)
-                         ;
+  print("TRACE: " , "initBackendBus" );
   local data = {};
   if (config.backends.bus.stateTimeout) then
     data[1] = config.backends.bus.stateTimeout;
@@ -399,7 +399,7 @@ local function initBackendSPort(config)
 end
 
 local function initBackendTipTip(config)
-                            ;
+  print("TRACE: " , "initBackendTipTip" );
   local data = {};
   if (config.backends.tiptip.shortTimeout) then
     data[1] = config.backends.tiptip.shortTimeout;
@@ -417,13 +417,13 @@ local function initBackendTipTip(config)
     data[3] = 7;
   end
   if (config.backends.tiptip.values) then
-                                                                                                     ;
+    print("TRACE: " , "initBackendTipTip values:", config.backends.tiptip.values, #config.backends.tiptip.values );
     data[4] = config.backends.tiptip.values;
   else
     data[4] = {0, 100, -100};
   end
 
-                                                                                                    ;
+  print("TRACE: " , "initBackendTipTip VALUES: ", data[2], data[1] );
 
   return data;
 end
@@ -436,7 +436,7 @@ end
 --]]
 
 local function initConfigBW(config, modifyModel)
-                       ;
+  print("TRACE: " , "initConfigBW" );
   local cfg = {};
   cfg[20] = {};
 
@@ -493,7 +493,7 @@ local function initConfigBW(config, modifyModel)
     cfg[9] = 2; --sbus
   end
 
-  local footer = "Vers: " .. "2.52";
+  local footer = "Vers: " .. "2.53";
 
   if (cfg[9] == 0) then
     footer = footer .. " Mod: xjt";
@@ -533,7 +533,7 @@ local function initConfigBW(config, modifyModel)
       if (config.safeMode.timeOut > 0) and (config.safeMode.linkDropoutMax > 0) then
         local fmLsNumber = insertSettableSwitch(1);
         if (fmLsNumber >= 0) then
-
+          print("TRACE: " , "safemode ls number", fmLsNumber )
           for ch = 0,63 do
             local lines = model.getMixesCount(ch);
             for line = 0, lines do
@@ -555,11 +555,11 @@ local function initConfigBW(config, modifyModel)
               if (getSwitchIndex) then
                 ls = {};
                 ls.id = getSwitchIndex("L" .. (fmLsNumber + 1));
-                                                           ;
+                print("TRACE: " , "safemode getSwitchIndex", ls, ls.id );
               end
 
             if (ls) then
-                                            ;
+              print("TRACE: " , "safeMode ls.id", ls.id );
               if (config.safeMode.name) then
                 fm.name = config.safeMode.name;
               else
@@ -568,7 +568,7 @@ local function initConfigBW(config, modifyModel)
               fm.switch = -ls.id; -- inverted
               model.setFlightMode(config.safeMode.flightMode, fm);
             else
-                                     ;
+              print("TRACE: " , "safeMode !LS63" );
               if (config.safeMode.name) then
                 fm.name = config.safeMode.name;
               else
@@ -582,7 +582,7 @@ local function initConfigBW(config, modifyModel)
           cfg[16] = config.safeMode.timeOut * 100;
           cfg[17] = config.safeMode.linkDropoutMax * 100;
           cfg[18] = fmLsNumber;
-                                                                                         ;
+          print("TRACE: " , "safeMode fmLsNumber", cfg[18], 18 );
         end
       end
     end
@@ -592,12 +592,12 @@ local function initConfigBW(config, modifyModel)
 end
 
 local function initConfigColor(config, modifyModel)
-                          ;
+  print("TRACE: " , "initConfigColor" );
   local cfg = initConfigBW(config, modifyModel);
 
-                           ;
+  print("TRACE: " , "initConfigColor2" );
   if (config.navigation) then
-                              ;
+    print("TRACE: " , "config.navigation" );
     local info = {};
     if (config.navigation.scrollUpDn) then
       info = getFieldInfo(config.navigation.scrollUpDn);
@@ -621,7 +621,7 @@ local function initConfigColor(config, modifyModel)
     if (modifyModel) then
       if (config.navigation.previous) then
         local lsfId = insertLogicalSwitchFor(config.navigation.previous);
-                                                  ;
+        print("TRACE: " , "config.navigation.previous", lsfId );
         if (lsfId >= 0) then
           cfg[11] = lsfId;
         else
@@ -630,14 +630,14 @@ local function initConfigColor(config, modifyModel)
           if (lsfId >= 0) then
             cfg[11] = lsfId;
           end
-                                                               ;
+          print("TRACE: " , "config.navigation.fallbackId.previous", lsfId );
 
         end
       end
 
       if (config.navigation.next) then
         local lsfId = insertLogicalSwitchFor(config.navigation.next);
-                                              ;
+        print("TRACE: " , "config.navigation.next", lsfId );
         if (lsfId >= 0) then
           cfg[12] = lsfId;
         else
@@ -646,14 +646,14 @@ local function initConfigColor(config, modifyModel)
           if (lsfId >= 0) then
             cfg[12] = lsfId;
           end
-                                                           ;
+          print("TRACE: " , "config.navigation.fallbackId.next", lsfId );
 
         end
       end
 
       if (config.navigation.select) then
         local lsfId = insertLogicalSwitchFor(config.navigation.select);
-                                                ;
+        print("TRACE: " , "config.navigation.select", lsfId );
         if (lsfId >= 0) then
           cfg[13] = lsfId;
         else
@@ -662,7 +662,7 @@ local function initConfigColor(config, modifyModel)
           if (lsfId >= 0) then
             cfg[13] = lsfId;
           end
-                                                             ;
+          print("TRACE: " , "config.navigation.fallbackId.select", lsfId );
 
         end
       end
@@ -670,7 +670,7 @@ local function initConfigColor(config, modifyModel)
   end
 
   if (config.remote) then
-                                   ;
+    print("TRACE: " , "initConfigColor remote" );
     info = getFieldInfo(config.remote);
     if (info) then
       cfg[8] = info.id;
@@ -678,21 +678,21 @@ local function initConfigColor(config, modifyModel)
   end
 
   if (modifyModel) and (config.removeTrimsFromFlightModes) then
-                                               ;
+    print("TRACE: " , "initConfigColor remove filghtmodes" );
     for mi, modeline in ipairs(config.removeTrimsFromFlightModes) do
       local mode = modeline.mode;
-                          ;
+      print("TRACE: " , "Mode:", mode );
       local fm = model.getFlightMode(mode);
       if (fm) and (modeline.trims) then
         local tmodes = {0, 0, 0, 0, 0, 0};
         --[[
         for k, v in pairs(fm.trimsModes) do
-                           ;
+          print("TRACE: " , "t:", k, v );
           tmodes[k + 1] = v;
         end
         ]]
         for itr, tr in ipairs(modeline.trims) do
-                                         ;
+          print("TRACE: " , "Disable Trim:", itr, tr );
           tmodes[tr] = 31; -- disable
         end
         fm.trimsModes = tmodes;
@@ -700,7 +700,7 @@ local function initConfigColor(config, modifyModel)
       end
     end
   end
-                            ;
+  print("TRACE: " , "initConfigColor E" );
   return cfg;
 end
 
@@ -784,7 +784,7 @@ local function initParamMenu(cfg, menu, map, modInfos, mode)
         end
       end
     end
-                                                        ;
+    print("TRACE: " , "initParamMenu: saveValues1:", valuesFileName );
   end
 
   local miTable = moduleItems(menu);
@@ -888,7 +888,7 @@ local function initParamMenu(cfg, menu, map, modInfos, mode)
       end
     end
   end
-                                                     ;
+  print("TRACE: " , "initParamMenu: saveValues:", valuesFileName );
   return headers, cmenu, help, valuesFileName;
 end
 
@@ -944,7 +944,7 @@ local function initMenuBW(menu)
         -- all switches can get lsmode
         if (item.lsmode) and (item.lsmode >= 1) and (item.lsmode <= 2) then
             lsmode = item.lsmode;
-                                                       ;
+                                                        ;
         end
       end
       -- todo: remove nil
@@ -962,12 +962,12 @@ local function initMenuBW(menu)
       if (item.virtual) then
         citem[7] = {};
         for i, v in ipairs(item.virtual) do
-                                            ;
+          print("TRACE: " , "virt: ", i, v.fn, v.module );
           if (v.fn) and (v.fn > 0) and (v.module) and (v.module > 0) then
             citem[7][i] = {v.fn, v.module};
           end
         end
-                                                               ;
+        print("TRACE: " , "virts4:", citem[1], citem[7] );
       end
 
       -- validity check
@@ -979,7 +979,9 @@ local function initMenuBW(menu)
         ) then
         cmenu[i][k] = citem;
         if (switchId) then
-          citem[1] = citem[1] .. "/" .. item.switch;
+          if (citem[1]) and (#citem[1] > 0) then
+            citem[1] = citem[1] .. "/" .. item.switch;
+          end
           local use = {citem, lsmode, i};
           if not switchUse[switchId] then
             switchUse[switchId] = {use};

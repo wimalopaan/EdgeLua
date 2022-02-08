@@ -351,40 +351,43 @@ local function displayMenuBW(config, widget, menu, overlays, state, pagetitles)
     local y = widget[2] + widget[6] + (row - 1) * widget[5];
 
     local label = item[1];
-    if (item[7]) then
-      label = label .. "#";
-    end
 
-    if (item[9]) then
-      label = label .. "~";
-    end
-
-    for io, o in ipairs(overlay) do
-      if (o[2] == item) then
-        label = label .. "*";
+    if (label) and (#label > 0) then
+      if (item[7]) then
+        label = label .. "#";
       end
-    end
 
-    if (row == state[1]) then
-      lcd.drawText(x, y, label, SMLSIZE + INVERS);
-    else
-      lcd.drawText(x, y, label, SMLSIZE);
-    end
+      if (item[9]) then
+        label = label .. "~";
+      end
 
-    local fw = (widget[3] - config[2]) / #item[2];
-    x = x + config[2];
-
-    for col, st in ipairs(item[2]) do
-      if (col == item[3]) then
-        lcd.drawText(x, y, st, SMLSIZE + INVERS);
-      else
-        if (state[2] == col) and (row == state[1]) then
-          lcd.drawText(x, y, st, SMLSIZE + INVERS + BLINK);
-        else
-          lcd.drawText(x, y, st);
+      for io, o in ipairs(overlay) do
+        if (o[2] == item) then
+          label = label .. "*";
         end
       end
-      x = x + fw;
+
+      if (row == state[1]) then
+        lcd.drawText(x, y, label, SMLSIZE + INVERS);
+      else
+        lcd.drawText(x, y, label, SMLSIZE);
+      end
+
+      local fw = (widget[3] - config[2]) / #item[2];
+      x = x + config[2];
+
+      for col, st in ipairs(item[2]) do
+        if (col == item[3]) then
+          lcd.drawText(x, y, st, SMLSIZE + INVERS);
+        else
+          if (state[2] == col) and (row == state[1]) then
+            lcd.drawText(x, y, st, SMLSIZE + INVERS + BLINK);
+          else
+            lcd.drawText(x, y, st);
+          end
+        end
+        x = x + fw;
+      end
     end
   end
 end
@@ -441,58 +444,62 @@ local function displayMenuColor(config, widget, menu, overlays, state, event, re
     local y = widget[2] + widget[6] + (row - 1) * widget[5];
 
     local label = item[1];
-    if (item[7]) then
-      label = label .. "#";
-    end
 
-    if (item[9]) then
-      label = label .. "~";
-    end
-
-    for io, o in ipairs(overlay) do
-      if (o[2] == item) then
-        label = label .. "*";
+    if (label) and (#label > 0) then
+      if (item[7]) then
+        label = label .. "#";
       end
-    end
 
-    if (row == state[1]) then
-      lcd.drawText(x, y, label, SMLSIZE + INVERS + COLOR_THEME_SECONDARY2, COLOR_THEME_PRIMARY2);
-    else
-      lcd.drawText(x, y, label, SMLSIZE + COLOR_THEME_PRIMARY1);
-    end
+      if (item[9]) then
+        label = label .. "~";
+      end
 
-    local fw = (widget[3] - config[2]) / #item[2];
-    x = x + config[2];
-
-    for col, st in ipairs(item[2]) do
-      local rect = {xmin = x, ymin = y, xmax = x + fw, ymax = y + widget[5]};
-      item[8][col] = rect;
-      if (col == item[3]) then -- active
-        lcd.drawText(x, y, st, SMLSIZE + INVERS + COLOR_THEME_SECONDARY2, COLOR_THEME_PRIMARY2);
-        if (event) then
-          lcd.drawRectangle(x - 1, y - 1, fw - 1, widget[5]- 1, COLOR_THEME_ACTIVE);
+      for io, o in ipairs(overlay) do
+        if (o[2] == item) then
+          label = label .. "*";
         end
+      end
+
+      if (row == state[1]) then
+        lcd.drawText(x, y, label, SMLSIZE + INVERS + COLOR_THEME_SECONDARY2, COLOR_THEME_PRIMARY2);
       else
-        if (state[2] == col) and (row == state[1]) then -- focus
-          lcd.drawText(x, y, st, SMLSIZE + INVERS + BLINK + COLOR_THEME_SECONDARY2, COLOR_THEME_PRIMARY2);
+        lcd.drawText(x, y, label, SMLSIZE + COLOR_THEME_PRIMARY1);
+      end
+
+      local fw = (widget[3] - config[2]) / #item[2];
+      x = x + config[2];
+
+      for col, st in ipairs(item[2]) do
+        local rect = {xmin = x, ymin = y, xmax = x + fw, ymax = y + widget[5]};
+        item[8][col] = rect;
+        if (col == item[3]) then -- active
+          lcd.drawText(x, y, st, SMLSIZE + INVERS + COLOR_THEME_SECONDARY2, COLOR_THEME_PRIMARY2);
           if (event) then
-            lcd.drawRectangle(x - 1, y - 1, fw - 1, widget[5]- 1, COLOR_THEME_FOCUS);
+            lcd.drawRectangle(x - 1, y - 1, fw - 1, widget[5]- 1, COLOR_THEME_ACTIVE);
           end
-        else --
-          lcd.drawText(x, y, st, SMLSIZE + COLOR_THEME_PRIMARY1);
-          if (event) then
-            lcd.drawRectangle(x - 1, y - 1, fw - 1, widget[5]- 1, COLOR_THEME_PRIMARY3);
+        else
+          if (state[2] == col) and (row == state[1]) then -- focus
+            lcd.drawText(x, y, st, SMLSIZE + INVERS + BLINK + COLOR_THEME_SECONDARY2, COLOR_THEME_PRIMARY2);
+            if (event) then
+              lcd.drawRectangle(x - 1, y - 1, fw - 1, widget[5]- 1, COLOR_THEME_FOCUS);
+            end
+          else --
+            lcd.drawText(x, y, st, SMLSIZE + COLOR_THEME_PRIMARY1);
+            if (event) then
+              lcd.drawRectangle(x - 1, y - 1, fw - 1, widget[5]- 1, COLOR_THEME_PRIMARY3);
+            end
           end
         end
+        x = x + fw;
       end
-      x = x + fw;
     end
+
   end
 end
 
 local function displayMenuColorNoTheme(config, widget, menu, overlays, state, event, remote, warning1, warning2, pagetitles, menudata)
 -- lcd.clear()
--- ;
+-- print("TRACE: " , "displayMenuColorNoTheme", widget[1], widget[2], widget[3], widget[4] );
 
   if (warning) then
     local ww, wh = lcd.sizeText(warning, DBLSIZE);
@@ -524,42 +531,45 @@ local function displayMenuColorNoTheme(config, widget, menu, overlays, state, ev
     local y = widget[2] + widget[6] + (row - 1) * widget[5];
 
     local label = item[1];
-    if (item[7]) then
-      label = label .. "#";
-    end
 
-    if (item[9]) then
-      label = label .. "~";
-    end
-
-    for io, o in ipairs(overlay) do
-      if (o[2] == item) then
-        label = label .. "*";
+    if (label) and (#label > 0) then
+      if (item[7]) then
+        label = label .. "#";
       end
-    end
 
-    if (row == state[1]) then
-      lcd.drawText(x, y, label, SMLSIZE + INVERS);
-    else
-      lcd.drawText(x, y, label, SMLSIZE);
-    end
+      if (item[9]) then
+        label = label .. "~";
+      end
 
-    local fw = (widget[3] - config[2]) / #item[2];
-    x = x + config[2];
-
-    for col, st in ipairs(item[2]) do
-      local rect = {xmin = x, ymin = y, xmax = x + fw, ymax = y + widget[5]};
-      item[8][col] = rect;
-      if (col == item[3]) then -- active
-        lcd.drawText(x, y, st, SMLSIZE + INVERS);
-      else
-        if (state[2] == col) and (row == state[1]) then -- focus
-          lcd.drawText(x, y, st, SMLSIZE + INVERS + BLINK);
-        else --
-          lcd.drawText(x, y, st, SMLSIZE);
+      for io, o in ipairs(overlay) do
+        if (o[2] == item) then
+          label = label .. "*";
         end
       end
-      x = x + fw;
+
+      if (row == state[1]) then
+        lcd.drawText(x, y, label, SMLSIZE + INVERS);
+      else
+        lcd.drawText(x, y, label, SMLSIZE);
+      end
+
+      local fw = (widget[3] - config[2]) / #item[2];
+      x = x + config[2];
+
+      for col, st in ipairs(item[2]) do
+        local rect = {xmin = x, ymin = y, xmax = x + fw, ymax = y + widget[5]};
+        item[8][col] = rect;
+        if (col == item[3]) then -- active
+          lcd.drawText(x, y, st, SMLSIZE + INVERS);
+        else
+          if (state[2] == col) and (row == state[1]) then -- focus
+            lcd.drawText(x, y, st, SMLSIZE + INVERS + BLINK);
+          else --
+            lcd.drawText(x, y, st, SMLSIZE);
+          end
+        end
+        x = x + fw;
+      end
     end
   end
 end
@@ -653,10 +663,17 @@ local function selectItem(menu, menuState, queue)
   setAndPushItem(queue, item, menuState[2]);
 end
 
+local lastEvent = 0;
+
 local function processEventsBWScroll(config, menu, menuState, event, queue, callback)
   if (event == EVT_VIRTUAL_ENTER) then
     callback(menu, menuState, queue);
   else
+
+    if (event ~= lastEvent) then
+                                            ;
+      lastEvent = event;
+    end
 
     if (event > 0) then
       menuDeselect(menuState);
@@ -678,6 +695,11 @@ local function processEventsBWKeys(config, menu, menuState, event, queue, callba
   if (event == EVT_VIRTUAL_ENTER) then
     callback(menu, menuState, queue);
   else
+
+    if (event ~= lastEvent) then
+                                          ;
+      lastEvent = event;
+    end
 
     if (event > 0) then
       menuDeselect(menuState);
@@ -760,7 +782,7 @@ local function processShortCuts(shortCuts, queue, switches)
       local item = sc[2];
       if not(item[3] == v) then
         setAndPushItem(queue, item, v);
-                                                                     ;
+        print("TRACE: " , "processShortCuts:", item[1], item[3] );
       end
     end
   end
@@ -819,7 +841,7 @@ local function processTrims(config, menu, menuState, buttonState, queue, callbac
   end
   processTrimsNext(config, buttonState, nextCB);
   local selectCB = function()
-                     ;
+    print("TRACE: " , "selectCB" );
     callback(menu, menuState, queue);
   end
   processTrimsSelect(config, buttonState, selectCB);
@@ -894,9 +916,12 @@ local function processTouch(menu, menuState, event, touch)
     if (event == EVT_TOUCH_TAP) then
       for row, item in ipairs(page) do
         for col, rect in ipairs(item[8]) do
-          if (covers(touch, rect)) then
-            menuState[1] = row;
-            menuState[2] = col;
+          if not (string.sub(item[2][col], 1, 1) == "-") then
+            print("TRACE: " , "processTouch: ", item[2][col], string.sub(item[2][col], 1, 1) );
+            if (covers(touch, rect)) then
+              menuState[1] = row;
+              menuState[2] = col;
+            end
           end
         end
       end
@@ -941,11 +966,11 @@ end
 
 local function processForeignInputFromQueue(config, foreignQueue, menu, queue)
   if (foreignQueue:size() > 0) then
-                                                              ;
+    print("TRACE: " , "processForeignInputFromQueue", foreignQueue:size() );
     local fitem = foreignQueue:pop();
     if (fitem) then
       local item = findItem(menu, fitem[4], fitem[5]);
-                                                                                          ;
+      print("TRACE: " , "processForeignInputFromQueue item", fitem[4], fitem[5] );
       if (item) then
         setAndPushItem(queue, item, fitem[3]);
         -- local push = {[1] = item, [2] = item[3]};
@@ -977,7 +1002,7 @@ local function processRemoteInput(config, menu, queue, remoteState)
     remoteState[2] = module;
     remoteState[3] = fn;
     remoteState[4] = state;
-                                        ;
+    print("TRACE: " , "remote: ", module, fn, state );
     setAndPushItem(queue, item, state);
     -- local push = {[1] = item, [2] = item[3]};
     -- item[3] = state;
@@ -1022,7 +1047,7 @@ local function displayAddressConfigBW(config, widget, encoder, pScaler, state, e
     lcd.drawText(widget[1], widget[2] + 3 * widget[9], "Switch on RX and device", MIDSIZE);
 
     local bendcfg = config[20][1];
-                            ;
+    print("TRACE: " , "Address: ", adr );
     encoder(bendcfg[2], 14, adr); -- learn code
 
     if (event == EVT_VIRTUAL_ENTER) then
@@ -1050,7 +1075,7 @@ local function displayAddressConfigColor(config, widget, encoder, pScaler, state
   end
 
   processTrimsSelect(config, buttonState, function()
-                     ;
+    print("TRACE: " , "selectCB" );
     event = EVT_VIRTUAL_ENTER;
   end);
 
@@ -1083,7 +1108,7 @@ local function displayAddressConfigColor(config, widget, encoder, pScaler, state
     lcd.drawFilledRectangle(rect.xmin, rect.ymin, rect.xmax - rect.xmin + 1, rect.ymax - rect.ymin + 1, COLOR_THEME_ACTIVE);
     lcd.drawText(rect.xmin + 5, rect.ymin + 5, "Switch on RX and device", MIDSIZE + COLOR_THEME_PRIMARY2);
 
-                           ;
+    print("TRACE: " , "Address: ", adr );
     local bendcfg = config[20][1];
     encoder(bendcfg[2], 14, adr);
 
