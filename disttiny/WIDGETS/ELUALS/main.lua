@@ -231,7 +231,7 @@ local function makeGroups(config)
   local groups = {};
   for i, b in ipairs(config.buttons) do
     if (b.ls > 0) then
-      if (b.exgroup > 0) then
+      if (b.exgroup) and (b.exgroup > 0) then
         if not (groups[b.exgroup]) then
           groups[b.exgroup] = {};
         end
