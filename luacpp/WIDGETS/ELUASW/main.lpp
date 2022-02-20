@@ -85,14 +85,6 @@ local function create(zone, options)
 
   collectgarbage();
 
-  #ifdef USE_REMOTE_SWITCHES
-  loadLibR();
-  if (__libR) then
-    remotes = __libR.initRemotes();
-    TRACE("ELUASW: remotes: ", remotes);
-  end
-  #endif
-
   return widget;
 end
 
@@ -112,11 +104,6 @@ local function background(widget)
     --   __libD.processForeignInput(__WmSw2Config, __WmSw2ForeignInput, menu, queue);
     --   lastForeignInput = __WmSw2ForeignInput;
     -- end
-    #ifdef USE_REMOTE_SWITCHES
-    if (__libR) then
-      __libR.processRemotes(remotes);
-    end
-    #endif
     if ((__stopWmSw2) and (__stopWmSw2 == 0)) or not (__stopWmSw2) then
       switchFSM(__WmSw2Config, menu, queue, fsmState, encoder, exportValues, autoResets);
     end

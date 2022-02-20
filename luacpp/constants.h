@@ -248,8 +248,15 @@
 #define DEBUG_TEXT_FuncNames 11
 
 #define REMOTE_SW_Name 1
-#define REMOTE_SW_thresh 2
-#define REMOTE_SW_map 3
-#define REMOTE_SW_fn 4
-#define REMOTE_SW_module 5
-#define REMOTE_SW_Id 6
+#define REMOTE_SW_Type 2
+#define REMOTE_SW_thresh 3
+#define REMOTE_SW_map 4
+#define REMOTE_SW_fn 5
+#define REMOTE_SW_module 6
+#define REMOTE_SW_Id 7
+#define REMOTE_SW_LS 8
+#define REMOTE_SW_State 9
+
+#define REMOTE_TYPE_Tr_Switch 1
+#define REMOTE_TYPE_Tr_LS 2
+#define REMOTE_TYPE_SumDV3_LS 3

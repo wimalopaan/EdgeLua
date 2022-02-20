@@ -21,8 +21,8 @@ local threshes = {
 };
 
 return {
-    {"trn1", threshes[1], maps[1], fn = 1, module = 1},
-    {"trn2", threshes[1], maps[1], fn = 2, module = 1},
-    {"trn5", threshes[2], maps[2], fn = 3, module = 1},
+    {source = "trn", number = 1, thr = threshes[1], map = maps[1], fn = 1, module = 1}, -- trainer input 1 with threshes[1], maps[1] for switch
+    {source = "trn", number = 2, thr = threshes[1], ls = {10, 11, 12} },
+    {source = "trn", number = 3, thr = threshes[2], ls = {13, 14} },
 
 };

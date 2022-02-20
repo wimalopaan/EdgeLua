@@ -1,0 +1,78 @@
+--
+-- EdgeLUA - EdgeTx / OpenTx Extensions 
+-- Copyright (C) 2021 Wilhelm Meier <wilhelm.wm.meier@googlemail.com>
+--
+-- This work is licensed under the Creative Commons Attribution-NonCommercial-NoDerivatives 4.0 International License. 
+-- To view a copy of this license, visit http://creativecommons.org/licenses/by-nc-nd/4.0/ 
+-- or send a letter to Creative Commons, PO Box 1866, Mountain View, CA 94042, USA.
+
+-- IMPORTANT
+-- Please note that the above license also covers the transfer protocol used and the encoding scheme and 
+-- all further principals of tranferring state and other information.
+
+#include "../../widget.h"
+
+local name = "EL_Rem";
+local options = {};
+local remotes = nil;
+
+local function create(zone, options)
+  load();
+  loadLibR();
+  collectgarbage();
+
+  if (errorCode > 0) then
+    return {};
+  end
+
+  local widget = __libI.initWidget(zone, options);
+  collectgarbage();
+
+  remotes = __libR.initRemotes();
+
+  if not(remotes) then
+    errorCode = 6;
+    return widget;
+  end
+
+  if not(__WmSw2ForeignInputQueue) then
+    __WmSw2ForeignInputQueue = __libP.Class.Queue.new();
+  end
+
+  __libI = nil; -- free memory
+
+  collectgarbage();
+
+  return widget;
+end
+
+local function update(widget, options)
+  widget[W_Options] = options;
+end
+
+local function background(widget)
+  if (errorCode == 0) then
+    if ((__stopWmSw2) and (__stopWmSw2 == 0)) or not (__stopWmSw2) then
+      __libR.processRemotes(remotes, __WmSw2ForeignInputQueue);        
+    end
+  end
+end
+
+local function refresh(widget, event, touch)
+  __libD.updateWidgetDimensions(widget, event);
+  if (errorCode == 0) then
+    __libR.displayRemotes(remotes, widget, event, touch);
+    background();
+  else
+    lcd.drawText(widget[W_X], widget[W_Y], "Error: " .. errorCode, DBLSIZE);
+  end
+end
+
+return { 
+  name=name,
+  options=options,
+  create=create,
+  update=update,
+  refresh=refresh,
+  background=background
+};

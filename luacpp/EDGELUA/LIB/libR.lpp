@@ -13,32 +13,140 @@
 #include "libconfig.lh"
 
 local function initRemotes() 
+    if not LS_FUNC_STICKY then
+        TRACE("fallback LS_FUNC_STICKY");
+        LS_FUNC_STICKY = LSFUNC_STICKY;
+      end
+    
     local baseDir = BASE_DIR .. "/RADIO/REMOTE/";
     local remotes, filename = loadFile(baseDir);
 
+    local cremotes = {};
     if (remotes) then
         local rcfg = remotes();
 
         TRACE("loadRemote", filename, rcfg);
 
         for li, remote in ipairs(rcfg) do
-            local fi = getFieldInfo(remote[REMOTE_SW_Name]);
-            if (fi) then
-                remote[REMOTE_SW_Id] = fi.id;
-                TRACE("remote: ", remote[REMOTE_SW_Name], fi, fi.id);
+            if (remote.source == "trn") then
+                if (remote.number) then
+                    local name = remote.source .. remote.number;
+                    local fi = getFieldInfo(name);
+                    if (fi) then
+                        local cr = {};
+                        cr[REMOTE_SW_Name] = name;
+                        cr[REMOTE_SW_Id] = fi.id;
+                        if (remote.thr) then
+                            cr[REMOTE_SW_thresh] = remote.thr;
+                            if (remote.map) then
+                                cr[REMOTE_SW_Type] = REMOTE_TYPE_Tr_Switch;
+                                cr[REMOTE_SW_map] = remote.map;
+                                cr[REMOTE_SW_fn] = remote.fn;
+                                cr[REMOTE_SW_module] = remote.module;
+                                cr[REMOTE_SW_State] = 1;
+                                TRACE("add remote", cr[REMOTE_SW_Name], cr[REMOTE_SW_Type]);
+                                ADD(cremotes, cr);
+                            elseif (remote.ls) then
+                                cr[REMOTE_SW_Type] = REMOTE_TYPE_Tr_LS;
+                                cr[REMOTE_SW_LS] = remote.ls;
+                                TRACE("add remote", cr[REMOTE_SW_Name], cr[REMOTE_SW_Type]);
+                                ADD(cremotes, cr);
+                                for li, l in ipairs(cr[REMOTE_SW_LS]) do
+                                    TRACE("insertSRFF: ", l);
+                                    local ls = model.getLogicalSwitch(l - 1);
+                                    if (ls) then
+                                      if (ls.func == 0) then
+                                        TRACE("insertSRFFs: insert", l);
+                                        model.setLogicalSwitch(l - 1, {func = LS_FUNC_STICKY});
+                                      end
+                                    end 
+                                end        
+                            end
+                        end
+                    end
+                end
             end
+            #ifdef USE_SUMDV3
+            if (remote.source == "sumdv3") then
+                
+            end
+            #endif
         end
-        return rcfg;
     end
-
-    return nil;
+    return cremotes;
 end
 
-local function processRemotes() 
+local function setLS(sws, index)
+    local lsNumber = sws[index]; 
+    if (lsNumber) then
+        for si, sw in ipairs(sws) do
+            if (sw == lsNumber) then
+                local v = getLogicalSwitchValue(sw - 1);
+                TRACE3("setLS check", sw, lsNumber, v);
+                if not (v) then
+                    setStickySwitch(sw - 1, true);
+                    TRACE3("setLS", lsNumber);
+                end
+            else
+                setStickySwitch(sw - 1, false);
+            end
+        end            
+    end
+end
+
+local function getThreshIndex(thrs, value)
+    for iv, thr in ipairs(thrs) do
+        if (value < thr) then
+            return iv;
+        else
+            if (value >= thr) and (iv == #thrs) then
+                return (iv + 1);
+            end
+        end        
+    end
+    return 0;
+end
+
+local function processLogicalSwitch(remote)
+    local value = getValue(remote[REMOTE_SW_Id]) / 10.24;
+    local lsIndex = getThreshIndex(remote[REMOTE_SW_thresh], value);
+    TRACE3("processLS: ", remote[REMOTE_SW_Name], value, lsIndex);
+    setLS(remote[REMOTE_SW_LS],lsIndex);
+end
+
+local function processQueuedSwitch(remote, queue)
+    local value = getValue(remote[REMOTE_SW_Id]) / 10.24;
+    local lsIndex = getThreshIndex(remote[REMOTE_SW_thresh], value);
+
+    local state = remote[REMOTE_SW_map][lsIndex];
+    if (remote[REMOTE_SW_State] ~= state) then
+        local item = {};
+        item[ITEM_Function] = remote[REMOTE_SW_fn];
+        item[ITEM_Module] = remote[REMOTE_SW_module];
+        item[ITEM_State] = state;
+        queue:push(item);
+        remote[REMOTE_SW_State] = state;            
+    end
+end
+
+local function processRemotes(remotes, queue) 
+    for ir, remote in ipairs(remotes) do
+        if (remote[REMOTE_SW_Type] == REMOTE_TYPE_Tr_LS) then
+            processLogicalSwitch(remote);
+        elseif (remote[REMOTE_SW_Type] == REMOTE_TYPE_Tr_Switch) then
+            processQueuedSwitch(remote, queue);
+        elseif (remote[REMOTE_SW_Type] == REMOTE_TYPE_SumDV3_LS) then
+        end
+    end
+end
+
+local function displayRemotes(remotes, widget, event, touch) 
+    lcd.drawText(widget[W_X], widget[W_Y], "Remotes", MIDSIZE);
 end
 
 return {
     initRemotes = initRemotes,
     processRemotes = processRemotes,
+    displayRemotes = displayRemotes,
 };
 

@@ -163,31 +163,139 @@ local function initBackendSolExpert(config)
 end
 
 local function initRemotes()
+    if not LS_FUNC_STICKY then
+                                        ;
+        LS_FUNC_STICKY = 18;
+      end
+
     local baseDir = "/EDGELUA" .. "/RADIO/REMOTE/";
     local remotes, filename = loadFile(baseDir);
 
+    local cremotes = {};
     if (remotes) then
         local rcfg = remotes();
 
                                            ;
 
         for li, remote in ipairs(rcfg) do
-            local fi = getFieldInfo(remote[1]);
-            if (fi) then
-                remote[6] = fi.id;
-                                                                    ;
+            if (remote.source == "trn") then
+                if (remote.number) then
+                    local name = remote.source .. remote.number;
+                    local fi = getFieldInfo(name);
+                    if (fi) then
+                        local cr = {};
+                        cr[1] = name;
+                        cr[7] = fi.id;
+                        if (remote.thr) then
+                            cr[3] = remote.thr;
+                            if (remote.map) then
+                                cr[2] = 1;
+                                cr[4] = remote.map;
+                                cr[5] = remote.fn;
+                                cr[6] = remote.module;
+                                cr[9] = 1;
+                                                                                           ;
+                                cremotes[#cremotes + 1] = cr;
+                            elseif (remote.ls) then
+                                cr[2] = 2;
+                                cr[8] = remote.ls;
+                                                                                           ;
+                                cremotes[#cremotes + 1] = cr;
+                                for li, l in ipairs(cr[8]) do
+                                                            ;
+                                    local ls = model.getLogicalSwitch(l - 1);
+                                    if (ls) then
+                                      if (ls.func == 0) then
+                                                                       ;
+                                        model.setLogicalSwitch(l - 1, {func = LS_FUNC_STICKY});
+                                      end
+                                    end
+                                end
+                            end
+                        end
+                    end
+                end
             end
-        end
-        return rcfg;
-    end
 
-    return nil;
+            if (remote.source == "sumdv3") then
+
+            end
+
+        end
+    end
+    return cremotes;
 end
 
-local function processRemotes()
+local function setLS(sws, index)
+    local lsNumber = sws[index];
+    if (lsNumber) then
+        for si, sw in ipairs(sws) do
+            if (sw == lsNumber) then
+                local v = getLogicalSwitchValue(sw - 1);
+                                                      ;
+                if not (v) then
+                    setStickySwitch(sw - 1, true);
+                                             ;
+                end
+            else
+                setStickySwitch(sw - 1, false);
+            end
+        end
+    end
+end
+
+local function getThreshIndex(thrs, value)
+    for iv, thr in ipairs(thrs) do
+        if (value < thr) then
+            return iv;
+        else
+            if (value >= thr) and (iv == #thrs) then
+                return (iv + 1);
+            end
+        end
+    end
+    return 0;
+end
+
+local function processLogicalSwitch(remote)
+    local value = getValue(remote[7]) / 10.24;
+    local lsIndex = getThreshIndex(remote[3], value);
+                                                                 ;
+    setLS(remote[8],lsIndex);
+end
+
+local function processQueuedSwitch(remote, queue)
+    local value = getValue(remote[7]) / 10.24;
+    local lsIndex = getThreshIndex(remote[3], value);
+
+    local state = remote[4][lsIndex];
+    if (remote[9] ~= state) then
+        local item = {};
+        item[4] = remote[5];
+        item[5] = remote[6];
+        item[3] = state;
+        queue:push(item);
+        remote[9] = state;
+    end
+end
+
+local function processRemotes(remotes, queue)
+    for ir, remote in ipairs(remotes) do
+        if (remote[2] == 2) then
+            processLogicalSwitch(remote);
+        elseif (remote[2] == 1) then
+            processQueuedSwitch(remote, queue);
+        elseif (remote[2] == 3) then
+        end
+    end
+end
+
+local function displayRemotes(remotes, widget, event, touch)
+    lcd.drawText(widget[1], widget[2], "Remotes", MIDSIZE);
 end
 
 return {
     initRemotes = initRemotes,
     processRemotes = processRemotes,
+    displayRemotes = displayRemotes,
 };
