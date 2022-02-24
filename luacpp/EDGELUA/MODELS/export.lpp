@@ -22,7 +22,7 @@ local menu = {
   {
     title = "Kollektion1",
     {"M1A", states = gstates1, state = 1, switch = "sa", fn = 1, module = 1, export = 1}, -- export values set 1 (see config under /EDGELUA/RADIO)
-    {"M2A", states = gstates1, state = 1, switch = "sb", fn = 1, module = 2, export = 3}, -- export values set 3
+    {"M2A", states = gstates1, state = 1, switch = nil, fn = 1, module = 2, export = 3}, -- export values set 3
   },
 }   
 
