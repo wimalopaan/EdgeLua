@@ -370,7 +370,7 @@ local function initConfigBW(config, modifyModel)
     cfg[9] = 2; --sbus
   end
 
-  local footer = "Vers: " .. "2.54";
+  local footer = "Vers: " .. "2.55";
   cfg[19] = footer;
 
   if (config.backend >= 1) and (config.backend <= 4) then

@@ -10,12 +10,14 @@
 -- Please note that the above license also covers the transfer protocol used and the encoding scheme and
 -- all further principals of tranferring state and other information.
 
-local function run()
-    lcd.clear();
-    lcd.drawText(10, 10, "Version: " .. "2.55", MIDSIZE);
-    return 0;
-end
-
 return {
-  run = run
+    name = "Effekte",
+    icon = "expand.png",
+    layout = {rows = 2, cols = 2},
+    buttons = {
+        {name = "Licht1", ls = 11},
+        {name = "Licht2", ls = 12},
+        {name = "Sound1", ls = 14},
+        {name = "Sound2", ls = 16},
+    }
 };

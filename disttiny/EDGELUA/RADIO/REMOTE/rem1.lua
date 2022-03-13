@@ -10,12 +10,20 @@
 -- Please note that the above license also covers the transfer protocol used and the encoding scheme and
 -- all further principals of tranferring state and other information.
 
-local function run()
-    lcd.clear();
-    lcd.drawText(10, 10, "Version: " .. "2.55", MIDSIZE);
-    return 0;
-end
+local maps = {
+    {2, 1, 3},
+    {1, 2},
+};
+
+local threshes = {
+    {-33, 33},
+    {0},
+};
 
 return {
-  run = run
+    {source = "trn", number = 7, thr = threshes[2], map = maps[1], fn = 1, module = 1}, -- trainer input 1 with threshes[1], maps[1] for switch
+    {source = "trn", number = 8, thr = threshes[2], ls = {10, 11} },
+    {source = "trn", number = 9, thr = threshes[1], ls = {12, 13, 14} },
+    {source = "trn", number = 10, thr = threshes[2], ls = {15, 16} },
+
 };
