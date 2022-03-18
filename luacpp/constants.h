@@ -260,3 +260,14 @@
 #define REMOTE_TYPE_Tr_Switch 1
 #define REMOTE_TYPE_Tr_LS 2
 #define REMOTE_TYPE_SumDV3_LS 3
+
+#define APP_Buttons 1
+#define APP_Analogs 2
+
+#define APP_BUTTON_Event 1
+#define APP_BUTTON_LS 2
+
+#define APP_ANALOG_Event 1
+#define APP_ANALOG_Shm 2
+
+#define APP_STATE_Undefined 1

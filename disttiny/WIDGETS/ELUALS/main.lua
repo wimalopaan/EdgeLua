@@ -104,6 +104,16 @@ local function loadLibR()
   collectgarbage();
 end
 
+local function loadLibApp()
+  if not __libApp then
+    __libApp = loadLib("libApp.lua");
+    if not __libApp then
+      errorCode = 3.4;
+    end
+  end
+  collectgarbage();
+end
+
 local function loadFile(baseDir, baseName)
     local content = nil;
     local filename = nil;
@@ -345,9 +355,9 @@ local function displayButtons(config, widget, event, touch)
   if not (config.buttons) then
     return 2;
   end
-  if ((config.layout.rows * config.layout.cols) > #config.buttons) then
-    return 3;
-  end
+  -- if ((config.layout.rows * config.layout.cols) > #config.buttons) then
+  -- return 3;
+  -- end
 
   local fw = widget[3] / config.layout.cols;
   local fh = widget[4] / config.layout.rows;
@@ -360,70 +370,78 @@ local function displayButtons(config, widget, event, touch)
     local y = widget[2] + (row - 1) * fh + border;
     for col = 1, config.layout.cols, 1 do
       local x = widget[1] + (col - 1) * fw + border;
-      local lsNumber = config.buttons[idx].ls - 1;
-      lcd.drawFilledRectangle(x, y, bw, bh, COLOR_THEME_SECONDARY1);
-      if (getLogicalSwitchValue(lsNumber)) then
-        lcd.drawRectangle(x, y, bw, bh, COLOR_THEME_WARNING, border);
-      else
-        lcd.drawRectangle(x, y, bw, bh, COLOR_THEME_PRIMARY2);
-      end
 
-      if (#config.buttons <= 4) then
-        if (config.buttons[idx].iconData) then
-          lcd.drawBitmap(config.buttons[idx].iconData, x + fw / 2 - 36, y + fh / 2 - 36);
+      if (config.buttons[idx]) then
+        local lsNumber = config.buttons[idx].ls - 1;
+        lcd.drawFilledRectangle(x, y, bw, bh, COLOR_THEME_SECONDARY1);
+        if (getLogicalSwitchValue(lsNumber)) then
+          lcd.drawRectangle(x, y, bw, bh, COLOR_THEME_WARNING, border);
         else
-          if (config.buttons[idx].icon) then
-            local icon, ok = loadIcon("/EDGELUA" .. "/ICONS/72px/" .. config.buttons[idx].icon);
-            if (ok) then
-              config.buttons[idx].iconData = icon;
-            end
+          lcd.drawRectangle(x, y, bw, bh, COLOR_THEME_PRIMARY2);
+        end
+
+        if (#config.buttons <= 4) then
+          if (config.buttons[idx].iconData) then
+            lcd.drawBitmap(config.buttons[idx].iconData, x + fw / 2 - 36, y + fh / 2 - 36);
           else
-            lcd.drawBitmap(iconDefaultLarge, x + fw / 2 - 36, y + fh / 2 - 36);
+            if (config.buttons[idx].icon) then
+              if not(config.buttons[idx].icon == 0) then
+                local icon, ok = loadIcon("/EDGELUA" .. "/ICONS/72px/" .. config.buttons[idx].icon);
+                if (ok) then
+                  config.buttons[idx].iconData = icon;
+                end
+              end
+            else
+              lcd.drawBitmap(iconDefaultLarge, x + fw / 2 - 36, y + fh / 2 - 36);
+            end
+          end
+          if (config.buttons[idx].name) then
+            lcd.drawText(x + 2 * border, y + 2 * border, config.buttons[idx].name, MIDSIZE + COLOR_THEME_PRIMARY1);
+          end
+        else
+          if (config.buttons[idx].iconData) then
+            lcd.drawBitmap(config.buttons[idx].iconData, x + fw / 2 - 24, y + fh / 2 - 24);
+          else
+            if (config.buttons[idx].icon) then
+              local icon, ok = loadIcon("/EDGELUA" .. "/ICONS/48px/" .. config.buttons[idx].icon);
+              if (ok) then
+                config.buttons[idx].iconData = icon;
+              end
+            else
+              lcd.drawBitmap(iconDefaultSmall, x + fw / 2 - 24, y + fh / 2 - 24);
+            end
+          end
+          if (config.buttons[idx].name) then
+            lcd.drawText(x + 2 * border, y + 2 * border, config.buttons[idx].name, SMLSIZE + COLOR_THEME_PRIMARY1);
           end
         end
-        if (config.buttons[idx].name) then
-          lcd.drawText(x + 2 * border, y + 2 * border, config.buttons[idx].name, MIDSIZE + COLOR_THEME_PRIMARY1);
-        end
       else
-        if (config.buttons[idx].iconData) then
-          lcd.drawBitmap(config.buttons[idx].iconData, x + fw / 2 - 24, y + fh / 2 - 24);
-        else
-          if (config.buttons[idx].icon) then
-            local icon, ok = loadIcon("/EDGELUA" .. "/ICONS/48px/" .. config.buttons[idx].icon);
-            if (ok) then
-              config.buttons[idx].iconData = icon;
-            end
-          else
-            lcd.drawBitmap(iconDefaultSmall, x + fw / 2 - 24, y + fh / 2 - 24);
-          end
-        end
-        if (config.buttons[idx].name) then
-          lcd.drawText(x + 2 * border, y + 2 * border, config.buttons[idx].name, SMLSIZE + COLOR_THEME_PRIMARY1);
-        end
+        lcd.drawFilledRectangle(x, y, bw, bh, COLOR_THEME_SECONDARY2);
       end
-
       local rect = {xmin = x, xmax = x + bw, ymin = y, ymax = y + bh};
       rects[idx] = rect;
-      idx = idx + 1;
+    idx = idx + 1;
     end
   end
 
   if ((touch) and (event == EVT_TOUCH_TAP)) then
     for i, rect in ipairs(rects) do
-      if (covers(touch, rect)) then
-                                                ;
-        local lsNumber = config.buttons[i].ls - 1;
-        if (getLogicalSwitchValue(lsNumber)) then
-          setStickySwitch(config.buttons[i].ls - 1, false);
-        else
-          if (config.buttons[i].exgroup) and (exclusiveGroups[config.buttons[i].exgroup]) then
-            for exgi, exls in ipairs(exclusiveGroups[config.buttons[i].exgroup]) do
-              if (config.buttons[i].ls ~= exls) then
-                setStickySwitch(exls - 1, false);
+      if (config.buttons[i]) then
+        if (covers(touch, rect)) then
+                                                  ;
+          local lsNumber = config.buttons[i].ls - 1;
+          if (getLogicalSwitchValue(lsNumber)) then
+            setStickySwitch(config.buttons[i].ls - 1, false);
+          else
+            if (config.buttons[i].exgroup) and (exclusiveGroups[config.buttons[i].exgroup]) then
+              for exgi, exls in ipairs(exclusiveGroups[config.buttons[i].exgroup]) do
+                if (config.buttons[i].ls ~= exls) then
+                  setStickySwitch(exls - 1, false);
+                end
               end
             end
+            setStickySwitch(config.buttons[i].ls - 1, true);
           end
-          setStickySwitch(config.buttons[i].ls - 1, true);
         end
       end
     end

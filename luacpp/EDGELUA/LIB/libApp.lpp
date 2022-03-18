@@ -1,0 +1,95 @@
+--
+-- EdgeLUA - EdgeTx / OpenTx Extensions 
+-- Copyright (C) 2021 Wilhelm Meier <wilhelm.wm.meier@googlemail.com>
+--
+-- This work is licensed under the Creative Commons Attribution-NonCommercial-NoDerivatives 4.0 International License. 
+-- To view a copy of this license, visit http://creativecommons.org/licenses/by-nc-nd/4.0/ 
+-- or send a letter to Creative Commons, PO Box 1866, Mountain View, CA 94042, USA.
+
+-- IMPORTANT
+-- Please note that the above license also covers the transfer protocol used and the encoding scheme and 
+-- all further principals of tranferring state and other information.
+
+#include "libconfig.lh"
+
+local function init() 
+    if not LS_FUNC_STICKY then
+        TRACE("fallback LS_FUNC_STICKY");
+        LS_FUNC_STICKY = LSFUNC_STICKY;
+      end
+    
+    local baseDir = BASE_DIR .. "/MODELS/APP/";
+    local app, filename = loadFile(baseDir);
+
+    local capp = {};
+    if (app) then
+        local acfg = app();
+
+        TRACE("loadApp", filename, acfg);
+
+        if (acfg.buttons) then
+            capp[APP_Buttons] = {};
+            for bi, btn in ipairs(acfg.buttons) do
+                if ((btn.event) and (btn.ls > 0) and (btn.ls <= 64)) then
+                    local button = {};
+                    button[APP_BUTTON_Event] = btn.event;
+                    button[APP_BUTTON_LS] = btn.ls;
+                    ADD(capp[APP_Buttons], button); 
+                    TRACE("APP add button", btn.event, btn.ls);
+                end
+            end
+            for bi, b in ipairs(capp[APP_Buttons]) do
+                local l = b[APP_BUTTON_LS];
+                TRACE("insertSRFF: ", l);
+                local ls = model.getLogicalSwitch(l - 1);
+                if (ls) then
+                  if (ls.func == 0) then
+                    TRACE("insertSRFFs: insert", l);
+                    model.setLogicalSwitch(l - 1, {func = LS_FUNC_STICKY});
+                  end
+                end 
+            end        
+        end
+        if (acfg.analogs) then
+            capp[APP_Analogs] = {};
+            for ai, ana in ipairs(acfg.analogs) do
+                if ((ana.event) and (ana.shm > 0) and (ana.shm <= 16)) then
+                    local analog = {};
+                    analog[APP_ANALOG_Event] = ana.event;
+                    analog[APP_ANALOG_Shm] = ana.shm;
+                    ADD(capp[APP_Analogs], analog); 
+                    TRACE("APP add analog", ana.event, ana.shm);
+                end
+            end
+        end
+    end
+    return capp;
+end
+
+local function setLS(sws, index)
+    local lsNumber = sws[index]; 
+    if (lsNumber) then
+        for si, sw in ipairs(sws) do
+            if (sw == lsNumber) then
+                local v = getLogicalSwitchValue(sw - 1);
+                TRACE3("setLS check", sw, lsNumber, v);
+                if not (v) then
+                    setStickySwitch(sw - 1, true);
+                    TRACE3("setLS", lsNumber);
+                end
+            else
+                setStickySwitch(sw - 1, false);
+            end
+        end            
+    end
+end
+
+
+local function displayRemotes(remotes, widget, event, touch) 
+    lcd.drawText(widget[W_X], widget[W_Y], "Remotes", MIDSIZE);
+end
+
+return {
+    init = init,
+};
+

@@ -5,6 +5,6 @@ targets += virt.lua areset.lua export.lua simple.lua
 targets += butexg.lua
 targets += tiny.lua.extract tiny.lua.html
 
-subdirs = LSBUT
+subdirs = LSBUT APP
 
 -include ../../makefile.include

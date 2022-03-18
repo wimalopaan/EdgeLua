@@ -1,0 +1,120 @@
+--
+-- EdgeLUA - EdgeTx / OpenTx Extensions 
+-- Copyright (C) 2021 Wilhelm Meier <wilhelm.wm.meier@googlemail.com>
+--
+-- This work is licensed under the Creative Commons Attribution-NonCommercial-NoDerivatives 4.0 International License. 
+-- To view a copy of this license, visit http://creativecommons.org/licenses/by-nc-nd/4.0/ 
+-- or send a letter to Creative Commons, PO Box 1866, Mountain View, CA 94042, USA.
+
+-- IMPORTANT
+-- Please note that the above license also covers the transfer protocol used and the encoding scheme and 
+-- all further principals of tranferring state and other information.
+
+#include "../../widget.h"
+
+local name = "EL_App";
+local options = {
+    { "Offset", VALUE, 0, 0, 49},
+    { "Value1", SOURCE, 1},
+    { "Value2", SOURCE, 2},
+    { "Value3", SOURCE, 3},
+    { "Value4", SOURCE, 4},
+    { "Value5", SOURCE, 5},
+};
+local app = {};
+local lasttime = 0;
+
+local function create(zone, options)
+  load();
+  loadLibApp();
+  collectgarbage();
+
+  if (errorCode > 0) then
+    return {};
+  end
+
+  local widget = __libI.initWidget(zone, options);
+  collectgarbage();
+
+  app = __libApp.init();
+
+  if not(app) then
+    errorCode = 6;
+    return widget;
+  end
+
+  __libI = nil; -- free memory
+
+  collectgarbage();
+
+  setSerialBaudrate(9600);
+
+  return widget;
+end
+
+local function update(widget, options)
+  widget[W_Options] = options;
+end
+
+local function send(widget)
+    local t = getTime();
+    if ((t - lasttime) > 33) then
+        lasttime = t;
+        local off = widget[W_Options].Offset;
+        local v1 = getValue(widget[W_Options].Value1);
+        serialWrite("$v" .. off .. ":" .. v1 .. "\n");
+        off = off + 1;
+        local v2 = getValue(widget[W_Options].Value2);
+        serialWrite("$v" .. off .. ":" .. v2 .. "\n");
+        off = off + 1;
+        local v3 = getValue(widget[W_Options].Value3);
+        serialWrite("$v" .. off .. ":" .. v3 .. "\n");
+        off = off + 1;
+        local v4 = getValue(widget[W_Options].Value4);
+        serialWrite("$v" .. off .. ":" .. v4 .. "\n");
+        off = off + 1;
+        local v5 = getValue(widget[W_Options].Value5);
+        serialWrite("$v" .. off .. ":" .. v5 .. "\n");          
+    end
+end
+
+local state = APP_STATE_Undefined;
+
+local function parse(b)
+    if (state == APP_STATE_Undefined) then
+    elseif (state == APP_STATE_Undefined) then
+    else
+    end
+end
+
+local function receive(widget)
+    local msg = serialRead();
+    for i=1, #msg do
+        parse(msg:byte(i, i));
+    end
+end
+
+local function background(widget)
+  if (errorCode == 0) then
+    send();
+    receive();
+  end
+end
+
+local function refresh(widget, event, touch)
+  __libD.updateWidgetDimensions(widget, event);
+  if (errorCode == 0) then
+    background();
+  else
+    lcd.drawText(widget[W_X], widget[W_Y], "Error: " .. errorCode, DBLSIZE);
+  end
+end
+
+return { 
+  name=name,
+  options=options,
+  create=create,
+  update=update,
+  refresh=refresh,
+  background=background
+};

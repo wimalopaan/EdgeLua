@@ -211,9 +211,9 @@ local function displayButtons(config, widget, event, touch)
   if not (config.buttons) then
     return 2;
   end
-  if ((config.layout.rows * config.layout.cols) > #config.buttons) then
-    return 3;
-  end
+  -- if ((config.layout.rows * config.layout.cols) > #config.buttons) then
+  --   return 3;
+  -- end
 
   local fw = widget[W_Width] / config.layout.cols;
   local fh = widget[W_Height] / config.layout.rows;
@@ -226,71 +226,79 @@ local function displayButtons(config, widget, event, touch)
     local y = widget[W_Y] + (row - 1) * fh + border;
     for col = 1, config.layout.cols, 1 do 
       local x = widget[W_X] + (col - 1) * fw + border;
-      local lsNumber = config.buttons[idx].ls - 1;
-      lcd.drawFilledRectangle(x, y, bw, bh, COLOR_THEME_SECONDARY1);
-      if (getLogicalSwitchValue(lsNumber)) then
-        lcd.drawRectangle(x, y, bw, bh, COLOR_THEME_WARNING, border);
-      else
-        lcd.drawRectangle(x, y, bw, bh, COLOR_THEME_PRIMARY2);
-      end
 
-      if (#config.buttons <= 4) then
-        if (config.buttons[idx].iconData) then
-          lcd.drawBitmap(config.buttons[idx].iconData, x + fw / 2 - 36, y + fh / 2 - 36);
+      if (config.buttons[idx]) then
+        local lsNumber = config.buttons[idx].ls - 1;
+        lcd.drawFilledRectangle(x, y, bw, bh, COLOR_THEME_SECONDARY1);
+        if (getLogicalSwitchValue(lsNumber)) then
+          lcd.drawRectangle(x, y, bw, bh, COLOR_THEME_WARNING, border);
         else
-          if (config.buttons[idx].icon) then
-            local icon, ok = loadIcon(BASE_DIR .. PATH_LARGE .. config.buttons[idx].icon);
-            if (ok) then
-              config.buttons[idx].iconData = icon;
-            end
+          lcd.drawRectangle(x, y, bw, bh, COLOR_THEME_PRIMARY2);
+        end
+  
+        if (#config.buttons <= 4) then
+          if (config.buttons[idx].iconData) then
+            lcd.drawBitmap(config.buttons[idx].iconData, x + fw / 2 - 36, y + fh / 2 - 36);
           else
-            lcd.drawBitmap(iconDefaultLarge, x + fw / 2 - 36, y + fh / 2 - 36);
+            if (config.buttons[idx].icon) then
+              if not(config.buttons[idx].icon == 0) then
+                local icon, ok = loadIcon(BASE_DIR .. PATH_LARGE .. config.buttons[idx].icon);
+                if (ok) then
+                  config.buttons[idx].iconData = icon;
+                end                  
+              end 
+            else
+              lcd.drawBitmap(iconDefaultLarge, x + fw / 2 - 36, y + fh / 2 - 36);
+            end
           end
-        end
-        if (config.buttons[idx].name) then
-          lcd.drawText(x + 2 * border, y + 2 * border, config.buttons[idx].name, MIDSIZE + COLOR_THEME_PRIMARY1);          
-        end
+          if (config.buttons[idx].name) then
+            lcd.drawText(x + 2 * border, y + 2 * border, config.buttons[idx].name, MIDSIZE + COLOR_THEME_PRIMARY1);          
+          end
+        else
+          if (config.buttons[idx].iconData) then
+            lcd.drawBitmap(config.buttons[idx].iconData, x + fw / 2 - 24, y + fh / 2 - 24);
+          else
+            if (config.buttons[idx].icon) then
+              local icon, ok = loadIcon(BASE_DIR .. PATH_SMALL .. config.buttons[idx].icon);
+              if (ok) then
+                config.buttons[idx].iconData = icon;
+              end
+            else
+              lcd.drawBitmap(iconDefaultSmall, x + fw / 2 - 24, y + fh / 2 - 24);
+            end
+          end
+          if (config.buttons[idx].name) then
+            lcd.drawText(x + 2 * border, y + 2 * border, config.buttons[idx].name, SMLSIZE + COLOR_THEME_PRIMARY1);
+          end
+        end          
       else
-        if (config.buttons[idx].iconData) then
-          lcd.drawBitmap(config.buttons[idx].iconData, x + fw / 2 - 24, y + fh / 2 - 24);
-        else
-          if (config.buttons[idx].icon) then
-            local icon, ok = loadIcon(BASE_DIR .. PATH_SMALL .. config.buttons[idx].icon);
-            if (ok) then
-              config.buttons[idx].iconData = icon;
-            end
-          else
-            lcd.drawBitmap(iconDefaultSmall, x + fw / 2 - 24, y + fh / 2 - 24);
-          end
-        end
-        if (config.buttons[idx].name) then
-          lcd.drawText(x + 2 * border, y + 2 * border, config.buttons[idx].name, SMLSIZE + COLOR_THEME_PRIMARY1);
-        end
+        lcd.drawFilledRectangle(x, y, bw, bh, COLOR_THEME_SECONDARY2);
       end
-
       local rect = {xmin = x, xmax = x + bw, ymin = y, ymax = y + bh};
       rects[idx] = rect;
-      idx = idx + 1;
+    idx = idx + 1;
     end
   end
 
   if ((touch) and (event == EVT_TOUCH_TAP)) then
     for i, rect in ipairs(rects) do 
-      if (covers(touch, rect)) then
-        TRACE("touch: ", config.buttons[i].name);
-        local lsNumber = config.buttons[i].ls - 1;
-        if (getLogicalSwitchValue(lsNumber)) then
-          setStickySwitch(config.buttons[i].ls - 1, false);
-        else  
-          if (config.buttons[i].exgroup) and (exclusiveGroups[config.buttons[i].exgroup]) then
-            for exgi, exls in ipairs(exclusiveGroups[config.buttons[i].exgroup]) do
-              if (config.buttons[i].ls ~= exls) then
-                setStickySwitch(exls - 1, false);                
+      if (config.buttons[i]) then
+        if (covers(touch, rect)) then
+          TRACE("touch: ", config.buttons[i].name);
+          local lsNumber = config.buttons[i].ls - 1;
+          if (getLogicalSwitchValue(lsNumber)) then
+            setStickySwitch(config.buttons[i].ls - 1, false);
+          else  
+            if (config.buttons[i].exgroup) and (exclusiveGroups[config.buttons[i].exgroup]) then
+              for exgi, exls in ipairs(exclusiveGroups[config.buttons[i].exgroup]) do
+                if (config.buttons[i].ls ~= exls) then
+                  setStickySwitch(exls - 1, false);                
+                end
               end
             end
+            setStickySwitch(config.buttons[i].ls - 1, true);
           end
-          setStickySwitch(config.buttons[i].ls - 1, true);
-        end
+        end          
       end
     end      
   end

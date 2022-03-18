@@ -114,72 +114,109 @@ local function loadLibApp()
   collectgarbage();
 end
 
-local widget = {};
-local menuState = {};
-local paramEncoder = nil;
-local paramScaler = nil;
+local name = "EL_App";
+local options = {
+    { "Offset", VALUE, 0, 0, 49},
+    { "Value1", SOURCE, 1},
+    { "Value2", SOURCE, 2},
+    { "Value3", SOURCE, 3},
+    { "Value4", SOURCE, 4},
+    { "Value5", SOURCE, 5},
+};
+local app = {};
+local lasttime = 0;
 
-local lastRun = 0;
+local function create(zone, options)
+  load();
+  loadLibApp();
+  collectgarbage();
 
-local function init_telemetry()
-    load();
-    collectgarbage();
-
-    if (errorCode > 0) then
-       return;
-    end
-
-    widget = __libI.initWidget();
-    collectgarbage();
-
-    if not(__WmSw2Config) then
-        local config = __libI.loadConfig();
-        if not(config) then
-          errorCode = 4;
-          return;
-        end
-        __WmSw2Config = __libI.initConfig(config, true); --todo
-      end
-      collectgarbage();
-
-      local unused = nil;
-      unused, paramScaler, paramEncoder = __libP.getEncoder(__WmSw2Config);
-      unused = nil;
-
-      __libI = nil; -- free memory
-
-      collectgarbage();
-end
-
-local function run_telemetry(event)
-    lcd.clear();
-    if (errorCode == 0) then
-      if not(__stopWmSw2) then
-        __stopWmSw2 = 0;
-      end
-      __stopWmSw2 = bit32.bor(__stopWmSw2, 2);
-      lastRun = getTime();
-      lcd.drawScreenTitle("Learn address", 1, 1);
-      __libD.displayAddressConfig(__WmSw2Config, widget, paramEncoder, paramScaler, menuState, event, touch);
-    else
-      lcd.drawText(0, 0, "Error: " .. errorCode, DBLSIZE);
-    end
+  if (errorCode > 0) then
+    return {};
   end
 
-local function background_telemetry()
-    if (errorCode == 0) then
-      if not(__stopWmSw2) then
-        __stopWmSw2 = 0;
-      end
-      if ((getTime() - lastRun) > 100) then
-        __stopWmSw2 = bit32.band(__stopWmSw2, bit32.bnot(2));
-        menuState[1] = 0; -- deselected state
-      end
+  local widget = __libI.initWidget(zone, options);
+  collectgarbage();
+
+  app = __libApp.init();
+
+  if not(app) then
+    errorCode = 6;
+    return widget;
+  end
+
+  __libI = nil; -- free memory
+
+  collectgarbage();
+
+  setSerialBaudrate(9600);
+
+  return widget;
+end
+
+local function update(widget, options)
+  widget[11] = options;
+end
+
+local function send(widget)
+    local t = getTime();
+    if ((t - lasttime) > 33) then
+        lasttime = t;
+        local off = widget[11].Offset;
+        local v1 = getValue(widget[11].Value1);
+        serialWrite("$v" .. off .. ":" .. v1 .. "\n");
+        off = off + 1;
+        local v2 = getValue(widget[11].Value2);
+        serialWrite("$v" .. off .. ":" .. v2 .. "\n");
+        off = off + 1;
+        local v3 = getValue(widget[11].Value3);
+        serialWrite("$v" .. off .. ":" .. v3 .. "\n");
+        off = off + 1;
+        local v4 = getValue(widget[11].Value4);
+        serialWrite("$v" .. off .. ":" .. v4 .. "\n");
+        off = off + 1;
+        local v5 = getValue(widget[11].Value5);
+        serialWrite("$v" .. off .. ":" .. v5 .. "\n");
     end
+end
+
+local state = 1;
+
+local function parse(b)
+    if (state == 1) then
+    elseif (state == 1) then
+    else
+    end
+end
+
+local function receive(widget)
+    local msg = serialRead();
+    for i=1, #msg do
+        parse(msg:byte(i, i));
+    end
+end
+
+local function background(widget)
+  if (errorCode == 0) then
+    send();
+    receive();
+  end
+end
+
+local function refresh(widget, event, touch)
+  __libD.updateWidgetDimensions(widget, event);
+  if (errorCode == 0) then
+    background();
+  else
+    lcd.drawText(widget[1], widget[2], "Error: " .. errorCode, DBLSIZE);
+  end
 end
 
 return {
-    init = init_telemetry,
-    run = run_telemetry,
-    background = background_telemetry,
-}
+  name=name,
+  options=options,
+  create=create,
+  update=update,
+  refresh=refresh,
+  background=background
+};
