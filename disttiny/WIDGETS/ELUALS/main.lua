@@ -297,6 +297,7 @@ local function create(zone, options)
   local instanceData = {};
   widget[12] = instanceData;
   instanceData[1] = ccfg;
+  instanceData[3] = 0;
 
   if (options.Reset == 0) then
     instanceData[2] = -1; -- no following explicit reset
@@ -335,7 +336,7 @@ local function background(widget)
       local t = getTime();
       if ((t - instanceData[3]) > 20) then
         instanceData[3] = t;
-        for i, b in ipairs(ccfg.buttons) do
+        for i, b in ipairs(instanceData[1].buttons) do
           if ((i >= instanceData[2]) and (b.ls > 0)) then
             local lsNumber = b.ls - 1;
                                              ;

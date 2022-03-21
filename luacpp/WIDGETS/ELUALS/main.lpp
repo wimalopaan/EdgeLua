@@ -162,6 +162,7 @@ local function create(zone, options)
   local instanceData = {};
   widget[W_InstanceData] = instanceData;
   instanceData[INSTANCE_Config] = ccfg;
+  instanceData[INSTANCE_LastTime] = 0;
 
   if (options.Reset == 0) then
     instanceData[INSTANCE_InitFailed] = -1; -- no following explicit reset
@@ -200,7 +201,7 @@ local function background(widget)
       local t = getTime();
       if ((t - instanceData[INSTANCE_LastTime]) > 20) then
         instanceData[INSTANCE_LastTime] = t;
-        for i, b in ipairs(ccfg.buttons) do  
+        for i, b in ipairs(instanceData[INSTANCE_Config].buttons) do  
           if ((i >= instanceData[INSTANCE_InitFailed]) and (b.ls > 0)) then
             local lsNumber = b.ls - 1;
             TRACE3("inial reset: ", lsNumber);
@@ -238,7 +239,7 @@ local function displayButtons(config, widget, event, touch)
   local iconDefaultLarge = widget[W_InstanceData][INSTANCE_IconDefaultLarge];
   local iconDefaultSmall = widget[W_InstanceData][INSTANCE_IconDefaultSmall];
   local exclusiveGroups = widget[W_InstanceData][INSTANCE_ExclusiveGroups];
-  
+
   local fw = widget[W_Width] / config.layout.cols;
   local fh = widget[W_Height] / config.layout.rows;
   local border = 6;
