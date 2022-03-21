@@ -493,7 +493,7 @@ local function initConfigBW(config, modifyModel)
     cfg[9] = 2; --sbus
   end
 
-  local footer = "Vers: " .. "2.56";
+  local footer = "Vers: " .. "2.57";
 
   if (cfg[9] == 0) then
     footer = footer .. " Mod: xjt";

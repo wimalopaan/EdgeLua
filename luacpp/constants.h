@@ -29,6 +29,7 @@
 #define W_FontHLarge 9
 #define W_Zone 10
 #define W_Options 11
+#define W_InstanceData 12
 
 #define CFG_Title 1
 #define CFG_FirstColWidth 2

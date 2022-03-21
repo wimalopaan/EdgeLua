@@ -161,27 +161,31 @@ local function loadConfig()
     end
     return nil;
 end
-
 local name = "EL_But";
 local options = {
   { "Name", STRING},
   { "Reset", VALUE, 0, 0, 1},
 };
 
-local config = nil;
-local initFailed = -1;
-local lastTime = 0;
+-- shared between all instances
+local iconTable = {}; -- hash table for icon bitmaps, only hash based access
 
-local exclusiveGroups = {};
+-- local ccfg = nil;
+-- local initFailed = -1;
+-- local lastTime = 0;
 
-local iconWidget = nil;
-local iconDefaultSmall = nil;
-local iconDefaultLarge = nil;
+-- local exclusiveGroups = {};
 
-local function insertSRFFs(config)
+-- local iconWidget = nil;
+-- local iconDefaultSmall = nil;
+-- local iconDefaultLarge = nil;
+
+local function insertSRFFs(widget, config)
   if not (config.buttons) then
     return 1;
   end
+
+  local instanceData = widget[12];
 
   if not LS_FUNC_STICKY then
                      ;
@@ -201,8 +205,8 @@ local function insertSRFFs(config)
         elseif (ls.func == LS_FUNC_STICKY) then
                                              ;
           if (setStickySwitch(lsNumber, false)) then
-            if (initFailed < 0) then
-              initFailed = i;
+            if (instanceData[2] < 0) then
+              instanceData[2] = i;
             end
           end
         else
@@ -214,8 +218,6 @@ local function insertSRFFs(config)
   end
   return 0;
 end
-
-local iconTable = {}; -- hash table for icon bitmaps, only hash based access
 
 local function loadIcon(filename)
   if (iconTable[filename]) then
@@ -275,37 +277,44 @@ local function create(zone, options)
 
   end
 
-  config = loadFile("/EDGELUA" .. "/MODELS/LSBUT/", name);
-  if (config) then
-    config = config();
-
-    if not (config.name) then
-      config.name = "unnamed";
+                                 ;
+  local cfg = loadFile("/EDGELUA" .. "/MODELS/LSBUT/", name);
+  local ccfg = {};
+  if (cfg) then
+    ccfg = cfg();
+    if not (ccfg.name) then
+      ccfg.name = "unnamed";
     end
-
   end
+
+                           ;
 
   if (errorCode > 0) then
     return {};
   end
 
-  local r = insertSRFFs(config);
+  local widget = __libI.initWidget(zone, options);
+  local instanceData = {};
+  widget[12] = instanceData;
+  instanceData[1] = ccfg;
+
+  if (options.Reset == 0) then
+    instanceData[2] = -1; -- no following explicit reset
+  end
+
+  local r = insertSRFFs(widget, ccfg);
   if (r > 0) then
     errorCode = 10 + r;
   end
 
-  exclusiveGroups = makeGroups(config);
+  local exclusiveGroups = makeGroups(ccfg);
 
-  if (options.Reset == 0) then
-    initFailed = -1; -- no follwing explicit reset
-  end
-
-  local widget = __libI.initWidget(zone, options);
   collectgarbage();
+  instanceData[4] = exclusiveGroups;
 
-  iconWidget = loadIcon("/EDGELUA" .. "/ICONS/48px/" .. "expand.png");
-  iconDefaultSmall = loadIcon("/EDGELUA" .. "/ICONS/48px/" .. "round.png");
-  iconDefaultLarge = loadIcon("/EDGELUA" .. "/ICONS/72px/" .. "round.png");
+  instanceData[5] = loadIcon("/EDGELUA" .. "/ICONS/48px/" .. "expand.png");
+  instanceData[6] = loadIcon("/EDGELUA" .. "/ICONS/48px/" .. "round.png");
+  instanceData[7] = loadIcon("/EDGELUA" .. "/ICONS/72px/" .. "round.png");
 
   __libI = nil;
   collectgarbage();
@@ -318,23 +327,25 @@ local function update(widget, options)
 end
 
 local function background(widget)
+  local instanceData = widget[12];
+
   if (errorCode == 0) then
                        ;
-    if (initFailed >= 0) then
+    if (instanceData[2] >= 0) then
       local t = getTime();
-      if ((t - lastTime) > 20) then
-        lastTime = t;
-        for i, b in ipairs(config.buttons) do
-          if ((i >= initFailed) and (b.ls > 0)) then
+      if ((t - instanceData[3]) > 20) then
+        instanceData[3] = t;
+        for i, b in ipairs(ccfg.buttons) do
+          if ((i >= instanceData[2]) and (b.ls > 0)) then
             local lsNumber = b.ls - 1;
                                              ;
             if (setStickySwitch(lsNumber, false)) then
-              initFailed = i;
+              instanceData[2] = i;
               return;
             end
           end
         end
-        initFailed = -1;
+        instanceData[2] = -1;
         end
     end
   end
@@ -358,6 +369,10 @@ local function displayButtons(config, widget, event, touch)
   -- if ((config.layout.rows * config.layout.cols) > #config.buttons) then
   -- return 3;
   -- end
+
+  local iconDefaultLarge = widget[12][7];
+  local iconDefaultSmall = widget[12][6];
+  local exclusiveGroups = widget[12][4];
 
   local fw = widget[3] / config.layout.cols;
   local fh = widget[4] / config.layout.rows;
@@ -451,16 +466,20 @@ local function displayButtons(config, widget, event, touch)
 end
 
 local function refresh(widget, event, touch)
+  local instanceData = widget[12];
+  local ccfg = instanceData[1];
+  local iconWidget = instanceData[5];
   background(widget);
   __libD.updateWidgetDimensions(widget, event);
-  if (errorCode == 0) and (config) then
+  if (errorCode == 0) and (ccfg) then
+    -- ;
     if (widget[3] <= (LCD_W / 2)) or (widget[4] <= (LCD_H / 2)) then
       if (iconWidget) then
         lcd.drawBitmap(iconWidget, widget[1], widget[2] + widget[4] / 2 - 24);
       end
-      lcd.drawText(widget[1] + 60, widget[2] + widget[4] / 2 - widget[9], config.name, MIDSIZE);
+      lcd.drawText(widget[1] + 60, widget[2] + widget[4] / 2 - widget[9], ccfg.name, MIDSIZE);
     else
-      local error = displayButtons(config, widget, event, touch);
+      local error = displayButtons(ccfg, widget, event, touch);
       if (error > 0) then
         lcd.drawText(widget[1], widget[2], "Error: " .. error, DBLSIZE);
       end
