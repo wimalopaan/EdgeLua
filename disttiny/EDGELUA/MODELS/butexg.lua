@@ -5,7 +5,6 @@
 -- This work is licensed under the Creative Commons Attribution-NonCommercial-NoDerivatives 4.0 International License.
 -- To view a copy of this license, visit http:
 -- or send a letter to Creative Commons, PO Box 1866, Mountain View, CA 94042, USA.
-
 -- IMPORTANT
 -- Please note that the above license also covers the transfer protocol used and the encoding scheme and
 -- all further principals of tranferring state and other information.
@@ -21,9 +20,7 @@ local menu = {
     {"Ausgang3", states = {"aus", "ein 1", "ein 2"}, state = 1, switch = "sa", fn = 3, module = 1},
   },
 }
-
 local map = {
   {module = 1, type = 1, description = "Das Modul mit dem roten Aufkleber"},
 };
-
 return menu, map;

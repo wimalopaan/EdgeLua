@@ -136,6 +136,7 @@ local function initDebugTextBW()
   debugText[DEBUG_TEXT_Filename] = "FNam:";
   debugText[DEBUG_TEXT_StringOption] = "SOpt:";
   debugText[DEBUG_TEXT_FuncNames] = "Func:";
+  debugText[DEBUG_TEXT_SUMDV3CMD] = "SumDV3:";
 end
 
 local function initDebugTextColor() 
@@ -150,7 +151,8 @@ local function initDebugTextColor()
   debugText[DEBUG_TEXT_Filename] = "ModelFileName:";
   debugText[DEBUG_TEXT_StringOption] = "StringOption:";
   debugText[DEBUG_TEXT_FuncNames] = "FunctionNames:";
-end
+  debugText[DEBUG_TEXT_SUMDV3CMD] = "SumDV3:";
+end 
 
 local function displayDebugBW(widget) 
   local y = widget[W_Y];
@@ -277,6 +279,22 @@ local function displayDebugBW(widget)
   #else
       lcd.drawText(x4, y, "-", SMLSIZE);
   #endif 
+
+  y = y + widget[W_FontHSmall]; 
+  lcd.drawText(x3, y, debugText[DEBUG_TEXT_SUMDV3CMD], SMLSIZE);
+  if (getSumDV3Command) then
+    local m, s = getSumDV3Command();
+    local r = "-";
+    if (m) then
+      r = "mode: " .. m;
+    end
+    if (s) then
+      r = r .. " sub: " .. s;
+    end
+    lcd.drawText(x4, y, r, SMLSIZE);
+  else
+    lcd.drawText(x4, y, "n/a", SMLSIZE);
+  end
 
 end
 

@@ -5,14 +5,12 @@
 -- This work is licensed under the Creative Commons Attribution-NonCommercial-NoDerivatives 4.0 International License.
 -- To view a copy of this license, visit http:
 -- or send a letter to Creative Commons, PO Box 1866, Mountain View, CA 94042, USA.
-
 -- IMPORTANT
 -- Please note that the above license also covers the transfer protocol used and the encoding scheme and
 -- all further principals of tranferring state and other information.
 
 local function init()
 end
-
 local function gather(basedir, names)
   for filename in dir(basedir) do
     if (string.find(filename, ".lua$")) then
@@ -21,7 +19,6 @@ local function gather(basedir, names)
     end
   end
 end
-
 local function compile(filename)
   local chunk = loadScript(filename);
   if (chunk) then
@@ -32,25 +29,21 @@ local function compile(filename)
   chunk = nil;
   collectgarbage();
 end
-
 local lastTime = 0;
 local state = 0;
 local iterator = 1;
 local fileIter = 1;
 local filenames = {};
-
 local dirs = {
-
   "/EDGELUA/COMMON",
   "/EDGELUA/LIB",
   "/EDGELUA/MODELS",
   "/EDGELUA/RADIO",
   "/SCRIPTS/TELEMETRY",
 };
-
 local function run()
 -- lcd.clear();
-  lcd.drawText(0, 0, "Compiling ..." .. "2.58", TEXT_COLOR);
+  lcd.drawText(0, 0, "Compiling ..." .. "2.60", TEXT_COLOR);
   local t = getTime();
   local dir = nil;
   if ((t - lastTime) > 50) then
@@ -89,7 +82,6 @@ local function run()
   end
   return 1;
 end
-
 return {
   init = init,
   run = run

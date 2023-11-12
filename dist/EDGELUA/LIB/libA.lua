@@ -5,7 +5,6 @@
 -- This work is licensed under the Creative Commons Attribution-NonCommercial-NoDerivatives 4.0 International License.
 -- To view a copy of this license, visit http:
 -- or send a letter to Creative Commons, PO Box 1866, Mountain View, CA 94042, USA.
-
 -- IMPORTANT
 -- Please note that the above license also covers the transfer protocol used and the encoding scheme and
 -- all further principals of tranferring state and other information.
@@ -20,7 +19,6 @@ local function sort(table, key) -- sort up
     end
   end
 end
-
 local function sortDown(table, key)
     for i = 1, (#table - 1) do
       if (table[i][key] < table[i + 1][key]) then
@@ -31,12 +29,10 @@ local function sortDown(table, key)
       end
     end
   end
-
 local function isEdgeTx()
   local ver, radio, maj, minor, rev, osname = getVersion();
   return osname ~= nil;
 end
-
 local function loadAnimations(config)
   local basedir = "/EDGELUA" .. "/ANIMS/";
   local anims = {};
@@ -56,21 +52,17 @@ local function loadAnimations(config)
   end
   return anims;
 end
-
 local function initAnimations(anims)
   local canims = {};
   for ia, anim in ipairs(anims) do
     local canim = {};
     canim[1] = anim.name;
-
     if not(anim.length) or (anim.length == 0) then
       canim[2] = 0;
     else
       canim[2] = math.floor(anim.length * 100);
     end
-
                                                                 ;
-
     local trans = {};
     if (anim.switches) then
       local allTransitions = {};
@@ -101,7 +93,6 @@ local function initAnimations(anims)
       end
       sort(allTransitions, 4);
       canim[3] = allTransitions;
-
       -- for ci, tr in ipairs(canim[3]) do
       -- ;
       -- end
@@ -111,7 +102,6 @@ local function initAnimations(anims)
                                       ;
   return canims;
 end
-
 local function setItem(fn, module, state, queue)
                                       ;
 -- __WmSw2ForeignInput = module * 100 + fn * 10 + state;
@@ -121,20 +111,17 @@ local function setItem(fn, module, state, queue)
   item[3] = state;
   queue:push(item);
 end
-
 local function clearAnim(anim)
   for i, tr in ipairs(anim[3]) do
     tr[5] = false;
   end
 end
-
 local function runAnimation(anim, state, queue)
   if not(anim) then
     return;
   end
   local t = getTime();
   local wasLastTransition = false;
-
   if (state[2] == 0) then -- state: init
     __WmSw2Warning1 = "Animation";
     __WmSw2Warning2 = anim[1];
@@ -176,7 +163,6 @@ local function runAnimation(anim, state, queue)
   end
   return anim;
 end
-
 local function resetState(state)
   local t = getTime();
   state[1] = t; -- timepoint for statemachine
@@ -184,14 +170,12 @@ local function resetState(state)
   state[3] = t; -- start time of anim
   state[4] = t; -- last sequencepoint start time
 end
-
 local function initAnimationFSM(state)
   resetState(state);
   state[5] = 0; -- active anim [1...4]
   state[8] = 0; -- selection
   state[8] = 1;
 end
-
 local function drawButtons(anims, rects, state)
   for i, rect in ipairs(rects) do
     if (state[5] == i) then
@@ -207,7 +191,6 @@ local function drawButtons(anims, rects, state)
     lcd.drawText(rect.xmin + 5, rect.ymin + 5, anims[i][1], COLOR_THEME_PRIMARY1);
   end
 end
-
 local function covers(touch, item)
   if ((touch.x >= item.xmin) and (touch.x <= item.xmax)
     and (touch.y >= item.ymin) and (touch.y <= item.ymax)) then
@@ -215,7 +198,6 @@ local function covers(touch, item)
   end
   return false;
 end
-
 local function processKeyEvents(anims, state, event)
   if (event == EVT_VIRTUAL_ENTER) then
                                                                        ;
@@ -244,7 +226,6 @@ local function processKeyEvents(anims, state, event)
     end
   end
 end
-
 local function processEvents(anims, rects, state, event, touch)
   if (event == EVT_TOUCH_TAP) then
     for bi, rect in ipairs(rects) do
@@ -256,15 +237,12 @@ local function processEvents(anims, rects, state, event, touch)
   end
   processKeyEvents(anims, state, event);
 end
-
 local function chooseAnimationBW(config, widget, anims, state, event)
                                ;
   if not(anims) or (#anims == 0) then
     return;
   end
-
   processKeyEvents(anims, state, event);
-
   for i, anim in ipairs(anims) do
     local x1 = widget[1] + 10;
     local x2 = widget[1] + 30;
@@ -291,15 +269,12 @@ local function chooseAnimationBW(config, widget, anims, state, event)
   end
   return nil;
 end
-
 local function chooseAnimationNoTheme(config, widget, anims, state, event, touch)
                                     ;
   if not(anims) or (#anims == 0) then
     return;
   end
-
   processKeyEvents(anims, state, event);
-
   for i, anim in ipairs(anims) do
     local x1 = widget[1] + 10;
     local x2 = widget[1] + 30;
@@ -325,7 +300,6 @@ local function chooseAnimationNoTheme(config, widget, anims, state, event, touch
   end
   return nil;
 end
-
 local function chooseAnimation(config, widget, anims, state, event, touch, png)
   lcd.clear();
   local rects = {};
@@ -333,9 +307,7 @@ local function chooseAnimation(config, widget, anims, state, event, touch, png)
   local border_h = 40;
   local bw = widget[3] - 2 * border_h;;
   local vs = 5;
-
                                                                        ;
-
   if (widget[3] <= (LCD_W / 2)) then
     if (png) then
       lcd.drawBitmap(png, widget[1], widget[2]);
@@ -343,7 +315,6 @@ local function chooseAnimation(config, widget, anims, state, event, touch, png)
     lcd.drawText(widget[1] + 60, widget[2], "Animationen", MIDSIZE);
     return;
   end
-
   if not(anims) then
     return;
   end
@@ -384,10 +355,8 @@ local function chooseAnimation(config, widget, anims, state, event, touch, png)
       ymin = widget[2] + widget[4] / 2 + bh + 3 * vs / 2, ymax = widget[2] + widget[4] / 2 + 2 * bh + 3 * vs / 2};
     rects[4] = rect;
   end
-
   drawButtons(anims, rects, state);
   processEvents(anims, rects, state, event, touch);
-
   if (state[5] > 0) then
     return anims[state[5]];
   else
@@ -395,9 +364,7 @@ local function chooseAnimation(config, widget, anims, state, event, touch, png)
     __WmSw2Warning2 = nil;
     return nil;
   end
-
 end
-
 if (LCD_W <= 128) then
   return {
     loadAnimations = loadAnimations,

@@ -247,6 +247,7 @@
 #define DEBUG_TEXT_Filename 9
 #define DEBUG_TEXT_StringOption 10
 #define DEBUG_TEXT_FuncNames 11
+#define DEBUG_TEXT_SUMDV3CMD 12
 
 #define REMOTE_SW_Name 1
 #define REMOTE_SW_Type 2

@@ -5,15 +5,12 @@
 -- This work is licensed under the Creative Commons Attribution-NonCommercial-NoDerivatives 4.0 International License.
 -- To view a copy of this license, visit http:
 -- or send a letter to Creative Commons, PO Box 1866, Mountain View, CA 94042, USA.
-
 -- IMPORTANT
 -- Please note that the above license also covers the transfer protocol used and the encoding scheme and
 -- all further principals of tranferring state and other information.
 
 -- Default menu for large radios w/ color lcd
-
 local gstates1 = {"aus", "ein1", "ein2"};
-
 local menu = {
   title = "DA Demo 6",
   saveValues = true,
@@ -84,10 +81,8 @@ local menu = {
     {"M6H", states = gstates1, state = 1, switch = "sh", fn = 8, module = 6, lsmode = 1},
   },
 }
-
 -- deprecated
 -- local exportValues = {0, -50, 50, 100}; -- values for states
-
 local map = {
   {module = 1, type = 2, description = "Graupner 2-16K"},
   {module = 2, type = 2, description = "Graupner 2-16K"},
@@ -96,5 +91,4 @@ local map = {
   {module = 5, type = 2, description = "Lothar Löwer"},
   {module = 6, type = 2, description = "unknown"},
 };
-
 return menu, map, exportValues;

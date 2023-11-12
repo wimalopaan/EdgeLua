@@ -5,18 +5,16 @@
 -- This work is licensed under the Creative Commons Attribution-NonCommercial-NoDerivatives 4.0 International License.
 -- To view a copy of this license, visit http:
 -- or send a letter to Creative Commons, PO Box 1866, Mountain View, CA 94042, USA.
-
 -- IMPORTANT
 -- Please note that the above license also covers the transfer protocol used and the encoding scheme and
 -- all further principals of tranferring state and other information.
-
 local function loadLib(filename)
-                             ;
+  print("TRACE: " , "loadLib:", filename );
   local basedir = "/EDGELUA" .. "/LIB/";
   local chunk = loadScript(basedir .. filename);
   local lib = nil;
   if (chunk) then
-                                     ;
+    print("TRACE: " , "loadLib chunk:", filename );
     lib = chunk();
   end
   collectgarbage();
@@ -24,13 +22,11 @@ local function loadLib(filename)
 end
 
 local errorCode = 0;
-
 -- __stopWmSw2 = 0;
 -- __WmSw2Config = nil;
 -- __WmSw2ForeignInput = 0;
 -- __WmSw2Warning1 = nil;
 -- __WmSw2Warning2 = nil;
-
 local function loadLibI()
   if not __libI then
     __libI = loadLib("libI.lua");
@@ -39,7 +35,6 @@ local function loadLibI()
     end
   end
 end
-
 local function loadLibM()
   if not __libM then
     __libM = loadLib("libM.lua");
@@ -48,7 +43,6 @@ local function loadLibM()
     end
   end
 end
-
 local function loadLibD()
   if not __libD then
     __libD = loadLib("libD.lua");
@@ -57,7 +51,6 @@ local function loadLibD()
     end
   end
 end
-
 local function loadLibP()
   if not __libP then
     __libP = loadLib("libP.lua");
@@ -67,13 +60,11 @@ local function loadLibP()
   end
   collectgarbage();
 end
-
 local function load()
   loadLibI();
   loadLibD();
   loadLibP();
 end
-
 local function loadLibA()
   if not __libA then
     __libA = loadLib("libA.lua");
@@ -83,7 +74,6 @@ local function loadLibA()
   end
   collectgarbage();
 end
-
 local function loadLibU()
   if not __libU then
     __libU = loadLib("libU.lua");
@@ -93,7 +83,6 @@ local function loadLibU()
   end
   collectgarbage();
 end
-
 local function loadLibR()
   if not __libR then
     __libR = loadLib("libR.lua");
@@ -103,7 +92,6 @@ local function loadLibR()
   end
   collectgarbage();
 end
-
 local function loadLibApp()
   if not __libApp then
     __libApp = loadLib("libApp.lua");
@@ -128,22 +116,17 @@ local paramEncoder = nil;
 local paramScaler = nil;
 local configFSM = nil;
 local help = {};
-
 local lastRun = 0;
-
 local function create(zone, options)
   load();
   loadLibU();
   collectgarbage();
-
   if (errorCode > 0) then
     return {};
   end
-
   local widget = __libI.initWidget(zone, options);
   collectgarbage();
-
-                         ;
+  print("TRACE: " , "EL_Con ctreat1" );
   if not(__WmSw2Config) then
     local config = __libI.loadConfig();
     if not (config) then
@@ -153,51 +136,35 @@ local function create(zone, options)
     __WmSw2Config = __libI.initConfig(config, true);
   end
   collectgarbage();
-
-                         ;
-
+  print("TRACE: " , "EL_Con ctreat2" );
   local map = nil;
   local modInfos = nil;
   local filename = {};
   local exportValues = nil;
   menu, exportValues, filename, map, modInfos = __libI.loadMenu();
   exportValues = nil;
-
-                         ;
-
+  print("TRACE: " , "EL_Con ctreat3" );
   if not (menu) then
     errorCode = 5;
     return widget;
   end
-
-                         ;
-
+  print("TRACE: " , "EL_Con ctreat4" );
   encoder, paramScaler, paramEncoder = __libP.getEncoder(__WmSw2Config);
-                          ;
-
+  print("TRACE: " , "EL_Con ctreat41" );
   configFSM = __libP.getConfigFSM(__WmSw2Config);
-                          ;
-
+  print("TRACE: " , "EL_Con ctreat42" );
   headers, menu, help, valuesFileName = __libI.initParamMenu(__WmSw2Config, menu, map, modInfos, filename)
-
-                         ;
-                       ;
-
+  print("TRACE: " , "EL_Con ctreat5" );
+print("TRACE: " , "EL_Con ctreat6" );
   __libI.initConfigFSM(fsmState);
-
   __libI = nil; -- free memory
-
   queue = __libP.Class.Queue.new();
-
   collectgarbage();
-
   return widget;
 end
-
 local function update(widget, options)
   widget[11] = options;
 end
-
 local function background(widget)
   if (errorCode == 0) then
     if ((getTime() - lastRun) > 100) then
@@ -208,7 +175,6 @@ local function background(widget)
     end
   end
 end
-
 local function refresh(widget, event, touch)
   __libD.updateWidgetDimensions(widget, event);
   if (errorCode == 0) then
@@ -222,12 +188,10 @@ local function refresh(widget, event, touch)
     __libD.processButtons(__WmSw2Config, menu, menuState, buttonState, queue, __libD.selectParamItem);
     local pvalue = __libD.displayParamMenu(__WmSw2Config, widget, menu, headers, menuState, paramScaler, event, help);
     configFSM(__WmSw2Config, menu, headers, menuState, queue, fsmState, encoder, paramEncoder, pvalue);
-
   else
     lcd.drawText(widget[1], widget[2], "Error: " .. errorCode, DBLSIZE);
   end
 end
-
 return {
   name = name,
   options = options,

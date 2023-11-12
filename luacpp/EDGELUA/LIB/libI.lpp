@@ -352,9 +352,13 @@ local function initConfigBW(config, modifyModel)
   
   if (config.parameterDial) then
     local info = getFieldInfo(config.parameterDial);
+    TRACE("*** 1 ParameterDial: ", config.parameterDial, info);
     if (info) then
+      TRACE("*** 2 ParameterDial: ", info.id);
       cfg[CFG_ParamaterDialId] = info.id;
     end
+  else
+  TRACE("*** 3 ParameterDial: ", cfg[CFG_ParamaterDialId]);
   end
 
   local module = model.getModule(config.module or 0);

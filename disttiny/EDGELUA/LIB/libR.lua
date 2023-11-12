@@ -5,53 +5,50 @@
 -- This work is licensed under the Creative Commons Attribution-NonCommercial-NoDerivatives 4.0 International License.
 -- To view a copy of this license, visit http:
 -- or send a letter to Creative Commons, PO Box 1866, Mountain View, CA 94042, USA.
-
 -- IMPORTANT
 -- Please note that the above license also covers the transfer protocol used and the encoding scheme and
 -- all further principals of tranferring state and other information.
-
 local function loadFile(baseDir, baseName)
     local content = nil;
     local filename = nil;
     if (baseName) then
         filename = baseName .. ".lua";
-                                              ;
+        print("TRACE: " , "loadFile", baseDir .. filename );
         content = loadScript(baseDir .. filename);
     end
     if not(content) then
         if (#model.getInfo().name > 0) then
             filename = model.getInfo().name .. ".lua";
-                                                  ;
+            print("TRACE: " , "loadFile", baseDir .. filename );
             content = loadScript(baseDir .. filename);
         end
     end
     if not(content) then
         if (LCD_W <= 128) then
             filename = "tiny.lua";
-                                                  ;
+            print("TRACE: " , "loadFile", baseDir .. filename );
             content = loadScript(baseDir .. filename);
         elseif (LCD_W <= 212) then
             filename = "medium.lua";
-                                                  ;
+            print("TRACE: " , "loadFile", baseDir .. filename );
             content = loadScript(baseDir .. filename);
         else
             filename = "large.lua";
-                                                  ;
+            print("TRACE: " , "loadFile", baseDir .. filename );
             content = loadScript(baseDir .. filename);
         end
     end
     if not(content) then
         filename = "default.lua";
-                                              ;
+        print("TRACE: " , "loadFile", baseDir .. filename );
         content = loadScript(baseDir .. filename);
     end
     return content, filename;
 end
-
 local function loadConfig()
     local baseDir = "/EDGELUA" .. "/RADIO/";
     local cfg = loadFile(baseDir);
-                            ;
+    print("TRACE: " , "loadConfig", cfg );
     if (cfg) then
         return cfg();
     end
@@ -63,44 +60,42 @@ end
 -- local filename = nil;
 -- if (#model.getInfo().name > 0) then
 -- filename = model.getInfo().name .. ".lua";
--- ;
+-- print("TRACE: " , "loadFile", baseDir .. filename );
 -- content = loadScript(baseDir .. filename);
 -- end
 -- if not content then
 -- if (LCD_W <= 128) then
 -- filename = "tiny.lua";
--- ;
+-- print("TRACE: " , "loadFile", baseDir .. filename );
 -- content = loadScript(baseDir .. filename);
 -- elseif (LCD_W <= 212) then
 -- filename = "medium.lua";
--- ;
+-- print("TRACE: " , "loadFile", baseDir .. filename );
 -- content = loadScript(baseDir .. filename);
 -- else
 -- filename = "large.lua";
--- ;
+-- print("TRACE: " , "loadFile", baseDir .. filename );
 -- content = loadScript(baseDir .. filename);
 -- end
 -- end
 -- if not content then
 -- filename = "default.lua";
--- ;
+-- print("TRACE: " , "loadFile", baseDir .. filename );
 -- content = loadScript(baseDir .. filename);
 -- end
 -- return content, filename;
 -- end
-
 -- local function loadConfig()
 -- local baseDir = "/EDGELUA" .. "/RADIO/";
 -- local cfg = loadFile(baseDir);
--- ;
+-- print("TRACE: " , "loadConfig", cfg );
 -- if (cfg) then
 -- return cfg();
 -- end
 -- return nil;
 -- end
-
 local function initBackendBus(config)
-                         ;
+  print("TRACE: " , "initBackendBus" );
   local data = {};
   if (config.backends.bus.stateTimeout) then
     data[1] = config.backends.bus.stateTimeout;
@@ -117,19 +112,15 @@ end
 
 local function initRemotes()
     if not LS_FUNC_STICKY then
-                                        ;
+        print("TRACE: " , "fallback LS_FUNC_STICKY" );
         LS_FUNC_STICKY = 18;
       end
-
     local baseDir = "/EDGELUA" .. "/RADIO/REMOTE/";
     local remotes, filename = loadFile(baseDir);
-
     local cremotes = {};
     if (remotes) then
         local rcfg = remotes();
-
-                                           ;
-
+        print("TRACE: " , "loadRemote", filename, rcfg );
         for li, remote in ipairs(rcfg) do
             if (remote.source == "trn") then
                 if (remote.number) then
@@ -147,19 +138,19 @@ local function initRemotes()
                                 cr[5] = remote.fn;
                                 cr[6] = remote.module;
                                 cr[9] = 1;
-                                                                                           ;
+                                print("TRACE: " , "add remote", cr[1], cr[2] );
                                 cremotes[#cremotes + 1] = cr;
                             elseif (remote.ls) then
                                 cr[2] = 2;
                                 cr[8] = remote.ls;
-                                                                                           ;
+                                print("TRACE: " , "add remote", cr[1], cr[2] );
                                 cremotes[#cremotes + 1] = cr;
                                 for li, l in ipairs(cr[8]) do
-                                                            ;
+                                    print("TRACE: " , "insertSRFF: ", l );
                                     local ls = model.getLogicalSwitch(l - 1);
                                     if (ls) then
                                       if (ls.func == 0) then
-                                                                       ;
+                                        print("TRACE: " , "insertSRFFs: insert", l );
                                         model.setLogicalSwitch(l - 1, {func = LS_FUNC_STICKY});
                                       end
                                     end
@@ -169,12 +160,10 @@ local function initRemotes()
                     end
                 end
             end
-
         end
     end
     return cremotes;
 end
-
 local function setLS(sws, index)
     local lsNumber = sws[index];
     if (lsNumber) then
@@ -192,7 +181,6 @@ local function setLS(sws, index)
         end
     end
 end
-
 local function getThreshIndex(thrs, value)
     for iv, thr in ipairs(thrs) do
         if (value < thr) then
@@ -205,18 +193,15 @@ local function getThreshIndex(thrs, value)
     end
     return 0;
 end
-
 local function processLogicalSwitch(remote)
     local value = getValue(remote[7]) / 10.24;
     local lsIndex = getThreshIndex(remote[3], value);
                                                                  ;
     setLS(remote[8],lsIndex);
 end
-
 local function processQueuedSwitch(remote, queue)
     local value = getValue(remote[7]) / 10.24;
     local lsIndex = getThreshIndex(remote[3], value);
-
     local state = remote[4][lsIndex];
     if (remote[9] ~= state) then
         local item = {};
@@ -227,7 +212,6 @@ local function processQueuedSwitch(remote, queue)
         remote[9] = state;
     end
 end
-
 local function processRemotes(remotes, queue)
     for ir, remote in ipairs(remotes) do
         if (remote[2] == 2) then
@@ -238,11 +222,9 @@ local function processRemotes(remotes, queue)
         end
     end
 end
-
 local function displayRemotes(remotes, widget, event, touch)
     lcd.drawText(widget[1], widget[2], "Remotes", MIDSIZE);
 end
-
 return {
     initRemotes = initRemotes,
     processRemotes = processRemotes,

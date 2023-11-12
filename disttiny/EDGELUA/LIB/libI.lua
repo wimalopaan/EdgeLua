@@ -5,53 +5,50 @@
 -- This work is licensed under the Creative Commons Attribution-NonCommercial-NoDerivatives 4.0 International License.
 -- To view a copy of this license, visit http:
 -- or send a letter to Creative Commons, PO Box 1866, Mountain View, CA 94042, USA.
-
 -- IMPORTANT
 -- Please note that the above license also covers the transfer protocol used and the encoding scheme and
 -- all further principals of tranferring state and other information.
-
 local function loadFile(baseDir, baseName)
     local content = nil;
     local filename = nil;
     if (baseName) then
         filename = baseName .. ".lua";
-                                              ;
+        print("TRACE: " , "loadFile", baseDir .. filename );
         content = loadScript(baseDir .. filename);
     end
     if not(content) then
         if (#model.getInfo().name > 0) then
             filename = model.getInfo().name .. ".lua";
-                                                  ;
+            print("TRACE: " , "loadFile", baseDir .. filename );
             content = loadScript(baseDir .. filename);
         end
     end
     if not(content) then
         if (LCD_W <= 128) then
             filename = "tiny.lua";
-                                                  ;
+            print("TRACE: " , "loadFile", baseDir .. filename );
             content = loadScript(baseDir .. filename);
         elseif (LCD_W <= 212) then
             filename = "medium.lua";
-                                                  ;
+            print("TRACE: " , "loadFile", baseDir .. filename );
             content = loadScript(baseDir .. filename);
         else
             filename = "large.lua";
-                                                  ;
+            print("TRACE: " , "loadFile", baseDir .. filename );
             content = loadScript(baseDir .. filename);
         end
     end
     if not(content) then
         filename = "default.lua";
-                                              ;
+        print("TRACE: " , "loadFile", baseDir .. filename );
         content = loadScript(baseDir .. filename);
     end
     return content, filename;
 end
-
 local function loadConfig()
     local baseDir = "/EDGELUA" .. "/RADIO/";
     local cfg = loadFile(baseDir);
-                            ;
+    print("TRACE: " , "loadConfig", cfg );
     if (cfg) then
         return cfg();
     end
@@ -63,44 +60,42 @@ end
 -- local filename = nil;
 -- if (#model.getInfo().name > 0) then
 -- filename = model.getInfo().name .. ".lua";
--- ;
+-- print("TRACE: " , "loadFile", baseDir .. filename );
 -- content = loadScript(baseDir .. filename);
 -- end
 -- if not content then
 -- if (LCD_W <= 128) then
 -- filename = "tiny.lua";
--- ;
+-- print("TRACE: " , "loadFile", baseDir .. filename );
 -- content = loadScript(baseDir .. filename);
 -- elseif (LCD_W <= 212) then
 -- filename = "medium.lua";
--- ;
+-- print("TRACE: " , "loadFile", baseDir .. filename );
 -- content = loadScript(baseDir .. filename);
 -- else
 -- filename = "large.lua";
--- ;
+-- print("TRACE: " , "loadFile", baseDir .. filename );
 -- content = loadScript(baseDir .. filename);
 -- end
 -- end
 -- if not content then
 -- filename = "default.lua";
--- ;
+-- print("TRACE: " , "loadFile", baseDir .. filename );
 -- content = loadScript(baseDir .. filename);
 -- end
 -- return content, filename;
 -- end
-
 -- local function loadConfig()
 -- local baseDir = "/EDGELUA" .. "/RADIO/";
 -- local cfg = loadFile(baseDir);
--- ;
+-- print("TRACE: " , "loadConfig", cfg );
 -- if (cfg) then
 -- return cfg();
 -- end
 -- return nil;
 -- end
-
 local function initBackendBus(config)
-                         ;
+  print("TRACE: " , "initBackendBus" );
   local data = {};
   if (config.backends.bus.stateTimeout) then
     data[1] = config.backends.bus.stateTimeout;
@@ -119,7 +114,6 @@ local function isEdgeTx()
   local ver, radio, maj, minor, rev, osname = getVersion();
   return osname ~= nil;
 end
-
 local function initWidgetBW()
   local widget = {0, 0, 0, 0, 0, 0, 0};
   widget[1] = 0;
@@ -136,12 +130,10 @@ end
 local function getLogicalSwitchFor(id)
   local max = getFieldInfo("max");
   if not(max) then return -1; end
-
   local maxId = max.id;
   for lsNumber = 63, 0, -1 do
     local ls = model.getLogicalSwitch(lsNumber);
     if (ls) then
-
       if (LS_FUNC_VPOS) then
         if (ls.func == LS_FUNC_VPOS) and (ls.v1 == maxId) and (ls.v2 == 0) and (ls["and"] == id) then
           return lsNumber;
@@ -151,12 +143,10 @@ local function getLogicalSwitchFor(id)
           return lsNumber;
         end
       end
-
     end
   end
   return -1;
 end
-
 local function getFirstFreeLogicalSwitch()
   for lsNumber = 63, 0, -1 do
     local ls = model.getLogicalSwitch(lsNumber);
@@ -166,15 +156,13 @@ local function getFirstFreeLogicalSwitch()
   end
   return -1;
 end
-
 local function insertLogicalSwitchFor(id)
-                                     ;
-
+  print("TRACE: " , "insertLogicalSwitchFor", id );
   if (type(id) == "string") then
     if (getSwitchIndex) then
       local swid = getSwitchIndex(CHAR_TRIM .. id);
       if (swid) then
-                                                                ;
+        print("TRACE: " , "insertLogicalSwitchFor getSwitchIndex", id, swid );
         id = swid;
       else
         return -1;
@@ -191,19 +179,17 @@ local function insertLogicalSwitchFor(id)
       if (lsNumber < 0) then
         lsNumber = getFirstFreeLogicalSwitch();
         if (lsNumber >= 0) then
-
           if (LS_FUNC_VPOS) then
             model.setLogicalSwitch(lsNumber, {func = LS_FUNC_VPOS, v1 = maxId, v2 = 0, ["and"] = id});
           else
             model.setLogicalSwitch(lsNumber, {func = 3, v1 = maxId, v2 = 0, ["and"] = id});
           end
-
         end
       end
       if (lsNumber >= 0) then
         local lsf = getFieldInfo("ls" .. (lsNumber + 1));
         if (lsf) then
-
+          print("TRACE: " , "insertLogicalSwitchFor", lsNumber, lsf.id )
           return lsf.id;
         end
       end
@@ -211,16 +197,13 @@ local function insertLogicalSwitchFor(id)
   end
   return -1;
 end
-
 local function insertSettableSwitch(number)
-                               ;
+  print("TRACE: " , "insertSettableSwitch" );
   local max = getFieldInfo("max");
   if (max) then
     local maxId = max.id;
-
     for n = 63, 0, -1 do
       local ls = model.getLogicalSwitch(n);
-
       if (LS_FUNC_VEQUAL) then
         if ((ls.func == LS_FUNC_VEQUAL) or (ls.func == LS_FUNC_VPOS)) and (ls.v1 == maxId) and (ls.v2 == number) then
           return n;
@@ -230,53 +213,48 @@ local function insertSettableSwitch(number)
           return n;
         end
       end
-
     end
     local lsNumber = getFirstFreeLogicalSwitch();
     if (lsNumber >= 0) then
-
       if (LS_FUNC_VEQUAL) then
         model.setLogicalSwitch(lsNumber, {func = LS_FUNC_VEQUAL, v1 = maxId, v2 = number}); -- func: 1: a == 0, 3: a > x
       else
         model.setLogicalSwitch(lsNumber, {func = 1, v1 = maxId, v2 = number}); -- func: 1: a == 0, 3: a > x
       end
-
       return lsNumber;
     end
   end
   return -1;
 end
-
 -- local function loadFile(baseDir)
 -- local content = nil;
 -- local filename = nil;
 -- if (#model.getInfo().name > 0) then
 -- filename = model.getInfo().name .. ".lua";
--- ;
+-- print("TRACE: " , "loadFile", baseDir .. filename );
 -- content = loadScript(baseDir .. filename);
 -- end
 -- if not content then
 -- if (LCD_W <= 128) then
 -- filename = "tiny.lua";
--- ;
+-- print("TRACE: " , "loadFile", baseDir .. filename );
 -- content = loadScript(baseDir .. filename);
 -- elseif (LCD_W <= 212) then
 -- filename = "medium.lua";
--- ;
+-- print("TRACE: " , "loadFile", baseDir .. filename );
 -- content = loadScript(baseDir .. filename);
 -- else
 -- filename = "large.lua";
--- ;
+-- print("TRACE: " , "loadFile", baseDir .. filename );
 -- content = loadScript(baseDir .. filename);
 -- end
 -- end
 -- return content, filename;
 -- end
-
 local function loadMenu()
   local baseDir = "/EDGELUA" .. "/MODELS/";
   local menu, filename = loadFile(baseDir);
-                                    ;
+  print("TRACE: " , "loadMenu:", menu, filename );
   if (menu) then
     local modchunk = loadScript("/EDGELUA" .. "/COMMON/swmods.lua");
     if (modchunk) then
@@ -289,21 +267,18 @@ local function loadMenu()
   end
   return nil;
 end
-
 -- local function loadConfig()
 -- local baseDir = "/EDGELUA" .. "/RADIO/";
 -- local cfg = loadFile(baseDir);
--- ;
+-- print("TRACE: " , "loadCOnfig", cfg );
 -- if (cfg) then
 -- return cfg();
 -- end
 -- return nil;
 -- end
-
 --[[
-
 local function initBackendBus(config)
-                         ;
+  print("TRACE: " , "initBackendBus" );
   local data = {};
   if (config.backends.bus.stateTimeout) then
     data[1] = config.backends.bus.stateTimeout;
@@ -318,12 +293,10 @@ local function initBackendBus(config)
   return data;
 end
 --]]
-
 local function initConfigBW(config, modifyModel)
-                       ;
+  print("TRACE: " , "initConfigBW" );
   local cfg = {};
   cfg[20] = {};
-
   cfg[20][1] = initBackendBus(config);
   if (config.title) then
     cfg[1] = config.title;
@@ -335,20 +308,16 @@ local function initConfigBW(config, modifyModel)
   else
     cfg[2] = 40;
   end
-
   if (config.parameterDial) then
     local info = getFieldInfo(config.parameterDial);
     if (info) then
       cfg[6] = info.id;
     end
   end
-
   local module = model.getModule(config.module or 0);
-
   if not(module) or (module.Type == 0) then
     module = model.getModule(1);
   end
-
   if (module) then
     local type = module.Type;
     local proto = module.protocol;
@@ -369,23 +338,20 @@ local function initConfigBW(config, modifyModel)
   else
     cfg[9] = 2; --sbus
   end
-
-  local footer = "Vers: " .. "2.58";
+  local footer = "Vers: " .. "2.60";
   cfg[19] = footer;
-
   if (config.backend >= 1) and (config.backend <= 4) then
     cfg[14] = config.backend;
   else
     cfg[14] = 1;
   end
 -- model.deleteMixes();
-
   if (modifyModel) and (config.safeMode) then
     if (config.safeMode.flightMode > 0) then
       if (config.safeMode.timeOut > 0) and (config.safeMode.linkDropoutMax > 0) then
         local fmLsNumber = insertSettableSwitch(1);
         if (fmLsNumber >= 0) then
-
+          print("TRACE: " , "safemode ls number", fmLsNumber )
           for ch = 0,63 do
             local lines = model.getMixesCount(ch);
             for line = 0, lines do
@@ -403,15 +369,13 @@ local function initConfigBW(config, modifyModel)
           local fm = model.getFlightMode(config.safeMode.flightMode);
           if (fm) then
             local ls = nil;
-
               if (getSwitchIndex) then
                 ls = {};
                 ls.id = getSwitchIndex("L" .. (fmLsNumber + 1));
-                                                           ;
+                print("TRACE: " , "safemode getSwitchIndex", ls, ls.id );
               end
-
             if (ls) then
-                                            ;
+              print("TRACE: " , "safeMode ls.id", ls.id );
               if (config.safeMode.name) then
                 fm.name = config.safeMode.name;
               else
@@ -420,7 +384,7 @@ local function initConfigBW(config, modifyModel)
               fm.switch = -ls.id; -- inverted
               model.setFlightMode(config.safeMode.flightMode, fm);
             else
-                                     ;
+              print("TRACE: " , "safeMode !LS63" );
               if (config.safeMode.name) then
                 fm.name = config.safeMode.name;
               else
@@ -434,12 +398,11 @@ local function initConfigBW(config, modifyModel)
           cfg[16] = config.safeMode.timeOut * 100;
           cfg[17] = config.safeMode.linkDropoutMax * 100;
           cfg[18] = fmLsNumber;
-                                                                                         ;
+          print("TRACE: " , "safeMode fmLsNumber", cfg[18], 18 );
         end
       end
     end
   end
-
   return cfg;
 end
 local function findItem(cmenu, fn, module) -- compressed-menu
@@ -452,7 +415,6 @@ local function findItem(cmenu, fn, module) -- compressed-menu
   end
   return nil;
 end
-
 local function findModuleInfo(module, map, modInfos)
   for imap, entry in ipairs(map) do
     if (entry.module == module) then
@@ -473,7 +435,6 @@ local function findModuleInfo(module, map, modInfos)
   end
   return nil;
 end
-
 local function getModules(map)
   local modules = {};
   for i, mod in ipairs(map) do
@@ -481,7 +442,6 @@ local function getModules(map)
   end
   return modules;
 end
-
 local function moduleItems(menu)
   local mi = {};
   for ip, page in ipairs(menu) do
@@ -496,19 +456,15 @@ local function moduleItems(menu)
   end
   return mi;
 end
-
 local function initParamMenu(cfg, menu, map, modInfos, mode)
   if not(menu) or not(map) or not(modInfos) then
     return;
   end
-
   local cmenu = {};
   local headers = {};
   local help = {};
-
   local valuesFileName = nil;
   local miTable = moduleItems(menu);
-
   for _, imodule in ipairs(getModules(map)) do
     local items = miTable[imodule];
     if (items) and (#items > 0) then
@@ -529,7 +485,6 @@ local function initParamMenu(cfg, menu, map, modInfos, mode)
           end
           header[(l - 1) + 3] = line;
         end
-
         local page = {};
         local citem = {nil, nil, nil}; -- {name, fn, module}, Dummy Eintrag um ein lastOn im Modul auszulösen
         citem[1] = "Module";
@@ -551,7 +506,6 @@ local function initParamMenu(cfg, menu, map, modInfos, mode)
         if (mode) and (modInfo.help) then
           help[#cmenu] = modInfo.help;
         end
-
         header = {nil, nil, nil}; -- header[1] = title, header[2] = moduleNumber
         header[1] = modInfo.description;
         header[2] = imodule;
@@ -567,11 +521,9 @@ local function initParamMenu(cfg, menu, map, modInfos, mode)
           end
           header[(l - 1) + 3] = line;
         end
-
         local maxItemLines = 8 - #header; -- possible lines usable for function-parameters
         local itemsPerPage = math.floor(maxItemLines / #modInfo.functionParams);
         local pages = math.ceil(#items / itemsPerPage); -- needed for this module
-
         local itemNumber = 1;
         for p = 1, pages do
           local page = {};
@@ -585,7 +537,6 @@ local function initParamMenu(cfg, menu, map, modInfos, mode)
               for itemLineNumber = 1, #modInfo.functionParams do
                 local line = {nil, nil, nil}; -- {citem, {v0, v1, v2, ...}, itemLine}
                 local values = {};
-
                 for valueNumber = 1, #modInfo.functionParams[itemLineNumber] do
                   values[valueNumber] = 0;
                 end
@@ -608,10 +559,9 @@ local function initParamMenu(cfg, menu, map, modInfos, mode)
       end
     end
   end
-                                                     ;
+  print("TRACE: " , "initParamMenu: saveValues:", valuesFileName );
   return headers, cmenu, help, valuesFileName;
 end
-
 local function initParamMenuBW(cfg, menu, map, modInfos)
   return initParamMenu(cfg, menu, map, modInfos, false);
 end
@@ -619,17 +569,14 @@ local function initMenuBW(menu)
   if not menu then
     return;
   end
-
   local cmenu = {};
   local shortCuts = {};
   local overlays = {};
   local pagetitles = {};
-
   for i, p in ipairs(menu) do
     overlays[i] = {};
   end
   local switchUse = {};
-
   local switchId = nil;
   local lsmode = 0;
   for i, p in ipairs(menu) do
@@ -677,7 +624,6 @@ local function initMenuBW(menu)
     end
   end
   local switchStates = {};
-
   for switchid, uses in pairs(switchUse) do
     switchStates[switchid] = {
       [1] = 0;
@@ -716,7 +662,6 @@ local function initFSM(state)
     return;
   end
 end
-
 local function initConfigFSM(state)
   if not(state[1]) then
     state[1] = getTime();
@@ -725,7 +670,6 @@ local function initConfigFSM(state)
     return;
   end
 end
-
 if (LCD_W <= 128) then
   initMenuColor = nil;
   initParamMenuColor = nil;

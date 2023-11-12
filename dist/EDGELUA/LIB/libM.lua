@@ -1,4 +1,3 @@
-
 local function loadFile(baseDir, baseName)
     local content = nil;
     local filename = nil;
@@ -36,7 +35,6 @@ local function loadFile(baseDir, baseName)
     end
     return content, filename;
 end
-
 local function loadConfig()
     local baseDir = "/EDGELUA" .. "/RADIO/";
     local cfg = loadFile(baseDir);
@@ -77,7 +75,6 @@ end
 -- end
 -- return content, filename;
 -- end
-
 -- local function loadConfig()
 -- local baseDir = "/EDGELUA" .. "/RADIO/";
 -- local cfg = loadFile(baseDir);
@@ -87,7 +84,6 @@ end
 -- end
 -- return nil;
 -- end
-
 local function initBackendBus(config)
                          ;
   local data = {};
@@ -101,21 +97,17 @@ local function initBackendBus(config)
   else
     data[2] = 5;
   end
-
   if (config.export) then
     data[4] = config.export.mixerGlobalVariable;
     data[3] = config.export.values;
                                                                                                                              ;
   end
-
   return data;
 end
-
 local function initBackendSPort(config)
   local data = {};
   return data;
 end
-
 local function initBackendTipTip(config)
                             ;
   local data = {};
@@ -140,12 +132,9 @@ local function initBackendTipTip(config)
   else
     data[4] = {0, 100, -100};
   end
-
                                                                                                     ;
-
   return data;
 end
-
 local function initBackendSolExpert(config)
   local data = {};
   return data;
@@ -155,24 +144,17 @@ local function initConfigMixer(config)
                             ;
     local cfg = {};
     cfg[2] = {};
-
     cfg[2][1] = initBackendBus(config);
-
     cfg[2][2] = initBackendSPort(config);
-
     cfg[2][3] = initBackendTipTip(config);
-
     cfg[2][4] = initBackendSolExpert(config);
-
     if (config.backend >= 1) and (config.backend <= 4) then
         cfg[1] = config.backend;
     else
         cfg[1] = 1;
     end
-
     return cfg;
 end
-
 return {
     loadConfig = loadConfig,
     initConfig = initConfigMixer,

@@ -5,17 +5,14 @@
 -- This work is licensed under the Creative Commons Attribution-NonCommercial-NoDerivatives 4.0 International License.
 -- To view a copy of this license, visit http:
 -- or send a letter to Creative Commons, PO Box 1866, Mountain View, CA 94042, USA.
-
 -- IMPORTANT
 -- Please note that the above license also covers the transfer protocol used and the encoding scheme and
 -- all further principals of tranferring state and other information.
 
 -- Default menu for large radios w/ color lcd
-
 local gstates1 = {"aus", "ein", "blink 1", "blink 2"};
 local gstates2 = {"stop", "ab", "auf", "Not aus"};
 local gstates3 = {"Pos 1", "Pos 2", "Pos 3", "Pos 4"};
-
 local menu = {
   title = "Model3",
   saveValues = true,
@@ -53,14 +50,11 @@ local menu = {
     {"M2H", states = gstates1, state = 1, switch = "ls3", fn = 8, module = 2},
   },
 }
-
 -- deprecated
 -- local exportValues = {0, -50, 50, 100}; -- values for states
-
 local map = {
   {module = 1, type = 1, description = "Das Modul mit dem roten Aufkleber"},
   {module = 2, type = 2, description = "Im Ruderhaus"},
   {module = 8, type = 3},
 };
-
 return menu, map, exportValues;

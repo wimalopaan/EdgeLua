@@ -6,7 +6,6 @@
 -- This work is licensed under the Creative Commons Attribution-NonCommercial-NoDerivatives 4.0 International License.
 -- To view a copy of this license, visit http:
 -- or send a letter to Creative Commons, PO Box 1866, Mountain View, CA 94042, USA.
-
 -- IMPORTANT
 -- Please note that the above license also covers the transfer protocol used and the encoding scheme and
 -- all further principals of tranferring state and other information.
@@ -14,19 +13,15 @@
 local function isFullScreen(event)
   return not not event;
 end
-
 local function isEdgeTx()
   local ver, radio, maj, minor, rev, osname = getVersion();
   return osname ~= nil;
 end
-
 local function isColorLCD()
   return LCD_W >= 480;
 end
-
 local function updateWidgetDimensions(widget, event)
 end
-
 local function updateWidgetDimensionsEdgeTx(widget, event)
   if (isFullScreen(event)) then
     widget[1] = 0;
@@ -42,47 +37,36 @@ local function updateWidgetDimensionsEdgeTx(widget, event)
     widget[5]= widget[8];
   end
 end
-
 local function updateWidgetDimensionsOpenTx(widget, event)
 end
-
 local function displayFooter(widget, text)
   lcd.drawText(widget[1], widget[2] + widget[4] - widget[5], text, SMLSIZE + COLOR_THEME_PRIMARY3);
 end
-
 local function displayHeader(widget, text)
   lcd.drawText(widget[1] + widget[3] - 60, widget[2], text, SMLSIZE + COLOR_THEME_PRIMARY3);
 end
-
 local function displayInfo(widget, text)
   lcd.drawText(widget[1] + widget[3] - 60, widget[2] + widget[5], text, SMLSIZE + COLOR_THEME_PRIMARY3);
 end
-
 local function displayFooterNoTheme(widget, text)
   lcd.drawText(widget[1], widget[2] + widget[4] - widget[5], text, SMLSIZE);
 end
-
 local function displayHeaderNoTheme(widget, text)
   lcd.drawText(widget[1] + widget[3] - 60, widget[2], text, SMLSIZE);
 end
-
 local function displayInfoNoTheme(widget, text)
   lcd.drawText(widget[1] + widget[3] - 60, widget[2] + widget[5], text, SMLSIZE);
 end
-
 local function displayParamMenuBW(config, widget, pmenu, pheaders, state, paramScaler)
   local activePageIndex = state[3];
   local page = pmenu[activePageIndex];
   local header = pheaders[activePageIndex];
   lcd.clear()
-
   if (config[14] == 3) or (config[14] == 4) then
     lcd.drawText(widget[1], widget[2], "Not usable with backend: " .. config[14], MIDSIZE);
     return 0;
   end
-
   lcd.drawScreenTitle(header[1] .. "/" .. header[2], activePageIndex, #pheaders);
-
   local maxParamsPerLine = 1;
   for headerRow = 3, #header do -- Param header
     local hline = header[headerRow];
@@ -91,7 +75,6 @@ local function displayParamMenuBW(config, widget, pmenu, pheaders, state, paramS
     end
   end
   local fw = (widget[3] - config[2]) / maxParamsPerLine;
-
   for headerRow = 3, #header do
     local hline = header[headerRow];
     local x = widget[1];
@@ -102,7 +85,6 @@ local function displayParamMenuBW(config, widget, pmenu, pheaders, state, paramS
       x = x + fw;
     end
   end
-
   local pvalue, percent = paramScaler(config);
   local x = widget[1];
   local y = widget[2] + widget[6];
@@ -113,18 +95,15 @@ local function displayParamMenuBW(config, widget, pmenu, pheaders, state, paramS
   else
     lcd.drawText(x, y, pvalue .. "[" .. percent .. "%]", SMLSIZE);
   end
-
   for row, line in ipairs(page) do
     local x = widget[1];
     local y = widget[2] + widget[6] + (#header + row - 3) * widget[5];
     local label = line[1][1];
-
     if (row == state[1]) then
       lcd.drawText(x, y, label, SMLSIZE + INVERS);
     else
       lcd.drawText(x, y, label, SMLSIZE);
     end
-
     x = x + config[2];
     for col, pv in ipairs(line[2]) do
       if ((row == state[4]) and (col == state[5])) then
@@ -146,44 +125,35 @@ local function displayMenuBW(config, widget, menu, overlays, state, pagetitles)
   local activePageIndex = state[3];
   local page = menu[activePageIndex];
   local overlay = overlays[activePageIndex];
-
                                                                   ;
   if (pagetitles[activePageIndex]) then
     lcd.drawScreenTitle(pagetitles[activePageIndex], activePageIndex, #menu);
   else
     lcd.drawScreenTitle(config[1], activePageIndex, #menu);
   end
-
   for row, item in ipairs(page) do
     local x = widget[1];
     local y = widget[2] + widget[6] + (row - 1) * widget[5];
-
     local label = item[1];
-
     if (label) and (#label > 0) then
       if (item[7]) then
         label = label .. "#";
       end
-
       if (item[9]) then
         label = label .. "~";
       end
-
       for io, o in ipairs(overlay) do
         if (o[2] == item) then
           label = label .. "*";
         end
       end
-
       if (row == state[1]) then
         lcd.drawText(x, y, label, SMLSIZE + INVERS);
       else
         lcd.drawText(x, y, label, SMLSIZE);
       end
-
       local fw = (widget[3] - config[2]) / #item[2];
       x = x + config[2];
-
       for col, st in ipairs(item[2]) do
         if (col == item[3]) then
           lcd.drawText(x, y, st, SMLSIZE + INVERS);
@@ -206,7 +176,6 @@ local function prevPage(menu, menuState)
     menuState[3] = menuState[3] - 1;
   end
 end
-
 local function nextPage(menu, menuState)
   if (menuState[3] == #menu) then
     menuState[3] = 1;
@@ -214,7 +183,6 @@ local function nextPage(menu, menuState)
     menuState[3] = menuState[3] + 1;
   end
 end
-
 local function prevRow(menu, menuState)
   if (menuState[1] == 1) then
     prevPage(menu, menuState);
@@ -223,7 +191,6 @@ local function prevRow(menu, menuState)
     menuState[1] = menuState[1] - 1;
   end
 end
-
 local function nextRow(menu, menuState)
   if (menuState[1] == #menu[menuState[3]]) then
     nextPage(menu, menuState);
@@ -232,7 +199,6 @@ local function nextRow(menu, menuState)
     menuState[1] = menuState[1] + 1;
   end
 end
-
 local function prevCol(menu, menuState)
   if (menuState[2] == 1) then
     prevRow(menu, menuState);
@@ -241,7 +207,6 @@ local function prevCol(menu, menuState)
     menuState[2] = menuState[2] - 1;
   end
 end
-
 local function nextCol(menu, menuState)
   if (menuState[2] == #menu[menuState[3]][menuState[1]][2]) then
     nextRow(menu, menuState);
@@ -250,45 +215,41 @@ local function nextCol(menu, menuState)
     menuState[2] = menuState[2] + 1;
   end
 end
-
 local function menuDeselect(menuState)
   menuState[4] = 0;
   menuState[5] = 0;
-
 end
-
 local function makeSelection(menuState)
   menuState[4] = menuState[1]; -- selection
   menuState[5] = menuState[2];
 end
-
 local function setAndPushItem(queue, item, newState)
   local push = {[1] = item, [2] = item[3]};
   item[3] = newState;
   queue:push(push);
 end
-
 local function selectParamItem(menu, menuState, queue)
   makeSelection(menuState);
   local page = menu[menuState[3]];
   local pitem = page[menuState[1]];
   local item = pitem;
   queue:push(item);
-
 end
-
 local function selectItem(menu, menuState, queue)
   makeSelection(menuState);
   local page = menu[menuState[3]];
   local item = page[menuState[1]];
   setAndPushItem(queue, item, menuState[2]);
 end
-
+local lastEvent = 0;
 local function processEventsBWScroll(config, menu, menuState, event, queue, callback)
   if (event == EVT_VIRTUAL_ENTER) then
     callback(menu, menuState, queue);
   else
-
+    if (event ~= lastEvent) then
+                                            ;
+      lastEvent = event;
+    end
     if (event > 0) then
       menuDeselect(menuState);
     end
@@ -303,13 +264,15 @@ local function processEventsBWScroll(config, menu, menuState, event, queue, call
     end
   end
 end
-
 local function processEventsBWKeys(config, menu, menuState, event, queue, callback)
                                  ;
   if (event == EVT_VIRTUAL_ENTER) then
     callback(menu, menuState, queue);
   else
-
+    if (event ~= lastEvent) then
+                                          ;
+      lastEvent = event;
+    end
     if (event > 0) then
       menuDeselect(menuState);
     end
@@ -349,7 +312,6 @@ local function getSwitchValue(id, lsmode)
     end
   end
 end
-
 local function processShortCuts(shortCuts, queue, switches)
                                       ;
   for i, sc in ipairs(shortCuts) do
@@ -359,19 +321,17 @@ local function processShortCuts(shortCuts, queue, switches)
       local item = sc[2];
       if not(item[3] == v) then
         setAndPushItem(queue, item, v);
-                                                                     ;
+        print("TRACE: " , "processShortCuts:", item[1], item[3] );
       end
     end
   end
 end
-
 local function processOverlays(overlays, menuState, queue, switches)
                                      ;
   local activePageIndex = menuState[3];
   local overlay = overlays[activePageIndex];
   processShortCuts(overlay, queue, switches);
 end
-
 local function processTrimsSelect(config, buttonState, callback)
                                                                                ;
   if (config[13]) then
@@ -384,7 +344,6 @@ local function processTrimsSelect(config, buttonState, callback)
     buttonState[3] = value;
   end
 end
-
 local function processTrimsPrevious(config, buttonState, callback)
   if (config[11]) then
     local value = getValue(config[11]);
@@ -394,7 +353,6 @@ local function processTrimsPrevious(config, buttonState, callback)
     buttonState[1] = value;
   end
 end
-
 local function processTrimsNext(config, buttonState, callback)
   if (config[12]) then
     local value = getValue(config[12]);
@@ -404,7 +362,6 @@ local function processTrimsNext(config, buttonState, callback)
     buttonState[2] = value;
   end
 end
-
 local function processTrims(config, menu, menuState, buttonState, queue, callback)
                         ;
   local prevCB = function()
@@ -418,12 +375,11 @@ local function processTrims(config, menu, menuState, buttonState, queue, callbac
   end
   processTrimsNext(config, buttonState, nextCB);
   local selectCB = function()
-                     ;
+    print("TRACE: " , "selectCB" );
     callback(menu, menuState, queue);
   end
   processTrimsSelect(config, buttonState, selectCB);
 end
-
 local function processPots(config, menu, menuState, buttonState)
   if (config[4]) then
     local activePageIndex = menuState[3];
@@ -451,7 +407,6 @@ local function processPots(config, menu, menuState, buttonState)
     end
   end
 end
-
 local function processMenuSwitch(config, menu, menuState, buttonState)
   if (config[7]) then
     local ms = getValue(config[7]);
@@ -471,13 +426,11 @@ local function processMenuSwitch(config, menu, menuState, buttonState)
     end
   end
 end
-
 local function processButtons(config, menu, menuState, buttonState, queue, callback)
   processTrims(config, menu, menuState, buttonState, queue, callback);
   processPots(config, menu, menuState, buttonState);
   processMenuSwitch(config, menu, menuState, buttonState);
 end
-
 local function covers(touch, item)
   if ((touch.x >= item.xmin) and (touch.x <= item.xmax)
     and (touch.y >= item.ymin) and (touch.y <= item.ymax)) then
@@ -485,7 +438,6 @@ local function covers(touch, item)
   end
   return false;
 end
-
 local function processTouch(menu, menuState, event, touch)
   if (touch) then
     local activePageIndex = menuState[3];
@@ -513,7 +465,6 @@ local function processTouch(menu, menuState, event, touch)
     end
   end
 end
-
 local function findItem(cmenu, fn, module) -- compressed-menu
   for ip, page in ipairs(cmenu) do
     for i, item in ipairs(page) do
@@ -524,14 +475,12 @@ local function findItem(cmenu, fn, module) -- compressed-menu
   end
   return nil;
 end
-
 -- local function processForeignInput(config, foreignInput, menu, queue)
 -- local state = foreignInput % 10;
 -- foreignInput = math.floor(foreignInput / 10);
 -- local fn = foreignInput % 10;
 -- foreignInput = math.floor(foreignInput / 10);
 -- local module = foreignInput % 10;
-
 -- local item = findItem(menu, fn, module);
 -- if (item) then
 -- setAndPushItem(queue, item, state);
@@ -540,14 +489,13 @@ end
 -- -- queue:push(push);
 -- end
 -- end
-
 local function processForeignInputFromQueue(config, foreignQueue, menu, queue)
   if (foreignQueue:size() > 0) then
-                                                              ;
+    print("TRACE: " , "processForeignInputFromQueue", foreignQueue:size() );
     local fitem = foreignQueue:pop();
     if (fitem) then
       local item = findItem(menu, fitem[4], fitem[5]);
-                                                                                          ;
+      print("TRACE: " , "processForeignInputFromQueue item", fitem[4], fitem[5] );
       if (item) then
         setAndPushItem(queue, item, fitem[3]);
         -- local push = {[1] = item, [2] = item[3]};
@@ -557,57 +505,45 @@ local function processForeignInputFromQueue(config, foreignQueue, menu, queue)
     end
   end
 end
-
 local function processRemoteInput(config, menu, queue, remoteState)
   if (not config[8]) then
     return;
   end
-
   local r = (getValue(config[8]) + 1024) / 2;
-
   if (r == remoteState[1]) then
     return;
   end
   remoteState[1] = r;
-
   local state = bit32.extract(r, 0, 3) + 1;
   local fn = bit32.extract(r, 3, 3) + 1;
   local module = bit32.extract(r, 6, 3) + 1;
-
   local item = findItem(menu, fn, module);
   if (item) then
     remoteState[2] = module;
     remoteState[3] = fn;
     remoteState[4] = state;
-                                        ;
+    print("TRACE: " , "remote: ", module, fn, state );
     setAndPushItem(queue, item, state);
     -- local push = {[1] = item, [2] = item[3]};
     -- item[3] = state;
     -- queue:push(push);
   end
 end
-
 local function displayFmRssiWarningColor(config, widget, state)
   local fm = getFlightMode();
   if (fm == config[15]) then
                       ;
   end
 end
-
 local function displayAddressConfigBW(config, widget, encoder, pScaler, state, event)
   if (config[14] == 3) or (config[14] == 4) then
     lcd.drawText(widget[1], widget[2], "Not usable with backend: " .. config[14], MIDSIZE);
     return;
   end
-
   lcd.drawText(widget[1], widget[2] + widget[4] - widget[8], config[19], SMLSIZE);
-
   if (state[1] == 0) then
-
     lcd.drawText(widget[1], widget[2] + widget[5], "Attach only one device to the RX.", SMLSIZE);
-
     lcd.drawText(widget[1], widget[2] + 2 * widget[5], "Press [Enter] to start learning", MIDSIZE);
-
     if (event == EVT_VIRTUAL_ENTER) then
       state[1] = 1;
     end
@@ -616,17 +552,12 @@ local function displayAddressConfigBW(config, widget, encoder, pScaler, state, e
     if (adr > 8) then
       adr = 8;
     end
-
     lcd.drawText(widget[1], widget[2] + widget[5], "Address: " .. adr, MIDSIZE + INVERS);
-
     lcd.drawText(widget[1], widget[2] + 2 * widget[9], "Watch for the device to respond.", SMLSIZE);
-
     lcd.drawText(widget[1], widget[2] + 3 * widget[9], "Switch on RX and device", MIDSIZE);
-
     local bendcfg = config[20][1];
-                            ;
+    print("TRACE: " , "Address: ", adr );
     encoder(bendcfg[2], 14, adr); -- learn code
-
     if (event == EVT_VIRTUAL_ENTER) then
       state[1] = 0;
     end
@@ -635,13 +566,11 @@ local function displayAddressConfigBW(config, widget, encoder, pScaler, state, e
 end
 local function processEventsBW()
 end
-
 if (EVT_VIRTUAL_INC == EVT_VIRTUAL_NEXT) then
   processEventsBW = processEventsBWScroll;
 else
   processEventsBW = processEventsBWKeys;
 end
-
 if (LCD_W <= 128) then
   displayMenuColor = nil;
   displayMenuColorNoTheme = nil;

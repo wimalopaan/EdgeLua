@@ -5,7 +5,6 @@
 -- This work is licensed under the Creative Commons Attribution-NonCommercial-NoDerivatives 4.0 International License.
 -- To view a copy of this license, visit http:
 -- or send a letter to Creative Commons, PO Box 1866, Mountain View, CA 94042, USA.
-
 -- IMPORTANT
 -- Please note that the above license also covers the transfer protocol used and the encoding scheme and
 -- all further principals of tranferring state and other information.
@@ -24,9 +23,7 @@ local function loadLib(filename)
 end
 
 local errorCode = 0;
-
 -- __WmMixerConfig = nil;
-
 local function loadLibM()
   if not __libM then
     __libM = loadLib("libM.lua");
@@ -35,18 +32,14 @@ local function loadLibM()
     end
   end
 end
-
 local function clamp(value)
   return math.max(math.min(value, 1024), -1024);
 end
 
 local output = {
    "sw_var",
-
 };
-
 local gvar = 0;
-
 local function initGV()
                                           ;
    if not(__WmMixerConfig) then
@@ -68,35 +61,22 @@ local function initGV()
    end
    local backend = __WmMixerConfig[1];
    local bendcfg = __WmMixerConfig[2][backend];
-
    gvar = bendcfg[2];
                                ;
-
 end
-
 if (LCD_W <= 212) then
    __Sw2MixerValue = 0;
 end
-
 local function transportGlobalLua()
-
    return __Sw2MixerValue;
-
 end
-
 local function transportGV()
                                            ;
-
    return model.getGlobalVariable(gvar, 0);
-
 end
-
 local function transportShm()
-
    return getShmVar(1);
-
 end
-
 if (LCD_W <= 212) then
                                          ;
    return {
@@ -104,7 +84,6 @@ if (LCD_W <= 212) then
       run = transportGlobalLua
    };
 else
-
    if (getShmVar) then
                                       ;
       return {

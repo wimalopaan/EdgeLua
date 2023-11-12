@@ -1,0 +1,91 @@
+
+#include "../../widget.h"
+
+local name = "EL_crsf";
+local options = {};
+
+local function initWidgetColor(zone, options)
+    local widget = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+    widget[W_X] = zone.x;
+    widget[W_Y] = zone.y;
+    widget[W_Width] = zone.w;
+    widget[W_Height] = zone.h;
+    widget[W_Zone] = zone;
+    widget[W_Options] = options;
+  
+      local w, h = lcd.sizeText("A", SMLSIZE); 
+      widget[W_FontHeight] = h - 1;
+      widget[W_FontHSmall] = h;
+      widget[W_FontHLarge] = h * 3 / 2;
+      w, h = lcd.sizeText("A", MIDSIZE); 
+      widget[W_YOffset] = h;
+      widget[W_YPOffset] = h;
+    return widget;
+  end
+  
+
+local function create(zone, options)
+  local widget = initWidgetColor(zone, options);
+  widget.sendDataLastTime = getTime();
+  return widget;
+end
+
+local function update(widget, options)
+  widget[W_Options] = options;
+end
+
+CRSF_FRAMETYPE_DISPLAYPORT_CMD      = 0x7D
+CRSF_DISPLAYPORT_SUBCMD_UPDATE      = 0x01
+CRSF_DISPLAYPORT_SUBCMD_CLEAR       = 0x02
+CRSF_DISPLAYPORT_SUBCMD_OPEN        = 0x03
+CRSF_DISPLAYPORT_SUBCMD_CLOSE       = 0x04
+CRSF_DISPLAYPORT_SUBCMD_POLL        = 0x05
+CRSF_ADDRESS_BETAFLIGHT             = 0xC8
+CRSF_ADDRESS_TRANSMITTER            = 0xEA
+
+CRSF_FRAMETYPE_CMD      = 0x32
+CRSF_ADDRESS_CC         = 0xA0
+
+
+local function sendData(widget) 
+  local t = getTime();
+  if ((t - widget.sendDataLastTime) > 10) then -- 100ms
+    widget.sendDataLastTime = t;
+    local payloadOut = { CRSF_ADDRESS_BETAFLIGHT, CRSF_ADDRESS_TRANSMITTER, 0x05, t};
+    crossfireTelemetryPush(CRSF_FRAMETYPE_CMD, payloadOut);
+  end
+end
+
+local function background(widget)
+    sendData(widget);
+end
+
+local function refresh(widget, event, touch)
+    sendData(widget);
+    lcd.drawText(widget[W_X], widget[W_Y], "CRSF: ", DBLSIZE);
+    
+    local finfo = getFieldInfo("s1");
+    local v = getValue("s1");
+    lcd.drawText(20,100,"value = " .. v);
+
+    if (finfo) then
+        lcd.drawText(20,20,"id = " .. finfo.id)
+        lcd.drawText(20,40,"name = " .. finfo.name)
+        lcd.drawText(20,60,"desc = " .. finfo.desc)
+        if (finfo.unit) then
+            lcd.drawText(20,80,"unit = " .. (finfo.unit))
+        end
+    else
+        lcd.drawText(20,20,"No info for " .. CHAR_POT .. "S1")
+    end
+end
+
+return { 
+    name=name,
+    options=options,
+    create=create,
+    update=update,
+    refresh=refresh,
+    background=background
+};
+

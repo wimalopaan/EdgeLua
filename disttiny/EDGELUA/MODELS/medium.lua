@@ -5,17 +5,14 @@
 -- This work is licensed under the Creative Commons Attribution-NonCommercial-NoDerivatives 4.0 International License.
 -- To view a copy of this license, visit http:
 -- or send a letter to Creative Commons, PO Box 1866, Mountain View, CA 94042, USA.
-
 -- IMPORTANT
 -- Please note that the above license also covers the transfer protocol used and the encoding scheme and
 -- all further principals of tranferring state and other information.
 
 -- Default menu for medium radios
-
 local gstates1 = {"aus", "ein", "blk1", "blk2"};
 local gstates2 = {"aus", "e1", "e2"};
 local gstates3 = {"Pos1", "Pos2", "Pos3", "Pos4", "Pos5"};
-
 local menu = {
     title = "Model1",
     saveValues = true,
@@ -48,14 +45,11 @@ local menu = {
         {"M2H", states = gstates1, state = 1, switch = nil, fn = 8, module = 2},
     },
 }
-
 -- deprecated
 -- local exportValues = {0, -50, 50, 100}; -- values for states
-
 local map = {
    {module = 1, type = 1},
    {module = 2, type = 2},
    {module = 8, type = 3},
 };
-
 return menu, map, exportValues;

@@ -5,11 +5,9 @@
 -- This work is licensed under the Creative Commons Attribution-NonCommercial-NoDerivatives 4.0 International License.
 -- To view a copy of this license, visit http:
 -- or send a letter to Creative Commons, PO Box 1866, Mountain View, CA 94042, USA.
-
 -- IMPORTANT
 -- Please note that the above license also covers the transfer protocol used and the encoding scheme and
 -- all further principals of tranferring state and other information.
-
 local animation1 = {
     name = "Loop 1",
     length = 14, -- total loop length [s]
@@ -56,7 +54,6 @@ local animation1 = {
     inputs = {
     }
   };
-
   local animation2 = {
     name = "Single 1",
     length = 0, -- no looping
@@ -97,5 +94,4 @@ local animation1 = {
     inputs = {
     }
   };
-
   return {animation1, animation2};

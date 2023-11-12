@@ -20,9 +20,7 @@ local function loadLib(filename)
 end
 
 local errorCode = 0;
-
 -- __WmMixerConfig = nil;
-
 local function loadLibM()
   if not __libM then
     __libM = loadLib("libM.lua");
@@ -31,7 +29,6 @@ local function loadLibM()
     end
   end
 end
-
 local function clamp(value)
   return math.max(math.min(value, 1024), -1024);
 end
@@ -42,13 +39,10 @@ local input = {
    {"Scale", VALUE, 0, 100, 10},
    {"Deadb", VALUE, 0, 100, 2}
 };
-
 local output = {
    "Incremental"
 };
-
 local value = 0;
-
 local function run(inp, reset, scale, deadband)
    if (reset) and (reset > 0) then
       value = 0;
@@ -60,7 +54,6 @@ local function run(inp, reset, scale, deadband)
    end
    return value;
 end
-
 return {
    input = input,
    output = output,

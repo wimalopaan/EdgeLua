@@ -5,11 +5,9 @@
 -- This work is licensed under the Creative Commons Attribution-NonCommercial-NoDerivatives 4.0 International License.
 -- To view a copy of this license, visit http:
 -- or send a letter to Creative Commons, PO Box 1866, Mountain View, CA 94042, USA.
-
 -- IMPORTANT
 -- Please note that the above license also covers the transfer protocol used and the encoding scheme and
 -- all further principals of tranferring state and other information.
-
 local function loadFile(baseDir, baseName)
     local content = nil;
     local filename = nil;
@@ -47,7 +45,6 @@ local function loadFile(baseDir, baseName)
     end
     return content, filename;
 end
-
 local function loadConfig()
     local baseDir = "/EDGELUA" .. "/RADIO/";
     local cfg = loadFile(baseDir);
@@ -88,7 +85,6 @@ end
 -- end
 -- return content, filename;
 -- end
-
 -- local function loadConfig()
 -- local baseDir = "/EDGELUA" .. "/RADIO/";
 -- local cfg = loadFile(baseDir);
@@ -98,7 +94,6 @@ end
 -- end
 -- return nil;
 -- end
-
 local function initBackendBus(config)
                          ;
   local data = {};
@@ -112,21 +107,17 @@ local function initBackendBus(config)
   else
     data[2] = 5;
   end
-
   if (config.export) then
     data[4] = config.export.mixerGlobalVariable;
     data[3] = config.export.values;
                                                                                                                              ;
   end
-
   return data;
 end
-
 local function initBackendSPort(config)
   local data = {};
   return data;
 end
-
 local function initBackendTipTip(config)
                             ;
   local data = {};
@@ -151,12 +142,9 @@ local function initBackendTipTip(config)
   else
     data[4] = {0, 100, -100};
   end
-
                                                                                                     ;
-
   return data;
 end
-
 local function initBackendSolExpert(config)
   local data = {};
   return data;
@@ -167,16 +155,12 @@ local function initRemotes()
                                         ;
         LS_FUNC_STICKY = 18;
       end
-
     local baseDir = "/EDGELUA" .. "/RADIO/REMOTE/";
     local remotes, filename = loadFile(baseDir);
-
     local cremotes = {};
     if (remotes) then
         local rcfg = remotes();
-
                                            ;
-
         for li, remote in ipairs(rcfg) do
             if (remote.source == "trn") then
                 if (remote.number) then
@@ -216,16 +200,12 @@ local function initRemotes()
                     end
                 end
             end
-
             if (remote.source == "sumdv3") then
-
             end
-
         end
     end
     return cremotes;
 end
-
 local function setLS(sws, index)
     local lsNumber = sws[index];
     if (lsNumber) then
@@ -243,7 +223,6 @@ local function setLS(sws, index)
         end
     end
 end
-
 local function getThreshIndex(thrs, value)
     for iv, thr in ipairs(thrs) do
         if (value < thr) then
@@ -256,18 +235,15 @@ local function getThreshIndex(thrs, value)
     end
     return 0;
 end
-
 local function processLogicalSwitch(remote)
     local value = getValue(remote[7]) / 10.24;
     local lsIndex = getThreshIndex(remote[3], value);
                                                                  ;
     setLS(remote[8],lsIndex);
 end
-
 local function processQueuedSwitch(remote, queue)
     local value = getValue(remote[7]) / 10.24;
     local lsIndex = getThreshIndex(remote[3], value);
-
     local state = remote[4][lsIndex];
     if (remote[9] ~= state) then
         local item = {};
@@ -278,7 +254,6 @@ local function processQueuedSwitch(remote, queue)
         remote[9] = state;
     end
 end
-
 local function processRemotes(remotes, queue)
     for ir, remote in ipairs(remotes) do
         if (remote[2] == 2) then
@@ -289,11 +264,9 @@ local function processRemotes(remotes, queue)
         end
     end
 end
-
 local function displayRemotes(remotes, widget, event, touch)
     lcd.drawText(widget[1], widget[2], "Remotes", MIDSIZE);
 end
-
 return {
     initRemotes = initRemotes,
     processRemotes = processRemotes,

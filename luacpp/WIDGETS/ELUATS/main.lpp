@@ -62,6 +62,8 @@ local function create(zone, options)
 
   bmpExpandSmall = Bitmap.open(BASE_DIR .. "/ICONS/48px/expand.png");
 
+  widget.sendDataLastTime = getTime();
+
   return widget;
 end
 
@@ -71,6 +73,31 @@ end
 
 local function background(widget)
   if (errorCode == 0) then
+  end
+end
+
+CRSF_FRAMETYPE_DISPLAYPORT_CMD      = 0x7D
+CRSF_DISPLAYPORT_SUBCMD_UPDATE      = 0x01
+CRSF_DISPLAYPORT_SUBCMD_CLEAR       = 0x02
+CRSF_DISPLAYPORT_SUBCMD_OPEN        = 0x03
+CRSF_DISPLAYPORT_SUBCMD_CLOSE       = 0x04
+CRSF_DISPLAYPORT_SUBCMD_POLL        = 0x05
+CRSF_ADDRESS_BETAFLIGHT             = 0xC8
+CRSF_ADDRESS_TRANSMITTER            = 0xEA
+
+CRSF_FRAMETYPE_CMD      = 0x32
+CRSF_ADDRESS_CC         = 0xA0
+
+
+local function sendData(widget) 
+  local t = getTime();
+  if ((t - widget.sendDataLastTime) > 10) then -- 100ms
+    widget.sendDataLastTime = t;
+    TRACE("sendData");
+
+    local payloadOut = { CRSF_ADDRESS_CC, CRSF_ADDRESS_TRANSMITTER, 0x05, t};
+    crossfireTelemetryPush(CRSF_FRAMETYPE_CMD, payloadOut);
+
   end
 end
 
@@ -84,6 +111,7 @@ local function refresh(widget, event, touch)
       lcd.drawText(widget[W_X] + 60, widget[W_Y], "Sys-Infos", MIDSIZE);
     else
       __libU.displayDebug(widget);
+      sendData(widget);
     end
   else
     lcd.drawText(widget[W_X], widget[W_Y], "Error: " .. errorCode, DBLSIZE);

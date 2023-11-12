@@ -32,4 +32,12 @@ backends = {
         {module = 3, values = {0, -100, 100}}, 
       },
     },
+
+    crsf = {
+      map = {
+        {module = 1, id = 226},
+        {module = 2, id = 256},
+        {module = 3, id = 128},
+      },
+    },
   },

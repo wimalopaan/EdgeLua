@@ -5,11 +5,9 @@
 -- This work is licensed under the Creative Commons Attribution-NonCommercial-NoDerivatives 4.0 International License.
 -- To view a copy of this license, visit http:
 -- or send a letter to Creative Commons, PO Box 1866, Mountain View, CA 94042, USA.
-
 -- IMPORTANT
 -- Please note that the above license also covers the transfer protocol used and the encoding scheme and
 -- all further principals of tranferring state and other information.
-
 local function loadLib(filename)
                              ;
   local basedir = "/EDGELUA" .. "/LIB/";
@@ -24,13 +22,11 @@ local function loadLib(filename)
 end
 
 local errorCode = 0;
-
 -- __stopWmSw2 = 0;
 -- __WmSw2Config = nil;
 -- __WmSw2ForeignInput = 0;
 -- __WmSw2Warning1 = nil;
 -- __WmSw2Warning2 = nil;
-
 local function loadLibI()
   if not __libI then
     __libI = loadLib("libI.lua");
@@ -39,7 +35,6 @@ local function loadLibI()
     end
   end
 end
-
 local function loadLibM()
   if not __libM then
     __libM = loadLib("libM.lua");
@@ -48,7 +43,6 @@ local function loadLibM()
     end
   end
 end
-
 local function loadLibD()
   if not __libD then
     __libD = loadLib("libD.lua");
@@ -57,7 +51,6 @@ local function loadLibD()
     end
   end
 end
-
 local function loadLibP()
   if not __libP then
     __libP = loadLib("libP.lua");
@@ -67,13 +60,11 @@ local function loadLibP()
   end
   collectgarbage();
 end
-
 local function load()
   loadLibI();
   loadLibD();
   loadLibP();
 end
-
 local function loadLibA()
   if not __libA then
     __libA = loadLib("libA.lua");
@@ -83,7 +74,6 @@ local function loadLibA()
   end
   collectgarbage();
 end
-
 local function loadLibU()
   if not __libU then
     __libU = loadLib("libU.lua");
@@ -93,7 +83,6 @@ local function loadLibU()
   end
   collectgarbage();
 end
-
 local function loadLibR()
   if not __libR then
     __libR = loadLib("libR.lua");
@@ -103,7 +92,6 @@ local function loadLibR()
   end
   collectgarbage();
 end
-
 local function loadLibApp()
   if not __libApp then
     __libApp = loadLib("libApp.lua");
@@ -113,7 +101,6 @@ local function loadLibApp()
   end
   collectgarbage();
 end
-
 local function loadFile(baseDir, baseName)
     local content = nil;
     local filename = nil;
@@ -151,7 +138,6 @@ local function loadFile(baseDir, baseName)
     end
     return content, filename;
 end
-
 local function loadConfig()
     local baseDir = "/EDGELUA" .. "/RADIO/";
     local cfg = loadFile(baseDir);
@@ -161,17 +147,13 @@ local function loadConfig()
     end
     return nil;
 end
-
 local name = "EL_Sli";
 local options = {
   { "Name", STRING}
 };
-
 local config = nil;
 local iconWidget = nil;
-
 local iconTable = {}; -- hash table for icon bitmaps, only hash based access
-
 local function loadIcon(filename)
   if (iconTable[filename]) then
                                       ;
@@ -191,54 +173,39 @@ local function loadIcon(filename)
   end
   return icon, ok;
 end
-
 local function create(zone, options)
   load();
   collectgarbage();
-
   if (errorCode > 0) then
     return {};
   end
-
   local widget = __libI.initWidget(zone, options);
   collectgarbage();
-
   __libI = nil; -- free memory
-
   collectgarbage();
-
   local name = options.Name;
   if (name) then
-
     if not (type(name) == "string") then
                                   ;
       name = __libU.optionString(name);
     end
-
   end
-
   config = loadFile("/EDGELUA" .. "/RADIO/SLIDER/", name);
   if (config) then
     config = config();
-
     if not (config.name) then
       config.name = "unnamed";
     end
-
     if (name) then
       config.widgetName = name;
     end
   end
-
   if (errorCode > 0) then
     return {};
   end
-
   iconWidget = loadIcon("/EDGELUA" .. "/ICONS/48px/" .. "expand.png");
-
   return widget;
 end
-
 local function inside(touch, area)
                                                                                        ;
   if ((touch.x >= area.x) and (touch.x < (area.x + area.w)) and (touch.y >= area.y) and (touch.y <= (area.y + area.h))) then
@@ -246,7 +213,6 @@ local function inside(touch, area)
   end
   return false;
 end
-
 local function displaySliderVertical(slider, widget, event, touch)
   if (slider.data.color) then
     lcd.drawFilledRectangle(slider.x, slider.y, slider.w, slider.h, lcd.RGB(slider.data.color));
@@ -255,13 +221,10 @@ local function displaySliderVertical(slider, widget, event, touch)
   if (slider.data.name) then
     lcd.drawText(slider.x, slider.y - 1.1 * widget[8], slider.data.name, COLOR_THEME_PRIMARY1);
   end
-
   if (slider.data.shm) then
     local value = -1 * getShmVar(slider.data.shm);
     local position = slider.h * (value / 1024 + 1) / 2 + slider.y;
-
     lcd.drawFilledRectangle(slider.x, position - 5, slider.w, 10, COLOR_THEME_PRIMARY1);
-
     if (event == EVT_TOUCH_SLIDE) then
       if (inside(touch, slider)) then
         local d = (touch.y - slider.y) / slider.h;
@@ -281,7 +244,6 @@ local function displaySliderVertical(slider, widget, event, touch)
   end
   return 0;
 end
-
 local function displaySliderHorizontal(slider, widget, event, touch)
   if (slider.data.color) then
     lcd.drawFilledRectangle(slider.x, slider.y, slider.w, slider.h, lcd.RGB(slider.data.color));
@@ -290,13 +252,10 @@ local function displaySliderHorizontal(slider, widget, event, touch)
   if (slider.data.name) then
     lcd.drawText(slider.x, slider.y - 1.1 * widget[8], slider.data.name, COLOR_THEME_PRIMARY1);
   end
-
   if (slider.data.shm) then
     local value = -1 * getShmVar(slider.data.shm);
     local position = slider.w * (value / 1024 + 1) / 2 + slider.x;
-
     lcd.drawFilledRectangle(position - 5, slider.y, 10, slider.h, COLOR_THEME_PRIMARY1);
-
     if (event == EVT_TOUCH_SLIDE) then
       if (inside(touch, slider)) then
         local d = (touch.x - slider.x) / slider.w;
@@ -316,7 +275,6 @@ local function displaySliderHorizontal(slider, widget, event, touch)
   end
   return 0;
 end
-
 local function displayFooter(config, widget, xOffset)
   local name = "---";
   if (config.widgetName) then
@@ -327,10 +285,8 @@ local function displayFooter(config, widget, xOffset)
   end
   lcd.drawText(xOffset, widget[4] - 1.1 * widget[9], name, MIDSIZE + COLOR_THEME_PRIMARY3);
 end
-
 local function displayAllSlider(config, widget, event, touch)
                               ;
-
   if (config.layout) and (config.layout == "V") then
     if (config.slider) and (#config.slider > 0) then
       local width = widget[3] / ( 2 * #config.slider + 1);
@@ -373,16 +329,13 @@ local function displayAllSlider(config, widget, event, touch)
   end
   return 0;
 end
-
 local function update(widget, options)
   widget[11] = options;
 end
-
 local function background(widget)
   if (errorCode == 0) then
   end
 end
-
 local function refresh(widget, event, touch)
   __libD.updateWidgetDimensions(widget, event);
   if (errorCode == 0) and (config) then
@@ -401,7 +354,6 @@ local function refresh(widget, event, touch)
     lcd.drawText(widget[1], widget[2], "Error: " .. errorCode, DBLSIZE);
   end
 end
-
 return {
   name=name,
   options=options,
