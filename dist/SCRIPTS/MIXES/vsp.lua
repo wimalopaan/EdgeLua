@@ -1,6 +1,6 @@
 ---
 -- EdgeLUA - EdgeTx / OpenTx Extensions
--- Copyright (C) 2021 Wilhelm Meier <wilhelm.wm.meier@googlemail.com>
+-- Copyright (C) 2024 Wilhelm Meier <wilhelm.wm.meier@googlemail.com>
 --
 -- This work is licensed under the Creative Commons Attribution-NonCommercial-NoDerivatives 4.0 International License.
 -- To view a copy of this license, visit http:
@@ -44,8 +44,8 @@ local input = {
 -- {"VSP", VALUE, 1, 2, 1}
 };
 local output = {
- "VspS1",
- "VspS2"
+ "S1",
+ "S2"
 };
 local function run(a, b, wa, wb)
    local ab = math.abs(a);
