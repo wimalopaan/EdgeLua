@@ -39,8 +39,8 @@ end
 local input = {
    {"Eing 1", SOURCE},
    {"Eing 2", SOURCE},
-   {"Gew 1->2", VALUE, -100, 100, 0},
-   {"Gew 2->1", VALUE, -100, 100, 0},
+   {"G 1->2", VALUE, -100, 100, 0},
+   {"G 2->1", VALUE, -100, 100, 0},
 -- {"VSP", VALUE, 1, 2, 1}
 };
 local output = {
